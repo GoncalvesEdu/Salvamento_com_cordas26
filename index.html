@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <title>Portal EAD Salvamento com Cordas - 2º GB CBMESP</title>
+  <meta name="description" content="Plataforma de Ensino a Distância de Salvamento com Cordas do 2º Grupamento de Bombeiros.">
+  
+  <!-- Google Fonts - Outfit -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --color-tactical-blue: #237bbd;
+      --color-tactical-blue-dark: #165280;
+      --color-tactical-blue-light: #449ee2;
+
+      --color-gold-patch: #f5c23d;
+      --color-gold-dark: #b88d1d;
+
+      --color-fire-red: #b91c1c;
+      --color-fire-red-hover: #dc2626;
+      
+      --color-dark-950: #070a13;
+      --color-dark-900: #0d1322;
+      --color-dark-800: #141c2e;
+      --color-dark-700: #1f2d45;
+      
+      --color-text-main: #f3f4f6;
+      --color-text-muted: #9ca3af;
+      --color-text-light: #ffffff;
+
+      --font-sans: 'Outfit', 'Inter', system-ui, sans-serif;
+      --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --border-radius-lg: 18px;
+      --border-radius-md: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: #eef1f6 !important;
+      background-image: radial-gradient(#ffffff 2px, transparent 2px), radial-gradient(#e2e8f0 1px, #eef1f6 100%) !important;
+      background-size: 32px 32px, 100% 100% !important;
+      color: var(--color-text-main) !important;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      line-height: 1.5;
+      transition: background 0.4s ease;
+    }
+
+    body.dark-bg-mode {
+      background-color: var(--color-dark-950) !important;
+      background-image: radial-gradient(rgba(35, 123, 189, 0.15) 1px, transparent 1px) !important;
+      background-size: 24px 24px !important;
+    }
+
+    /* Header */
+    header {
+      background-color: rgba(13, 19, 34, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 3px solid var(--color-gold-patch);
+      padding: 0.85rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+    }
+
+    .logo-emblem {
+      width: 58px;
+      height: 58px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 10px rgba(245, 194, 61, 0.6));
+      transition: transform 0.2s ease;
+    }
+
+    .logo-section:hover .logo-emblem { transform: scale(1.05); }
+
+    .logo-section h1 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff, var(--color-tactical-blue-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.2;
+    }
+
+    .logo-section span {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--color-gold-patch);
+      background: rgba(245, 194, 61, 0.15);
+      border: 1px solid rgba(245, 194, 61, 0.4);
+      padding: 2px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-btn {
+      background-color: var(--color-dark-800);
+      color: var(--color-text-main);
+      border: 1px solid var(--color-dark-700);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition-smooth);
+    }
+
+    .nav-btn:hover {
+      border-color: var(--color-gold-patch);
+      color: var(--color-gold-patch);
+    }
+
+    .btn-bg-toggle {
+      background: #ffffff;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      font-weight: 800;
+    }
+
+    /* Sistema de Telas Exclusivas */
+    .screen {
+      display: none !important;
+      opacity: 0;
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .screen.active {
+      display: flex !important;
+      flex-direction: column;
+      opacity: 1;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* TELA 1: LOGIN SIMPLIFICADO PAINEL ESCURO */
+    #screen-login, #screen-reset-password {
+      padding: 3.5rem 1rem;
+      justify-content: center;
+      align-items: center;
+      min-height: calc(100vh - 80px);
+    }
+
+    .login-container {
+      background-color: var(--color-dark-900);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--border-radius-lg);
+      padding: 3rem 2.5rem;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 35px 70px rgba(15, 23, 42, 0.35), 0 10px 25px rgba(0, 0, 0, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-container::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #237bbd 0%, #449ee2 50%, #f5c23d 100%);
+    }
+
+    .login-tabs-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 2rem;
+      background-color: #070b14;
+      padding: 6px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .login-tab-btn {
+      flex: 1;
+      padding: 12px 14px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: var(--transition-smooth);
+    }
+
+    .login-tab-btn.active-aluno {
+      background: linear-gradient(135deg, var(--color-tactical-blue), var(--color-tactical-blue-dark));
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(35, 123, 189, 0.4);
+    }
+
+    .login-tab-btn.active-instrutor {
+      background: linear-gradient(135deg, #d97706, #92400e);
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(217, 119, 6, 0.4);
+    }
+
+    .login-tab-btn.inactive {
+      background: transparent;
+      color: var(--color-text-muted);
+    }
+
+    .login-emblem-large {
+      width: 145px;
+      height: 145px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 25px rgba(245, 194, 61, 0.65));
+      margin: 0 auto 1.25rem auto;
+      display: block;
+    }
+
+    .login-title-text {
+      font-size: 1.75rem;
+      font-weight: 900;
+      color: #ffffff;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+      text-align: center;
+    }
+
+    .login-sub-text {
+      font-size: 0.88rem;
+      color: var(--color-text-muted);
+      margin-bottom: 2rem;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    .form-group {
+      margin-bottom: 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-align: left;
+    }
+
+    .form-group label {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .form-control {
+      background-color: #070b14;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--color-text-light);
+      padding: 0.95rem 1.1rem;
+      border-radius: var(--border-radius-md);
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+    }
+
+    .form-control:focus {
+      border-color: var(--color-tactical-blue);
+      box-shadow: 0 0 0 3px rgba(35, 123, 189, 0.25);
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: linear-gradient(135deg, var(--color-tactical-blue), var(--color-tactical-blue-dark));
+      color: var(--color-text-light);
+      border: 1px solid var(--color-tactical-blue-light);
+      padding: 1.05rem;
+      border-radius: var(--border-radius-md);
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 20px rgba(35, 123, 189, 0.4);
+      margin-top: 1.75rem;
+    }
+
+    .auth-error-box {
+      background: rgba(185, 28, 28, 0.2);
+      border: 1px solid var(--color-fire-red);
+      color: #f87171;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .vault-section {
+      width: 100%;
+      max-width: 440px;
+      margin-top: 2rem;
+      background-color: var(--color-dark-900);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--border-radius-md);
+      padding: 1.25rem;
+    }
+
+    /* TELA DA INSTRUTORIA */
+    #screen-instrutoria { padding: 2.5rem 1rem; }
+
+    .instrutoria-panel-card {
+      background-color: var(--color-dark-900);
+      border: 1px solid var(--color-dark-700);
+      border-radius: var(--border-radius-lg);
+      padding: 2.5rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .db-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(42, 157, 104, 0.15);
+      border: 1px solid #2a9d68;
+      color: #2a9d68;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+
+    .live-monitor-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(35, 123, 189, 0.18);
+      border: 1px solid var(--color-tactical-blue);
+      color: var(--color-tactical-blue-light);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+
+    .stats-grid-turma {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card-turma {
+      background-color: var(--color-dark-950);
+      border: 1px solid var(--color-dark-700);
+      border-radius: var(--border-radius-md);
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .stat-card-turma-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+    }
+
+    .stat-card-pct {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--color-gold-patch);
+    }
+
+    .mini-progress-bg {
+      height: 6px;
+      background: var(--color-dark-800);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .mini-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--color-gold-patch), var(--color-tactical-blue));
+    }
+
+    .alerts-card {
+      background: rgba(185, 28, 28, 0.1);
+      border: 1px solid rgba(185, 28, 28, 0.3);
+      border-radius: var(--border-radius-md);
+      padding: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .db-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .db-table th {
+      background-color: var(--color-dark-950);
+      color: var(--color-gold-patch);
+      text-align: left;
+      padding: 12px;
+      border-bottom: 2px solid var(--color-dark-700);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .db-table td {
+      padding: 12px;
+      border-bottom: 1px solid var(--color-dark-700);
+      color: var(--color-text-main);
+    }
+
+    .filter-btn-group {
+      display: flex;
+      gap: 6px;
+      background-color: var(--color-dark-950);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--color-dark-700);
+    }
+
+    .filter-btn {
+      padding: 6px 14px;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+      color: var(--color-text-muted);
+      background: transparent;
+      transition: var(--transition-smooth);
+    }
+
+    .filter-btn.active {
+      background-color: var(--color-dark-800);
+      color: var(--color-gold-patch);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-action-soft-delete {
+      background: rgba(217, 119, 6, 0.18) !important;
+      border-color: #d97706 !important;
+      color: #f5c23d !important;
+    }
+
+    .btn-action-hard-delete {
+      background: rgba(185, 28, 28, 0.2) !important;
+      border-color: var(--color-fire-red) !important;
+      color: #f87171 !important;
+    }
+
+    .btn-action-hard-delete:hover {
+      background: var(--color-fire-red) !important;
+      color: #ffffff !important;
+    }
+
+    .instrutoria-dropzone {
+      border: 2px dashed rgba(245, 194, 61, 0.4);
+      background-color: var(--color-dark-950);
+      border-radius: var(--border-radius-lg);
+      padding: 3rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      margin: 1.5rem 0;
+    }
+
+    .instrutoria-dropzone:hover {
+      border-color: var(--color-gold-patch);
+      background-color: var(--color-dark-800);
+    }
+
+    .file-item-card {
+      background-color: var(--color-dark-950);
+      border: 1px solid var(--color-dark-700);
+      border-radius: var(--border-radius-md);
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    /* Sala de Aula Aluno */
+    #screen-classroom { padding: 2rem 1rem; }
+
+    .classroom-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 2rem;
+      width: 100%;
+    }
+
+    .course-navigation {
+      background-color: var(--color-dark-900);
+      border: 1px solid var(--color-dark-700);
+      border-radius: var(--border-radius-lg);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .course-progress-panel {
+      background-color: var(--color-dark-950);
+      border: 1px solid var(--color-dark-700);
+      border-radius: var(--border-radius-md);
+      padding: 1rem;
+    }
+
+    .course-progress-bar-bg {
+      height: 8px;
+      background-color: var(--color-dark-800);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+
+    .course-progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--color-gold-patch), var(--color-tactical-blue));
+      transition: width 0.4s ease;
+    }
+
+    .menu-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .menu-item {
+      background-color: var(--color-dark-950);
+      border: 1px solid var(--color-dark-700);
+      border-radius: var(--border-radius-md);
+      padding: 0.85rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      text-align: left;
+      color: var(--color-text-muted);
+    }
+
+    .menu-item:hover, .menu-item.active {
+      background-color: var(--color-dark-800);
+      border-color: var(--color-tactical-blue);
+      color: var(--color-text-light);
+    }
+
+    .menu-item.active i { color: var(--color-gold-patch); }
+
+    .slide-card {
+      background-color: var(--color-dark-900);
+      border: 1px solid var(--color-dark-700);
+      border-radius: var(--border-radius-lg);
+      padding: 2rem;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    }
+
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .slide-module-tag {
+      background-color: rgba(35, 123, 189, 0.2);
+      border: 1px solid var(--color-tactical-blue);
+      color: var(--color-tactical-blue-light);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+
+    .slide-media-container {
+      width: 100%;
+      height: 380px;
+      background-color: var(--color-dark-950);
+      border-radius: var(--border-radius-md);
+      border: 1px solid var(--color-dark-700);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .slide-img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+    .slide-bullets {
+      background-color: var(--color-dark-950);
+      border: 1px solid var(--color-dark-700);
+      border-radius: var(--border-radius-md);
+      padding: 1.5rem;
+      margin: 1.25rem 0 1.75rem 0;
+    }
+
+    .slide-bullets ul { list-style: disc; padding-left: 1.25rem; line-height: 1.8; font-size: 0.95rem; }
+
+    .slide-footer-nav { display: flex; justify-content: space-between; gap: 1rem; }
+
+    .btn-slide-nav {
+      padding: 0.8rem 1.5rem;
+      background-color: var(--color-dark-800);
+      border: 1px solid var(--color-dark-700);
+      color: var(--color-text-main);
+      border-radius: var(--border-radius-md);
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-slide-nav.primary {
+      background: linear-gradient(135deg, var(--color-tactical-blue), var(--color-tactical-blue-dark));
+      border-color: var(--color-tactical-blue-light);
+      color: #fff;
+    }
+
+    .quiz-card {
+      background-color: var(--color-dark-900);
+      border: 2px solid var(--color-gold-patch);
+      border-radius: var(--border-radius-lg);
+      padding: 2rem;
+    }
+
+    .quiz-card.hidden { display: none !important; }
+
+    .quiz-option-btn {
+      padding: 1rem 1.25rem;
+      background-color: var(--color-dark-950);
+      border: 1px solid var(--color-dark-700);
+      border-radius: var(--border-radius-md);
+      color: var(--color-text-main);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      width: 100%;
+      margin-bottom: 8px;
+    }
+
+    .quiz-option-btn:hover, .quiz-option-btn.selected {
+      background-color: var(--color-dark-800);
+      border-color: var(--color-gold-patch);
+      color: #fff;
+    }
+
+    /* Certificado */
+    .certificate-container { max-width: 850px; margin: 2rem auto; text-align: center; width: 100%; }
+
+    .certificate-frame {
+      background: #ffffff !important;
+      color: #0f172a !important;
+      padding: 3rem;
+      border-radius: 12px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+      margin-bottom: 2rem;
+    }
+
+    .cert-border { border: 4px double var(--color-tactical-blue); padding: 2.5rem; }
+
+    /* Modais */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(7, 10, 19, 0.88);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      z-index: 2000;
+    }
+
+    .modal-overlay.hidden { display: none !important; }
+
+    .modal-card {
+      background-color: var(--color-dark-900);
+      border: 2px solid var(--color-gold-patch);
+      border-radius: var(--border-radius-lg);
+      padding: 2rem;
+      max-width: 650px;
+      width: 100%;
+      position: relative;
+    }
+
+    .modal-card.danger-modal {
+      border-color: var(--color-fire-red);
+      box-shadow: 0 0 40px rgba(185, 28, 28, 0.4);
+    }
+
+    .summary-badge-success {
+      background: rgba(42, 157, 104, 0.2);
+      border: 1px solid #2a9d68;
+      color: #2a9d68;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    .summary-badge-danger {
+      background: rgba(185, 28, 28, 0.2);
+      border: 1px solid #f87171;
+      color: #f87171;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 900px) {
+      .classroom-layout { grid-template-columns: 1fr; }
+      .stats-grid-turma { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body class="light-bg-mode">
+
+  <!-- Cabecalho principal -->
+  <header>
+    <div class="logo-section" id="btn-header-logo">
+      <img src="images/logo_salvamento_2gb.png" alt="Brasão Salvamento com Cordas 2º GB" class="logo-emblem">
+      <div>
+        <h1>Portal Salvamento com Cordas</h1>
+        <span>CORPO DE BOMBEIROS MILITAR - 2º GB</span>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <button class="nav-btn btn-bg-toggle" id="btn-toggle-bg-canvas">
+        <i class="fa-solid fa-palette"></i> Fundo Limpo (Estúdio)
+      </button>
+
+      <button class="nav-btn" id="btn-header-instrutoria" style="display: none; background: rgba(35, 123, 189, 0.15); border: 1px solid rgba(35, 123, 189, 0.4); color: var(--color-tactical-blue-light);">
+        <i class="fa-solid fa-user-shield"></i> Área da Instrutoria
+      </button>
+
+      <div class="user-session-info" id="session-info-header" style="display: none; align-items: center; gap: 12px;">
+        <div style="background: var(--color-dark-800); border: 1px solid var(--color-gold-patch); color: var(--color-gold-patch); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">
+          <i class="fa-solid fa-award"></i> <span id="header-user-re">Bombeiro Militar</span>
+        </div>
+        <button class="nav-btn" id="btn-sair-sessao" style="background: rgba(185, 28, 28, 0.2); color: var(--color-fire-red); border-color: var(--color-fire-red);">
+          <i class="fa-solid fa-right-from-bracket"></i> Sair
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Corpo Principal (Telas) -->
+  <main style="flex: 1; width: 100%;">
+
+    <!-- TELA 1: LOGIN PAINEL COM SELEÇÃO DE ÁREA -->
+    <section class="screen active" id="screen-login">
+      <div class="login-container">
+        
+        <div class="login-tabs-group">
+          <button type="button" id="tab-btn-aluno" class="login-tab-btn active-aluno" onclick="switchLoginTab('aluno')">
+            <i class="fa-solid fa-user-check"></i> Área do Aluno
+          </button>
+          <button type="button" id="tab-btn-instrutor" class="login-tab-btn inactive" onclick="switchLoginTab('instrutor')">
+            <i class="fa-solid fa-shield"></i> Instrutoria 2º GB
+          </button>
+        </div>
+
+        <div id="auth-error-message" class="auth-error-box"></div>
+
+        <div id="login-header-aluno">
+          <img src="images/logo_salvamento_2gb.png" alt="Salvamento com Cordas 2º GB" class="login-emblem-large">
+          <h2 class="login-title-text" id="login-title">Acesso do Aluno</h2>
+          <p class="login-sub-text" id="login-subtitle">Credenciamento Individual para Instrução EAD - 2º GB</p>
+        </div>
+
+        <!-- Formulário de Login (RE e Senha) -->
+        <form id="form-login" onsubmit="return false;">
+          <div class="form-group">
+            <label for="login-re" id="login-re-label">RE DO BOMBEIRO MILITAR</label>
+            <input type="text" id="login-re" class="form-control" placeholder="Ex: 123456-7" required>
+          </div>
+          <div class="form-group">
+            <label for="login-senha" id="login-pass-label">SENHA DE ACESSO</label>
+            <input type="password" id="login-senha" class="form-control" placeholder="Senha (No 1º acesso, a senha é o seu RE)" required>
+          </div>
+          <button type="button" id="btn-submit-login" class="btn-primary">
+            Acessar Sala de Aula <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </form>
+      </div>
+
+      <div class="vault-section">
+        <div style="font-size: 0.85rem; font-weight: 800; color: var(--color-text-muted); text-transform: uppercase; margin-bottom: 0.75rem;">
+          <i class="fa-solid fa-shield-halved" style="color: var(--color-gold-patch);"></i> Autenticação Única &amp; RBAC Seguro
+        </div>
+        <p style="font-size: 0.8rem; color: var(--color-text-muted); line-height: 1.4;">
+          O perfil de acesso (Aluno ou Instrutor) é validado automaticamente pelo servidor de forma segura no Banco de Dados.
+        </p>
+      </div>
+    </section>
+
+    <!-- TELA 2: REDEFINIÇÃO OBRIGATÓRIA DE SENHA PROVISÓRIA -->
+    <section class="screen" id="screen-reset-password">
+      <div class="login-container" style="border-color: var(--color-gold-patch);">
+        <img src="images/logo_salvamento_2gb.png" alt="Salvamento com Cordas 2º GB" class="login-emblem-large">
+        <h2 class="login-title-text" style="color: var(--color-gold-patch);">Primeiro Acesso ao Portal</h2>
+        <p class="login-sub-text">Por motivos de segurança, crie sua nova senha pessoal para substituir a senha provisória de cadastro.</p>
+
+        <div id="reset-error-message" class="auth-error-box"></div>
+
+        <form id="form-reset-password" onsubmit="return false;">
+          <div class="form-group">
+            <label for="reset-nova-senha">NOVA SENHA PESSOAL</label>
+            <input type="password" id="reset-nova-senha" class="form-control" placeholder="Crie uma nova senha (mínimo 4 caracteres)" required>
+          </div>
+          <div class="form-group">
+            <label for="reset-confirmacao">CONFIRMAR NOVA SENHA</label>
+            <input type="password" id="reset-confirmacao" class="form-control" placeholder="Digite novamente a nova senha" required>
+          </div>
+          <button type="button" id="btn-submit-reset-password" onclick="handleAlterarSenhaProvisoria(event)" class="btn-primary" style="background: linear-gradient(135deg, var(--color-gold-dark), var(--color-gold-patch)); color: #000;">
+            Salvar Nova Senha &amp; Liberar Acesso <i class="fa-solid fa-key"></i>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- TELA 3: SALA DE AULA DO ALUNO -->
+    <section class="screen" id="screen-classroom">
+      <div class="classroom-layout">
+        
+        <!-- Painel Lateral de Navegação dos Módulos -->
+        <aside class="course-navigation">
+          <div>
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: #fff; margin-bottom: 4px;">Módulos de Instrução</h3>
+            <p style="font-size: 0.8rem; color: var(--color-text-muted);">Salvamento Vertical &bull; 2º GB</p>
+          </div>
+
+          <div class="course-progress-panel">
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 800; color: var(--color-gold-patch);">
+              <span>PROGRESSO DO CURSO</span>
+              <span id="course-progress-text">0 de 4 Módulos Concluídos</span>
+            </div>
+            <div class="course-progress-bar-bg">
+              <div class="course-progress-bar-fill" id="course-progress-bar-fill"></div>
+            </div>
+          </div>
+
+          <div class="menu-list">
+            <button class="menu-item active" id="btn-mod-1" data-mod="1">
+              <i class="fa-solid fa-shield-halved"></i>
+              <div>
+                <strong style="display: block; font-size: 0.88rem;">Módulo 1</strong>
+                <span style="font-size: 0.75rem;">Doutrina &amp; Fisiologia</span>
+              </div>
+            </button>
+
+            <button class="menu-item" id="btn-mod-2" data-mod="2">
+              <i class="fa-solid fa-dharmachakra"></i>
+              <div>
+                <strong style="display: block; font-size: 0.88rem;">Módulo 2</strong>
+                <span style="font-size: 0.75rem;">Nós &amp; Amarrações</span>
+              </div>
+            </button>
+
+            <button class="menu-item" id="btn-mod-3" data-mod="3">
+              <i class="fa-solid fa-network-wired"></i>
+              <div>
+                <strong style="display: block; font-size: 0.88rem;">Módulo 3</strong>
+                <span style="font-size: 0.75rem;">Ancoragens &amp; Vantagem</span>
+              </div>
+            </button>
+
+            <button class="menu-item" id="btn-mod-4" data-mod="4">
+              <i class="fa-solid fa-person-falling-burst"></i>
+              <div>
+                <strong style="display: block; font-size: 0.88rem;">Módulo 4</strong>
+                <span style="font-size: 0.75rem;">Manobras de Resgate</span>
+              </div>
+            </button>
+          </div>
+
+          <!-- Botão da Calculadora Tática Interativa -->
+          <button class="nav-btn" onclick="toggleCalcModal()" style="margin-top: 1rem; justify-content: center; background: rgba(245, 194, 61, 0.12); border-color: var(--color-gold-patch); color: var(--color-gold-patch);">
+            <i class="fa-solid fa-calculator"></i> Calculadora Tática (FQ / Y)
+          </button>
+        </aside>
+
+        <!-- Área Principal de Conteúdo do Slide -->
+        <div class="slide-card-container">
+          
+          <!-- Card do Slide de Aula -->
+          <div class="slide-card" id="slide-card-element">
+            <div class="slide-header">
+              <span class="slide-module-tag" id="slide-module-tag">MÓDULO 1 - SLIDE 1 DE 3</span>
+              <span style="font-size: 0.85rem; font-weight: 700; color: var(--color-text-muted);" id="slide-counter">Slide 1 de 3</span>
+            </div>
+
+            <h2 id="slide-title" style="font-size: 1.6rem; font-weight: 900; color: #fff; margin-bottom: 6px;">
+              Doutrina de Segurança &amp; Fator de Queda (FQ)
+            </h2>
+            <p id="slide-subtitle" style="font-size: 0.95rem; color: var(--color-text-muted); margin-bottom: 1.5rem;">
+              Conceitos fundamentais de retenção e absorção de choque.
+            </p>
+
+            <div class="slide-media-container">
+              <img id="slide-img" src="images/logo_salvamento_2gb.png" alt="Ilustração do Módulo" class="slide-img">
+            </div>
+
+            <div class="slide-bullets" id="slide-bullets">
+              <!-- Conteúdo Dinâmico dos Bullets -->
+            </div>
+
+            <div class="slide-footer-nav">
+              <button class="btn-slide-nav" id="btn-slide-prev">
+                <i class="fa-solid fa-chevron-left"></i> Slide Anterior
+              </button>
+              <button class="btn-slide-nav primary" id="btn-slide-next">
+                Próximo Slide <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card da Avaliação / Quiz Anti-Cheat -->
+          <div class="quiz-card hidden" id="quiz-card-element">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+              <span class="summary-badge-success"><i class="fa-solid fa-graduation-cap"></i> Avaliação do Módulo (Anti-Cheat)</span>
+              <span style="font-size: 0.8rem; font-weight: 800; color: var(--color-gold-patch);">Questões &amp; Opções Embaralhadas Deterministicamente</span>
+            </div>
+
+            <h3 id="quiz-question-text" style="font-size: 1.35rem; font-weight: 800; color: #fff; margin-bottom: 1.5rem; line-height: 1.4;">
+              Pergunta do Quiz...
+            </h3>
+
+            <div id="quiz-options-list" style="margin-bottom: 1.75rem;">
+              <!-- Alternativas Dinâmicas via option_id -->
+            </div>
+
+            <button type="button" class="btn-primary" id="btn-submit-quiz">
+              Submeter Resposta da Avaliação <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TELA 4: EMISSÃO DO CERTIFICADO -->
+    <section class="screen" id="screen-certificate">
+      <div class="certificate-container">
+        <div class="certificate-frame" id="printable-certificate">
+          <div class="cert-border">
+            <img src="images/logo_salvamento_2gb.png" alt="Brasão 2º GB" style="width: 100px; height: 100px; object-fit: contain; margin-bottom: 1rem;">
+            
+            <h1 style="font-size: 2.2rem; font-weight: 900; color: var(--color-tactical-blue); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 1px;">
+              Certificado de Conclusão
+            </h1>
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: #475569; margin-bottom: 2rem;">
+              CORPO DE BOMBEIROS MILITAR - 2º GRUPAMENTO DE BOMBEIROS
+            </h3>
+
+            <p style="font-size: 1rem; color: #334155; line-height: 1.8; margin-bottom: 2rem;">
+              Certificamos que o Militar <strong id="cert-user-name" style="font-size: 1.2rem; color: #0f172a;">SD PM EDUARDO SOUZA</strong>,<br>
+              pertencente ao RE <strong id="cert-user-re">123456-7</strong>, Unidade/Estação <strong id="cert-user-estacao">2º GB</strong>,<br>
+              concluiu com êxito o <strong>Curso de Instrução EAD de Salvamento com Cordas</strong>,<br>
+              cumprindo 100% da carga horária teórica e avaliações dos 4 módulos operacionais.
+            </p>
+
+            <div style="display: flex; justify-content: space-around; align-items: flex-end; margin-top: 3rem; border-top: 1px solid #cbd5e1; padding-top: 1.5rem;">
+              <div>
+                <p style="font-size: 0.85rem; font-weight: 700; color: #64748b;">DATA DE EMISSÃO</p>
+                <strong id="cert-date" style="font-size: 1rem; color: #0f172a;">26/07/2026</strong>
+              </div>
+
+              <div>
+                <p style="font-size: 0.85rem; font-weight: 700; color: #64748b;">CÓDIGO DE AUTENTICIDADE BD</p>
+                <code id="cert-hash" style="font-size: 1.1rem; font-weight: 900; color: var(--color-tactical-blue);">CB-2GB-984215</code>
+              </div>
+
+              <div>
+                <p style="font-size: 0.85rem; font-weight: 700; color: #64748b;">COMANDO DA INSTRUTORIA</p>
+                <strong style="font-size: 0.95rem; color: #0f172a;">2º GB / CBMESP</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="nav-btn" onclick="window.print()" style="margin: 0 auto; background: var(--color-tactical-blue); color: #fff; font-size: 1rem; padding: 12px 24px;">
+          <i class="fa-solid fa-print"></i> Imprimir / Salvar Certificado em PDF
+        </button>
+      </div>
+    </section>
+
+    <!-- TELA 5: ÁREA DA INSTRUTORIA (PAINEL ADMINISTRATIVO) -->
+    <section class="screen" id="screen-instrutoria">
+      <div class="instrutoria-panel-card">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid var(--color-dark-700); padding-bottom: 1.5rem;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
+              <h2 style="font-size: 1.8rem; font-weight: 900; color: #fff;">Painel do Instrutor</h2>
+              <span class="db-status-badge"><i class="fa-solid fa-database"></i> SQLite Conectado (WAL Mode)</span>
+              <span class="live-monitor-badge"><i class="fa-solid fa-chart-line"></i> Monitor de Turma 2º GB</span>
+            </div>
+            <p style="color: var(--color-text-muted); font-size: 0.9rem;">Gestão de Alunos, Históricos de Notas, Resets de Senha e Cadastro em Lote</p>
+          </div>
+
+          <div style="display: flex; gap: 10px;">
+            <label class="nav-btn" style="background: rgba(42, 157, 104, 0.2); border-color: #2a9d68; color: #2a9d68; cursor: pointer;">
+              <i class="fa-solid fa-file-csv"></i> Importar Alunos em Lote (CSV)
+              <input type="file" id="csv-file-input" accept=".csv" onchange="handleImportarCSVAlunos(event)" style="display: none;">
+            </label>
+
+            <button class="nav-btn" onclick="toggleCadastrarAlunoModal()" style="background: rgba(35, 123, 189, 0.2); border-color: var(--color-tactical-blue); color: var(--color-tactical-blue-light);">
+              <i class="fa-solid fa-user-plus"></i> Novo Aluno Manual
+            </button>
+          </div>
+        </div>
+
+        <!-- Estatísticas da Turma por Módulo -->
+        <div class="stats-grid-turma">
+          <div class="stat-card-turma">
+            <div class="stat-card-turma-header">
+              <span>Módulo 1: Doutrina</span>
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div class="stat-card-pct" id="pct-mod-1">0%</div>
+            <div class="mini-progress-bg"><div class="mini-progress-fill" id="fill-mod-1" style="width: 0%;"></div></div>
+            <span style="font-size: 0.75rem; color: var(--color-text-muted);" id="sub-mod-1">0 de 0 Alunos Ativos</span>
+          </div>
+
+          <div class="stat-card-turma">
+            <div class="stat-card-turma-header">
+              <span>Módulo 2: Nós</span>
+              <i class="fa-solid fa-dharmachakra"></i>
+            </div>
+            <div class="stat-card-pct" id="pct-mod-2">0%</div>
+            <div class="mini-progress-bg"><div class="mini-progress-fill" id="fill-mod-2" style="width: 0%;"></div></div>
+            <span style="font-size: 0.75rem; color: var(--color-text-muted);" id="sub-mod-2">0 de 0 Alunos Ativos</span>
+          </div>
+
+          <div class="stat-card-turma">
+            <div class="stat-card-turma-header">
+              <span>Módulo 3: Ancoragens</span>
+              <i class="fa-solid fa-network-wired"></i>
+            </div>
+            <div class="stat-card-pct" id="pct-mod-3">0%</div>
+            <div class="mini-progress-bg"><div class="mini-progress-fill" id="fill-mod-3" style="width: 0%;"></div></div>
+            <span style="font-size: 0.75rem; color: var(--color-text-muted);" id="sub-mod-3">0 de 0 Alunos Ativos</span>
+          </div>
+
+          <div class="stat-card-turma">
+            <div class="stat-card-turma-header">
+              <span>Módulo 4: Resgate</span>
+              <i class="fa-solid fa-person-falling-burst"></i>
+            </div>
+            <div class="stat-card-pct" id="pct-mod-4">0%</div>
+            <div class="mini-progress-bg"><div class="mini-progress-fill" id="fill-mod-4" style="width: 0%;"></div></div>
+            <span style="font-size: 0.75rem; color: var(--color-text-muted);" id="sub-mod-4">0 de 0 Alunos Ativos</span>
+          </div>
+        </div>
+
+        <!-- Alertas de Pendências -->
+        <div class="alerts-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <strong style="color: #f5c23d; font-size: 0.95rem;">
+              <i class="fa-solid fa-triangle-exclamation"></i> Painel de Alertas e Pendências da Turma
+            </strong>
+            <span id="alert-count-badge" style="background: rgba(245, 194, 61, 0.2); border: 1px solid #f5c23d; color: #f5c23d; padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 800;">
+              0 Alertas
+            </span>
+          </div>
+          <div id="alerts-list-box" style="font-size: 0.85rem; color: var(--color-text-main);">
+            <!-- Alertas Dinâmicos -->
+          </div>
+        </div>
+
+        <!-- Tabela de Alunos Cadastrados no Banco -->
+        <div style="margin-top: 2rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 style="font-size: 1.2rem; font-weight: 800; color: #fff;">
+              <i class="fa-solid fa-users"></i> Listagem de Alunos no Banco de Dados
+            </h3>
+
+            <!-- Filtros de Status -->
+            <div class="filter-btn-group">
+              <button class="filter-btn active" id="filter-btn-ativo" onclick="setStudentFilter('ativo')">
+                <i class="fa-solid fa-user-check"></i> Alunos Ativos
+              </button>
+              <button class="filter-btn" id="filter-btn-desligado" onclick="setStudentFilter('desligado')">
+                <i class="fa-solid fa-user-slash"></i> Desligados (Soft Delete)
+              </button>
+              <button class="filter-btn" id="filter-btn-todos" onclick="setStudentFilter('todos')">
+                <i class="fa-solid fa-list"></i> Todos os Cadastros
+              </button>
+            </div>
+          </div>
+
+          <div style="overflow-x: auto;">
+            <table class="db-table">
+              <thead>
+                <tr>
+                  <th>NOME COMPLETO DO MILITAR</th>
+                  <th>RE</th>
+                  <th>ESTAÇÃO / OPM</th>
+                  <th>STATUS DE ACESSO</th>
+                  <th>MÓDULOS CONCLUÍDOS</th>
+                  <th>MÉDIA DE NOTAS</th>
+                  <th>AÇÕES ADMINISTRATIVAS</th>
+                </tr>
+              </thead>
+              <tbody id="db-students-table-body">
+                <!-- Linhas Dinâmicas de Alunos -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Repositório de Arquivos da Instrutoria -->
+        <div style="margin-top: 3.5rem; border-top: 1px solid var(--color-dark-700); padding-top: 2rem;">
+          <h3 style="font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom: 1rem;">
+            <i class="fa-solid fa-folder-open"></i> Repositório de Arquivos &amp; Manuais em Disco (/uploads/)
+          </h3>
+
+          <label class="instrutoria-dropzone" style="display: block;">
+            <i class="fa-solid fa-cloud-arrow-up" style="font-size: 2.5rem; color: var(--color-gold-patch); margin-bottom: 10px; display: block;">
+            </i>
+            <strong style="color: #fff; font-size: 1.1rem; display: block;">Clique para Upload de Novo PDF/Apostila no Servidor</strong>
+            <span style="color: var(--color-text-muted); font-size: 0.85rem;">Os arquivos físicos são salvos no diretório persistente e disponibilizados para download.</span>
+            <input type="file" id="instructor-file-upload-input" accept=".pdf,.pptx,.docx,.zip" onchange="handleFileUpload(event)" style="display: none;">
+          </label>
+
+          <div id="instrutoria-files-list">
+            <!-- Lista Dinâmica de Arquivos Físicos -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: RESUMO DA IMPORTAÇÃO EM LOTE CSV -->
+  <div class="modal-overlay hidden" id="resumoImportacaoModal" onclick="closeResumoModal(event)">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.3rem; font-weight: 900; color: #fff;">
+          <i class="fa-solid fa-file-csv" style="color: var(--color-gold-patch);"></i> Resumo da Importação de Alunos em Lote
+        </h3>
+        <button type="button" onclick="closeResumoModal()" class="nav-btn" style="padding: 4px 10px; font-size: 0.8rem;">
+          <i class="fa-solid fa-xmark"></i> Fechar
+        </button>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-bottom: 1.5rem;">
+        <span class="summary-badge-success" id="summary-success-badge">
+          ✅ <span id="summary-success-count">0</span> Importados com Sucesso
+        </span>
+        <span class="summary-badge-danger" id="summary-error-badge">
+          ❌ <span id="summary-error-count">0</span> Linhas com Erro / Duplicadas
+        </span>
+      </div>
+
+      <div id="summary-errors-section" style="display: none; margin-bottom: 1.5rem;">
+        <strong style="color: #f87171; font-size: 0.85rem; text-transform: uppercase; display: block; margin-bottom: 6px;">
+          Linhas Ignoradas / Erros de Validação:
+        </strong>
+        <div id="summary-errors-list" style="background: rgba(185, 28, 28, 0.15); border: 1px solid rgba(185, 28, 28, 0.4); border-radius: 8px; padding: 10px; font-size: 0.82rem; color: #f87171; max-height: 140px; overflow-y: auto;">
+        </div>
+      </div>
+
+      <strong style="color: var(--color-gold-patch); font-size: 0.85rem; text-transform: uppercase; display: block; margin-bottom: 6px;">
+        Alunos Inseridos no Banco de Dados:
+      </strong>
+      <div id="summary-success-list" style="background: var(--color-dark-950); border: 1px solid var(--color-dark-700); border-radius: 8px; padding: 12px; font-size: 0.85rem; color: #fff; max-height: 160px; overflow-y: auto; margin-bottom: 1.5rem;">
+      </div>
+
+      <strong style="color: var(--color-text-muted); font-size: 0.8rem; text-transform: uppercase; display: block; margin-bottom: 6px;">
+        Log de Depuração Temporário (Smart CSV Parser):
+      </strong>
+      <div id="summary-debug-logs" style="background: #070b14; border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; font-family: monospace; font-size: 0.75rem; color: #94a3b8; max-height: 120px; overflow-y: auto;">
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CONFIRMAÇÃO DE EXCLUSÃO DEFINITIVA (HARD DELETE) -->
+  <div class="modal-overlay hidden" id="excluirAlunoModal" onclick="closeExcluirModal(event)">
+    <div class="modal-card danger-modal">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3 style="font-size: 1.3rem; font-weight: 900; color: #f87171;">
+          <i class="fa-solid fa-triangle-exclamation"></i> Exclusão Permanente de Cadastro (Hard Delete)
+        </h3>
+        <button type="button" onclick="closeExcluirModal()" class="nav-btn" style="padding: 4px 10px; font-size: 0.8rem;">
+          <i class="fa-solid fa-xmark"></i> Cancelar
+        </button>
+      </div>
+
+      <p style="font-size: 0.9rem; color: #cbd5e1; line-height: 1.5; margin-bottom: 1.25rem;">
+        ⚠️ Esta ação é <strong style="color: #f87171;">IRREVERSÍVEL</strong>. O cadastro do militar, todo o seu histórico de progresso, notas e certificados serão <strong>APAGADOS PERMANENTEMENTE</strong> do Banco de Dados.
+      </p>
+
+      <div style="background: rgba(185, 28, 28, 0.15); border: 1px solid #f87171; border-radius: 8px; padding: 12px; margin-bottom: 1.25rem;">
+        <span style="font-size: 0.8rem; color: #f87171; font-weight: 800; display: block; text-transform: uppercase;">Para confirmar, digite exatamente o nome do militar:</span>
+        <strong id="target-aluno-nome-display" style="font-size: 1.05rem; color: #ffffff; display: block; margin-top: 4px;">NOME DO ALUNO</strong>
+      </div>
+
+      <form id="form-confirmar-hard-delete" onsubmit="handleConfirmarExclusaoDefinitiva(event)">
+        <input type="hidden" id="excluir-target-re">
+        <input type="hidden" id="excluir-target-nome-real">
+
+        <div class="form-group">
+          <input type="text" id="input-confirmar-nome-aluno" class="form-control" onkeyup="validateHardDeleteInput()" placeholder="Digite o nome completo exatamente como mostrado acima" required style="border-color: rgba(248, 113, 113, 0.5);">
+        </div>
+
+        <button type="submit" id="btn-confirmar-hard-delete" class="btn-primary" style="background: linear-gradient(135deg, #b91c1c, #7f1d1d); border-color: #f87171;" disabled>
+          <i class="fa-solid fa-trash-can"></i> Confirmar Exclusão Definitiva no BD
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CADASTRAR ALUNO MANUAL -->
+  <div class="modal-overlay hidden" id="cadastrarAlunoModal" onclick="toggleCadastrarAlunoModal(event)">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.3rem; font-weight: 900; color: #fff;">
+          <i class="fa-solid fa-user-plus" style="color: var(--color-tactical-blue-light);"></i> Pré-Cadastro Manual de Aluno
+        </h3>
+        <button type="button" onclick="toggleCadastrarAlunoModal()" class="nav-btn" style="padding: 4px 10px; font-size: 0.8rem;">
+          <i class="fa-solid fa-xmark"></i> Fechar
+        </button>
+      </div>
+
+      <form id="form-cadastrar-aluno-manual" onsubmit="handleCadastrarAlunoInstrutoria(event)">
+        <div class="form-group">
+          <label for="cad-re">RE DO MILITAR</label>
+          <input type="text" id="cad-re" class="form-control" placeholder="Ex: 123456-7" required>
+        </div>
+        <div class="form-group">
+          <label for="cad-nome">NOME COMPLETO COM POSTO/GRADUAÇÃO</label>
+          <input type="text" id="cad-nome" class="form-control" placeholder="Ex: SD PM Eduardo Souza" required>
+        </div>
+        <div class="form-group">
+          <label for="cad-estacao">ESTAÇÃO DE BOMBEIROS / OPM</label>
+          <input type="text" id="cad-estacao" class="form-control" placeholder="Ex: 2º GB / 1ª Cia" required>
+        </div>
+        <button type="submit" class="btn-primary">
+          Gravar Aluno no Banco de Dados <i class="fa-solid fa-floppy-disk"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CALCULADORA TÁTICA INTERATIVA -->
+  <div class="modal-overlay hidden" id="calcModal" onclick="toggleCalcModal(event)">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.3rem; font-weight: 900; color: var(--color-gold-patch);">
+          <i class="fa-solid fa-calculator"></i> Calculadora Tática (Fator de Queda &amp; Ancoragem Y)
+        </h3>
+        <button type="button" onclick="toggleCalcModal()" class="nav-btn" style="padding: 4px 10px; font-size: 0.8rem;">
+          <i class="fa-solid fa-xmark"></i> Fechar
+        </button>
+      </div>
+
+      <!-- Fator de Queda -->
+      <div style="background: var(--color-dark-950); border: 1px solid var(--color-dark-700); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem;">
+        <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 8px;">1. Fator de Queda (FQ = H / L)</strong>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div>
+            <label style="font-size: 0.75rem; color: var(--color-text-muted);">Altura da Queda (m):</label>
+            <input type="number" id="fq-dist" class="form-control" value="2" step="0.1" oninput="calcFQ()">
+          </div>
+          <div>
+            <label style="font-size: 0.75rem; color: var(--color-text-muted);">Corda Ativa (m):</label>
+            <input type="number" id="fq-corda" class="form-control" value="3" step="0.1" oninput="calcFQ()">
+          </div>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 0.85rem; color: var(--color-text-muted);">Resultado FQ: <strong id="val-fq" style="color: #fff; font-size: 1.1rem;">0.67</strong></span>
+          <span id="st-fq" style="font-size: 0.8rem; font-weight: 800; color: #2a9d68;">Seguro (FQ &lt; 1.0)</span>
+        </div>
+      </div>
+
+      <!-- Ancoragem Y -->
+      <div style="background: var(--color-dark-950); border: 1px solid var(--color-dark-700); border-radius: 12px; padding: 1.25rem;">
+        <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 8px;">2. Carga nos Pontos da Ancoragem Y</strong>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div>
+            <label style="font-size: 0.75rem; color: var(--color-text-muted);">Carga Total (kgf):</label>
+            <input type="number" id="y-peso" class="form-control" value="200" oninput="calcY()">
+          </div>
+          <div>
+            <label style="font-size: 0.75rem; color: var(--color-text-muted);">Ângulo Interno (°): <span id="y-ang-val" style="color: var(--color-gold-patch);">60°</span></label>
+            <input type="range" id="y-ang" min="0" max="150" value="60" oninput="calcY()" style="width: 100%; margin-top: 8px;">
+          </div>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 0.85rem; color: var(--color-text-muted);">Carga por Ponto: <strong id="val-y" style="color: #fff; font-size: 1.1rem;">115 kgf</strong></span>
+          <span id="st-y" style="font-size: 0.8rem; font-weight: 800; color: #2a9d68;">Ângulo Recomendado (&le; 60°)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=20260726_v99"></script>
+</body>
+</html>

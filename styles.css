@@ -1,0 +1,464 @@
+/* ==========================================================================
+   PORTAL SALVAMENTO COM CORDAS 2º GB - DESIGN SYSTEM (VANILLA CSS)
+   ========================================================================== */
+
+:root {
+  --color-tactical-blue: #237bbd; /* Azul Royal do Brasão */
+  --color-tactical-blue-dark: #165280;
+  --color-tactical-blue-light: #449ee2;
+
+  --color-gold-patch: #f5c23d; /* Amarelo Dourado de Bordado */
+  --color-gold-dark: #b88d1d;
+
+  --color-fire-red: #b91c1c; /* Vermelho Bombeiro CBMESP */
+  
+  --color-dark-950: #070a13; /* Preto Tecido Tático */
+  --color-dark-900: #0b0f19;
+  --color-dark-800: #121826; /* Painéis e Cards */
+  --color-dark-700: #1f293d;
+  
+  --color-text-main: #f3f4f6;
+  --color-text-muted: #9ca3af;
+  --color-text-light: #ffffff;
+
+  --font-sans: 'Outfit', 'Inter', system-ui, sans-serif;
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --border-radius-lg: 14px;
+  --border-radius-md: 8px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-dark-950);
+  color: var(--color-text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  line-height: 1.5;
+  background-image: radial-gradient(rgba(35, 123, 189, 0.1) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Header */
+header {
+  background-color: rgba(7, 10, 19, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 3px solid var(--color-gold-patch);
+  padding: 0.85rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.logo-emblem {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--color-gold-patch);
+  box-shadow: 0 0 10px rgba(245, 194, 61, 0.5);
+}
+
+.logo-section h1 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffffff, var(--color-tactical-blue-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logo-section span {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--color-gold-patch);
+  background: rgba(245, 194, 61, 0.15);
+  border: 1px solid rgba(245, 194, 61, 0.4);
+  padding: 2px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+.nav-btn {
+  background-color: var(--color-dark-800);
+  color: var(--color-text-main);
+  border: 1px solid var(--color-dark-700);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition-smooth);
+}
+
+.nav-btn:hover {
+  border-color: var(--color-gold-patch);
+  color: var(--color-gold-patch);
+}
+
+/* Telas */
+.screen {
+  display: none !important;
+  opacity: 0;
+  width: 100%;
+  max-width: 1250px;
+  margin: 0 auto;
+}
+
+.screen.active {
+  display: flex !important;
+  flex-direction: column;
+  opacity: 1;
+}
+
+/* Tela 1: Login */
+#screen-login {
+  padding: 3rem 1rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-container {
+  background-color: var(--color-dark-900);
+  border: 1px solid var(--color-dark-700);
+  border-radius: var(--border-radius-lg);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  position: relative;
+}
+
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--color-tactical-blue), var(--color-gold-patch));
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+}
+
+.login-emblem-large {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--color-gold-patch);
+  box-shadow: 0 0 20px rgba(245, 194, 61, 0.4);
+  margin: 0 auto 1rem auto;
+  display: block;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.form-control {
+  background-color: var(--color-dark-950);
+  border: 1px solid var(--color-dark-700);
+  color: var(--color-text-light);
+  padding: 0.85rem 1rem;
+  border-radius: var(--border-radius-md);
+  font-size: 0.95rem;
+  font-family: inherit;
+  outline: none;
+}
+
+.form-control:focus {
+  border-color: var(--color-tactical-blue);
+  box-shadow: 0 0 0 3px rgba(35, 123, 189, 0.25);
+}
+
+.btn-primary {
+  width: 100%;
+  background: linear-gradient(135deg, var(--color-tactical-blue), var(--color-tactical-blue-dark));
+  color: var(--color-text-light);
+  border: 1px solid var(--color-tactical-blue-light);
+  padding: 1rem;
+  border-radius: var(--border-radius-md);
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(35, 123, 189, 0.4);
+  margin-top: 1.5rem;
+}
+
+.vault-section {
+  width: 100%;
+  max-width: 460px;
+  margin-top: 2rem;
+  background-color: var(--color-dark-900);
+  border: 1px solid var(--color-dark-700);
+  border-radius: var(--border-radius-md);
+  padding: 1.25rem;
+}
+
+/* Sala de Aula */
+#screen-classroom {
+  padding: 2rem 1rem;
+}
+
+.classroom-layout {
+  display: grid;
+  grid-template-columns: 310px 1fr;
+  gap: 2rem;
+  width: 100%;
+}
+
+.course-navigation {
+  background-color: var(--color-dark-900);
+  border: 1px solid var(--color-dark-700);
+  border-radius: var(--border-radius-lg);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.course-progress-panel {
+  background-color: var(--color-dark-950);
+  border: 1px solid var(--color-dark-700);
+  border-radius: var(--border-radius-md);
+  padding: 1rem;
+}
+
+.course-progress-bar-bg {
+  height: 8px;
+  background-color: var(--color-dark-800);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.course-progress-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--color-gold-patch), var(--color-tactical-blue));
+  transition: width 0.4s ease;
+}
+
+.menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.menu-item {
+  background-color: var(--color-dark-950);
+  border: 1px solid var(--color-dark-700);
+  border-radius: var(--border-radius-md);
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--color-text-muted);
+}
+
+.menu-item:hover, .menu-item.active {
+  background-color: var(--color-dark-800);
+  border-color: var(--color-tactical-blue);
+  color: var(--color-text-light);
+}
+
+.slide-card {
+  background-color: var(--color-dark-900);
+  border: 1px solid var(--color-dark-700);
+  border-radius: var(--border-radius-lg);
+  padding: 2rem;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+}
+
+.slide-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.slide-module-tag {
+  background-color: rgba(35, 123, 189, 0.2);
+  border: 1px solid var(--color-tactical-blue);
+  color: var(--color-tactical-blue-light);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.slide-media-container {
+  width: 100%;
+  height: 360px;
+  background-color: var(--color-dark-950);
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--color-dark-700);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.slide-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.slide-bullets {
+  background-color: var(--color-dark-950);
+  border: 1px solid var(--color-dark-700);
+  border-radius: var(--border-radius-md);
+  padding: 1.5rem;
+  margin: 1.25rem 0 1.75rem 0;
+}
+
+.slide-bullets ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+  line-height: 1.8;
+  font-size: 0.95rem;
+}
+
+.slide-footer-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.btn-slide-nav {
+  padding: 0.8rem 1.5rem;
+  background-color: var(--color-dark-800);
+  border: 1px solid var(--color-dark-700);
+  color: var(--color-text-main);
+  border-radius: var(--border-radius-md);
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-slide-nav.primary {
+  background: linear-gradient(135deg, var(--color-tactical-blue), var(--color-tactical-blue-dark));
+  border-color: var(--color-tactical-blue-light);
+  color: #fff;
+}
+
+.quiz-card {
+  background-color: var(--color-dark-900);
+  border: 2px solid var(--color-gold-patch);
+  border-radius: var(--border-radius-lg);
+  padding: 2rem;
+}
+
+.quiz-card.hidden {
+  display: none !important;
+}
+
+.quiz-option-btn {
+  padding: 1rem 1.25rem;
+  background-color: var(--color-dark-950);
+  border: 1px solid var(--color-dark-700);
+  border-radius: var(--border-radius-md);
+  color: var(--color-text-main);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.quiz-option-btn:hover, .quiz-option-btn.selected {
+  background-color: var(--color-dark-800);
+  border-color: var(--color-gold-patch);
+  color: #fff;
+}
+
+/* Certificado */
+.certificate-container {
+  max-width: 850px;
+  margin: 2rem auto;
+  text-align: center;
+  width: 100%;
+}
+
+.certificate-frame {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  padding: 3rem;
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+  margin-bottom: 2rem;
+}
+
+.cert-border {
+  border: 4px double var(--color-tactical-blue);
+  padding: 2.5rem;
+}
+
+/* Modal Calculadora */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(7, 10, 19, 0.85);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 2000;
+}
+
+.modal-overlay.hidden {
+  display: none !important;
+}
+
+.modal-card {
+  background-color: var(--color-dark-900);
+  border: 2px solid var(--color-gold-patch);
+  border-radius: var(--border-radius-lg);
+  padding: 2rem;
+  max-width: 650px;
+  width: 100%;
+  position: relative;
+}
+
+@media (max-width: 900px) {
+  .classroom-layout { grid-template-columns: 1fr; }
+}

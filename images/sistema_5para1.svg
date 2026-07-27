@@ -1,0 +1,70 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 340' width='100%' height='100%'>
+        <defs>
+            <radialGradient id='slateBg' cx='50%' cy='50%' r='75%'>
+                <stop offset='0%' stop-color='#0f172a'/>
+                <stop offset='60%' stop-color='#090d16'/>
+                <stop offset='100%' stop-color='#030509'/>
+            </radialGradient>
+            <pattern id='slateGrain' width='4' height='4' patternUnits='userSpaceOnUse'>
+                <rect width='4' height='4' fill='#090d16'/>
+                <circle cx='2' cy='2' r='0.8' fill='#1e293b' opacity='0.3'/>
+            </pattern>
+            <filter id='neonLimeGlow' x='-30%' y='-30%' width='160%' height='160%'>
+                <feGaussianBlur stdDeviation='6' result='blur1'/>
+                <feGaussianBlur stdDeviation='2' result='blur2'/>
+                <feMerge>
+                    <feMergeNode in='blur1'/>
+                    <feMergeNode in='blur2'/>
+                    <feMergeNode in='SourceGraphic'/>
+                </feMerge>
+            </filter>
+            <filter id='neonRedGlow' x='-30%' y='-30%' width='160%' height='160%'>
+                <feGaussianBlur stdDeviation='6' result='blur1'/>
+                <feGaussianBlur stdDeviation='2' result='blur2'/>
+                <feMerge>
+                    <feMergeNode in='blur1'/>
+                    <feMergeNode in='blur2'/>
+                    <feMergeNode in='SourceGraphic'/>
+                </feMerge>
+            </filter>
+            <filter id='neonCyanGlow' x='-20%' y='-20%' width='140%' height='140%'>
+                <feGaussianBlur stdDeviation='3' result='blur'/>
+                <feMerge>
+                    <feMergeNode in='blur'/>
+                    <feMergeNode in='SourceGraphic'/>
+                </feMerge>
+            </filter>
+        </defs>
+
+        <rect width='600' height='340' fill='url(#slateBg)'/>
+        <rect width='600' height='340' fill='url(#slateGrain)' opacity='0.7'/>
+        <rect x='12' y='12' width='576' height='316' rx='16' fill='none' stroke='#334155' stroke-width='2' opacity='0.6'/>
+
+        <!-- Neon Cyan Title -->
+        <text x='300' y='52' fill='#00f0ff' font-family='sans-serif' font-weight='900' font-size='22' letter-spacing='1.5' text-anchor='middle' filter='url(#neonCyanGlow)'>SISTEMA DE REDUÇÃO 5:1 (VECTOR SYSTEM)</text>
+        <text x='300' y='76' fill='#00f0ff' font-family='sans-serif' font-weight='600' font-size='12' letter-spacing='1' text-anchor='middle' opacity='0.9'>SISTEMA DUPLO COM 5 PERNAS DE CORDA</text>
+
+        <!-- Red Anchor Block Left -->
+        <rect x='120' y='130' width='45' height='110' rx='10' fill='#030509' stroke='#ff003c' stroke-width='4' filter='url(#neonRedGlow)'/>
+        <circle cx='142' cy='155' r='12' fill='#ff003c'/>
+        <circle cx='142' cy='215' r='12' fill='#ff003c'/>
+
+        <!-- Lime Moving Block Right -->
+        <rect x='410' y='130' width='45' height='110' rx='10' fill='#030509' stroke='#39ff14' stroke-width='4' filter='url(#neonLimeGlow)'/>
+        <circle cx='432' cy='155' r='12' fill='#39ff14'/>
+        <circle cx='432' cy='215' r='12' fill='#39ff14'/>
+
+        <!-- 5 Neon Ropes -->
+        <line x1='142' y1='155' x2='432' y2='155' stroke='#39ff14' stroke-width='6' filter='url(#neonLimeGlow)'/>
+        <line x1='142' y1='175' x2='432' y2='175' stroke='#ff003c' stroke-width='6' filter='url(#neonRedGlow)'/>
+        <line x1='142' y1='195' x2='432' y2='195' stroke='#39ff14' stroke-width='6' filter='url(#neonLimeGlow)'/>
+        <line x1='142' y1='215' x2='432' y2='215' stroke='#ff003c' stroke-width='6' filter='url(#neonRedGlow)'/>
+
+        <path d='M 432 155 C 480 155, 480 215, 432 215' stroke='#39ff14' stroke-width='6' fill='none' filter='url(#neonLimeGlow)'/>
+        <path d='M 142 155 C 95 155, 95 215, 142 215' stroke='#ff003c' stroke-width='6' fill='none' filter='url(#neonRedGlow)'/>
+
+        <line x1='142' y1='185' x2='550' y2='185' stroke='#39ff14' stroke-width='8' stroke-linecap='round' filter='url(#neonLimeGlow)'/>
+
+        <rect x='160' y='292' width='280' height='30' rx='15' fill='#090d16' stroke='#00f0ff' stroke-width='1.5' filter='url(#neonCyanGlow)'/>
+        <text x='300' y='312' fill='#00f0ff' font-family='sans-serif' font-weight='bold' font-size='12' text-anchor='middle'>SISTEMA DE ALTA POTÊNCIA OPERACIONAL</text>
+    </svg>
