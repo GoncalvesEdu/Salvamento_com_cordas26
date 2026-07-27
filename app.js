@@ -4,7 +4,9 @@
 // Engine Anti-Cheat de Quiz: Randomização Determinística por Candidato
 // ==========================================================================
 
-const API_BASE_URL = 'http://localhost:8082/api';
+const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? `${window.location.protocol}//${window.location.hostname}:8082/api`
+  : `${window.location.origin}/api`;
 
 // Dados Visuais dos Módulos (Imagens Fotorrealistas de Alta Fidelidade Técnica)
 const modulesData = {
