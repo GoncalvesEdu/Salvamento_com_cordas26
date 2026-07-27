@@ -262,6 +262,7 @@ async function handleLogin() {
     localStorage.setItem('cb_auth_token', authToken);
     currentUser = data.user;
     currentRole = data.user.role; // ROLE VEIO RIGOROSAMENTE DO BD DO SERVIDORE
+    localStorage.setItem('cb_user_data', JSON.stringify(currentUser));
 
     updateHeaderUserInfo();
 
@@ -391,6 +392,7 @@ async function handleAlterarSenhaProvisoria(event) {
     // Atualizar no cliente e liberar navegação
     if (currentUser) {
       currentUser.senha_provisoria = 0;
+      localStorage.setItem('cb_user_data', JSON.stringify(currentUser));
     }
     
     if (currentRole === 'instrutor' || currentRole === 'admin') {
@@ -1099,8 +1101,28 @@ function updateHeaderUserInfo() {
 }
 
 function checkExistingSession() {
-  if (authToken) {
-    updateHeaderUserInfo();
+  const savedToken = localStorage.getItem('cb_auth_token');
+  const savedUser = localStorage.getItem('cb_user_data');
+
+  if (savedToken && savedUser) {
+    try {
+      authToken = savedToken;
+      currentUser = JSON.parse(savedUser);
+      currentRole = currentUser.role || 'aluno';
+
+      updateHeaderUserInfo();
+
+      if (currentUser.senha_provisoria === 1) {
+        showScreen('screen-reset-password');
+      } else if (currentRole === 'instrutor' || currentRole === 'admin') {
+        showScreen('screen-instrutoria');
+      } else {
+        loadModule(1);
+        showScreen('screen-classroom');
+      }
+    } catch (e) {
+      logoutSession();
+    }
   }
 }
 
@@ -1109,6 +1131,7 @@ function logoutSession() {
   currentUser = null;
   currentRole = 'aluno';
   localStorage.removeItem('cb_auth_token');
+  localStorage.removeItem('cb_user_data');
   updateHeaderUserInfo();
   showScreen('screen-login');
 }
