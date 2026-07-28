@@ -944,6 +944,11 @@
           <button class="nav-btn" onclick="toggleCalcModal()" style="margin-top: 1rem; justify-content: center; background: rgba(245, 194, 61, 0.12); border-color: var(--color-gold-patch); color: var(--color-gold-patch);">
             <i class="fa-solid fa-calculator"></i> Calculadora Tática (FQ / Y)
           </button>
+
+          <!-- Botão de Acesso Direto aos PDFs / Manuais -->
+          <button class="nav-btn" onclick="openLibraryModal()" style="margin-top: 0.75rem; justify-content: center; background: rgba(35, 123, 189, 0.15); border-color: var(--color-tactical-blue); color: var(--color-tactical-blue-light);">
+            <i class="fa-solid fa-folder-open"></i> Biblioteca &amp; PDFs EAD
+          </button>
         </aside>
 
         <!-- Área Principal de Conteúdo do Slide -->
@@ -1392,6 +1397,27 @@
           <span style="font-size: 0.85rem; color: var(--color-text-muted);">Carga por Ponto: <strong id="val-y" style="color: #fff; font-size: 1.1rem;">115 kgf</strong></span>
           <span id="st-y" style="font-size: 0.8rem; font-weight: 800; color: #2a9d68;">Ângulo Recomendado (&le; 60°)</span>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL BIBLIOTECA & PDFS PARA ALUNOS E INSTRUTORES -->
+  <div class="modal-overlay hidden" id="modal-library">
+    <div class="modal-content" style="max-width: 650px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3 style="color: #fff; font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+          <i class="fa-solid fa-book-bookmark" style="color: var(--color-gold-patch);"></i> Biblioteca &amp; Manuais EAD
+        </h3>
+        <button class="btn-slide-nav" onclick="closeLibraryModal()" style="padding: 4px 10px;">
+          <i class="fa-solid fa-xmark"></i> Fechar
+        </button>
+      </div>
+      <p style="color: var(--color-text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+        Faça o download das apostilas oficiais, manuais de APH e quadro de trabalho do curso:
+      </p>
+
+      <div id="classroom-files-list" style="display: flex; flex-direction: column; gap: 12px;">
+        <!-- Carregado Dinamicamente -->
       </div>
     </div>
   </div>

@@ -944,8 +944,8 @@ async function handleFileUpload(e) {
 }
 
 async function loadInstructorFiles() {
-  const container = document.getElementById('instrutoria-files-list');
-  if (!container) return;
+  const containerInst = document.getElementById('instrutoria-files-list');
+  const containerClass = document.getElementById('classroom-files-list');
 
   try {
     const res = await fetch(`${API_BASE_URL}/instrutoria/arquivos`, {
@@ -955,10 +955,10 @@ async function loadInstructorFiles() {
 
     if (!data.success || !data.arquivos) return;
 
-    container.innerHTML = data.arquivos.map(f => {
+    const htmlContent = data.arquivos.map(f => {
       const downloadUrl = `${API_BASE_URL}/instrutoria/download?id=${f.id}&token=${authToken}`;
       return `
-        <div class="file-item-card">
+        <div class="file-item-card" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
           <div style="display: flex; align-items: center; gap: 12px;">
             <i class="fa-solid fa-file-pdf" style="font-size: 2rem; color: #f87171;"></i>
             <div>
@@ -966,15 +966,28 @@ async function loadInstructorFiles() {
               <span style="font-size: 0.8rem; color: var(--color-text-muted);">${f.tamanho} &bull; Salvo no Servidor em ${f.data_upload}</span>
             </div>
           </div>
-          <a href="${downloadUrl}" target="_blank" class="nav-btn" style="background: rgba(35, 123, 189, 0.2); border-color: var(--color-tactical-blue); color: var(--color-tactical-blue-light); text-decoration: none;">
+          <a href="${downloadUrl}" target="_blank" class="nav-btn" style="background: rgba(35, 123, 189, 0.2); border-color: var(--color-tactical-blue); color: var(--color-tactical-blue-light); text-decoration: none; padding: 6px 14px;">
             <i class="fa-solid fa-download"></i> Abrir / Download PDF
           </a>
         </div>
       `;
     }).join('');
+
+    if (containerInst) containerInst.innerHTML = htmlContent;
+    if (containerClass) containerClass.innerHTML = htmlContent;
+
   } catch (err) {
     console.error("Erro ao carregar lista de arquivos:", err);
   }
+}
+
+function openLibraryModal() {
+  loadInstructorFiles();
+  document.getElementById('modal-library')?.classList.remove('hidden');
+}
+
+function closeLibraryModal() {
+  document.getElementById('modal-library')?.classList.add('hidden');
 }
 
 // ------------------------------------------------------------------
