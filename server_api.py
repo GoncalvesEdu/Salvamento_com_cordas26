@@ -750,7 +750,8 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             })
 
         # ------------------------------------------------------------------
-        # QUIZ ENGINE ANTI-CHEAT
+        # PORTAL SALVAMENTO COM CORDAS - SERVER API
+        # # teste de persistência de disco no render para forçar um deploy no Render.
         # ------------------------------------------------------------------
         elif path == '/api/quiz/start':
             user = self.authenticate_request(required_role='aluno')
