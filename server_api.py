@@ -248,6 +248,46 @@ def init_db():
 
     conn.commit()
     conn.close()
+    try:
+        sync_uploaded_files_in_db()
+    except Exception:
+        pass
+
+def sync_uploaded_files_in_db():
+    try:
+        conn = get_db()
+        cur = conn.cursor()
+
+        search_dirs = [UPLOAD_DIR, os.path.dirname(__file__)]
+        for d in search_dirs:
+            if not os.path.exists(d): continue
+            for fn in os.listdir(d):
+                if fn.lower().endswith(tuple(ALLOWED_UPLOAD_EXTENSIONS)):
+                    file_path = os.path.join(d, fn)
+                    if not os.path.isfile(file_path): continue
+
+                    if d != UPLOAD_DIR:
+                        target_path = os.path.join(UPLOAD_DIR, fn)
+                        if not os.path.exists(target_path):
+                            try: shutil.copy2(file_path, target_path)
+                            except Exception: pass
+                        file_path = target_path
+
+                    sz_mb = os.path.getsize(file_path) / (1024 * 1024)
+                    sz_str = f"{sz_mb:.2f} MB"
+                    mime = mimetypes.guess_type(file_path)[0] or 'application/pdf'
+
+                    cur.execute('SELECT COUNT(*) as cnt FROM arquivos_instrutoria WHERE nome_arquivo = ? OR nome_original = ? OR nome_salvo = ?', (fn, fn, fn))
+                    if cur.fetchone()['cnt'] == 0:
+                        cur.execute('''
+                            INSERT INTO arquivos_instrutoria (nome_arquivo, nome_original, nome_salvo, caminho_arquivo, tamanho, mime_type)
+                            VALUES (?, ?, ?, ?, ?, ?)
+                        ''', (fn, fn, fn, file_path, sz_str, mime))
+
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print("[AUTO-SYNC] Erro no auto-sync de arquivos:", e)
 
 def gerar_ordem_deterministica(aluno_re, curso_id, modulo_id, attempt_id, question_ids, options_by_question):
     seed_str = f"{aluno_re}:{curso_id}:{modulo_id}:{attempt_id}"
@@ -629,6 +669,8 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             user = self.authenticate_request(required_role=['aluno', 'instrutor', 'admin'])
             if not user:
                 return
+
+            sync_uploaded_files_in_db()
 
             conn = get_db()
             cur = conn.cursor()
