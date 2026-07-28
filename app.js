@@ -918,13 +918,17 @@ async function handleFileUpload(e) {
   const files = e.target.files;
   if (!files || files.length === 0) return;
 
+  const visibSelect = document.getElementById('upload-visibilidade-select');
+  const visibVal = visibSelect ? visibSelect.value : 'instrutor';
+
   const formData = new FormData();
   for (let i = 0; i < files.length; i++) {
     formData.append('file', files[i]);
   }
+  formData.append('visivel_para', visibVal);
 
   try {
-    const res = await fetch(`${API_BASE_URL}/instrutoria/upload`, {
+    const res = await fetch(`${API_BASE_URL}/instrutoria/upload?visivel_para=${visibVal}`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${authToken}` },
       body: formData
@@ -933,7 +937,8 @@ async function handleFileUpload(e) {
     const data = await res.json();
 
     if (data.success) {
-      alert("✅ Arquivo(s) enviado(s) e salvo(s) com sucesso no disco rígido e registrados no Banco de Dados!");
+      const tagVis = visibVal === 'todos' ? '🌐 Liberado para Alunos e Instrutores' : '🔒 Restrito à Instrutoria';
+      alert(`✅ Arquivo enviado e registrado no Banco de Dados!\nNível de Visibilidade: ${tagVis}`);
       loadInstructorFiles();
     } else {
       alert(`❌ Erro no upload: ${data.error || data.message}`);
@@ -957,13 +962,18 @@ async function loadInstructorFiles() {
 
     const htmlContent = data.arquivos.map(f => {
       const downloadUrl = `${API_BASE_URL}/instrutoria/download?id=${f.id}&token=${authToken}`;
+      const isPublic = f.visivel_para === 'todos';
+      const badge = isPublic 
+        ? `<span style="background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #4ade80; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 800; margin-left: 8px;">🌐 Liberado para Alunos</span>`
+        : `<span style="background: rgba(245, 194, 61, 0.15); border: 1px solid #f5c23d; color: #f5c23d; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 800; margin-left: 8px;">🔒 Restrito Instrutoria</span>`;
+
       return `
         <div class="file-item-card" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
           <div style="display: flex; align-items: center; gap: 12px;">
             <i class="fa-solid fa-file-pdf" style="font-size: 2rem; color: #f87171;"></i>
             <div>
-              <strong style="color: #fff; font-size: 0.95rem; display: block;">${f.nome_original || f.nome_arquivo}</strong>
-              <span style="font-size: 0.8rem; color: var(--color-text-muted);">${f.tamanho} &bull; Salvo no Servidor em ${f.data_upload}</span>
+              <strong style="color: #fff; font-size: 0.95rem; display: flex; align-items: center;">${f.nome_original || f.nome_arquivo} ${badge}</strong>
+              <span style="font-size: 0.8rem; color: var(--color-text-muted);">${f.tamanho} &bull; Disponibilizado em ${f.data_upload}</span>
             </div>
           </div>
           <a href="${downloadUrl}" target="_blank" class="nav-btn" style="background: rgba(35, 123, 189, 0.2); border-color: var(--color-tactical-blue); color: var(--color-tactical-blue-light); text-decoration: none; padding: 6px 14px;">

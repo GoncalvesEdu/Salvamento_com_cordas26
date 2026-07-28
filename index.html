@@ -1225,6 +1225,15 @@
             </i>
             <strong style="color: #fff; font-size: 1.1rem; display: block;">Clique para Upload de Novo PDF/Apostila no Servidor</strong>
             <span style="color: var(--color-text-muted); font-size: 0.85rem;">Os arquivos físicos são salvos no diretório persistente e disponibilizados para download.</span>
+            
+            <div style="margin-top: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px;" onclick="event.stopPropagation();">
+              <label style="color: var(--color-text-muted); font-size: 0.85rem; font-weight: 700;">Visibilidade do Novo Arquivo:</label>
+              <select id="upload-visibilidade-select" style="background: #1e293b; color: #fff; border: 1px solid var(--color-border); padding: 5px 12px; border-radius: 6px; font-size: 0.85rem;">
+                <option value="instrutor" selected>🔒 Apenas Instrutoria (Privado)</option>
+                <option value="todos">🌐 Todos (Alunos &amp; Instrutores)</option>
+              </select>
+            </div>
+
             <input type="file" id="instructor-file-upload-input" accept=".pdf,.pptx,.docx,.zip" onchange="handleFileUpload(event)" style="display: none;">
           </label>
 

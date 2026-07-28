@@ -523,6 +523,11 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             if 'phtls' in str(file_dict.get('nome_arquivo', '')).lower() or 'phtls' in str(file_dict.get('nome_original', '')).lower():
                 return self.send_json({'error': 'Acesso Proibido (403)', 'message': 'Arquivo de referência interna reservado. Download indisponível.'}, 403)
 
+            visib = file_dict.get('visivel_para', 'instrutor')
+            user_role = user.get('role', 'aluno')
+            if visib == 'instrutor' and user_role not in ('instrutor', 'admin'):
+                return self.send_json({'error': 'Acesso Proibido (403)', 'message': 'Acesso exclusivo para instrutores credenciados.'}, 403)
+
             physical_path = file_dict['caminho_arquivo']
             safe_base_filename = os.path.basename(physical_path)
             physical_path = os.path.join(UPLOAD_DIR, safe_base_filename)
@@ -691,7 +696,13 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
 
             conn = get_db()
             cur = conn.cursor()
-            cur.execute('SELECT * FROM arquivos_instrutoria ORDER BY id DESC')
+
+            user_role = user.get('role', 'aluno')
+            if user_role in ('instrutor', 'admin'):
+                cur.execute("SELECT * FROM arquivos_instrutoria WHERE LOWER(nome_arquivo) NOT LIKE '%phtls%' ORDER BY id DESC")
+            else:
+                cur.execute("SELECT * FROM arquivos_instrutoria WHERE (visivel_para = 'todos' OR visivel_para IS NULL) AND LOWER(nome_arquivo) NOT LIKE '%phtls%' ORDER BY id DESC")
+
             raw_files = [dict(r) for r in cur.fetchall()]
             conn.close()
 
@@ -700,6 +711,9 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                 f_dict = dict(f)
                 if 'nome_original' not in f_dict or not f_dict['nome_original'] or f_dict['nome_original'] == 'arquivo.pdf':
                     f_dict['nome_original'] = f_dict.get('nome_arquivo', 'Manual de Salvamento em Altura v3.pdf')
+                if 'visivel_para' not in f_dict or not f_dict['visivel_para']:
+                    fn_low = f_dict['nome_original'].lower()
+                    f_dict['visivel_para'] = 'todos' if ('qts' in fn_low or 'manual' in fn_low) else 'instrutor'
                 arquivos.append(f_dict)
 
             return self.send_json({'success': True, 'arquivos': arquivos})
@@ -1099,10 +1113,14 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                 mime = mimetypes.guess_type(orig_name)[0] or 'application/octet-stream'
                 now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
+                visib_val = 'instrutor'
+                if b'visivel_para=todos' in body_bytes or 'visivel_para=todos' in self.path:
+                    visib_val = 'todos'
+
                 cur.execute('''
-                    INSERT INTO arquivos_instrutoria (nome_arquivo, nome_original, nome_salvo, caminho_arquivo, tamanho, mime_type, data_upload)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)
-                ''', (orig_name, orig_name, saved_name, physical_path, size_str, mime, now_str))
+                    INSERT INTO arquivos_instrutoria (nome_arquivo, nome_original, nome_salvo, caminho_arquivo, tamanho, mime_type, visivel_para, data_upload)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (orig_name, orig_name, saved_name, physical_path, size_str, mime, visib_val, now_str))
                 
                 new_id = cur.lastrowid
                 saved_records.append({
@@ -1111,6 +1129,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                     'caminho_arquivo': physical_path,
                     'tamanho': size_str,
                     'mime_type': mime,
+                    'visivel_para': visib_val,
                     'data_upload': now_str
                 })
 
