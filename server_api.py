@@ -271,6 +271,8 @@ def sync_uploaded_files_in_db():
         for d in search_dirs:
             if not os.path.exists(d) or not os.path.isdir(d): continue
             for fn in os.listdir(d):
+                if 'phtls' in fn.lower():
+                    continue
                 if fn.lower().endswith(tuple(ALLOWED_UPLOAD_EXTENSIONS)):
                     file_path = os.path.join(d, fn)
                     if not os.path.isfile(file_path): continue
@@ -518,6 +520,9 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                 return self.send_json({'error': 'Arquivo não encontrado no BD (404)'}, 404)
 
             file_dict = dict(file_row)
+            if 'phtls' in str(file_dict.get('nome_arquivo', '')).lower() or 'phtls' in str(file_dict.get('nome_original', '')).lower():
+                return self.send_json({'error': 'Acesso Proibido (403)', 'message': 'Arquivo de referência interna reservado. Download indisponível.'}, 403)
+
             physical_path = file_dict['caminho_arquivo']
             safe_base_filename = os.path.basename(physical_path)
             physical_path = os.path.join(UPLOAD_DIR, safe_base_filename)
