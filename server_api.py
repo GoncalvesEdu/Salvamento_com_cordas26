@@ -258,9 +258,12 @@ def sync_uploaded_files_in_db():
         conn = get_db()
         cur = conn.cursor()
 
-        search_dirs = [UPLOAD_DIR, os.path.dirname(__file__)]
+        repo_dir = os.path.dirname(__file__)
+        repo_uploads = os.path.join(repo_dir, 'uploads')
+        search_dirs = [UPLOAD_DIR, repo_uploads, repo_dir]
+
         for d in search_dirs:
-            if not os.path.exists(d): continue
+            if not os.path.exists(d) or not os.path.isdir(d): continue
             for fn in os.listdir(d):
                 if fn.lower().endswith(tuple(ALLOWED_UPLOAD_EXTENSIONS)):
                     file_path = os.path.join(d, fn)
@@ -268,8 +271,10 @@ def sync_uploaded_files_in_db():
 
                     if d != UPLOAD_DIR:
                         target_path = os.path.join(UPLOAD_DIR, fn)
-                        if not os.path.exists(target_path):
-                            try: shutil.copy2(file_path, target_path)
+                        if not os.path.exists(target_path) or os.path.getsize(target_path) != os.path.getsize(file_path):
+                            try:
+                                shutil.copy2(file_path, target_path)
+                                print(f"[AUTO-SYNC] Copiado {fn} para {UPLOAD_DIR}")
                             except Exception: pass
                         file_path = target_path
 
@@ -283,6 +288,7 @@ def sync_uploaded_files_in_db():
                             INSERT INTO arquivos_instrutoria (nome_arquivo, nome_original, nome_salvo, caminho_arquivo, tamanho, mime_type)
                             VALUES (?, ?, ?, ?, ?, ?)
                         ''', (fn, fn, fn, file_path, sz_str, mime))
+                        print(f"[AUTO-SYNC] Registrado no BD: {fn}")
 
         conn.commit()
         conn.close()
