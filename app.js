@@ -1323,29 +1323,14 @@ function updateHeaderUserInfo() {
 }
 
 function checkExistingSession() {
-  const savedToken = localStorage.getItem('cb_auth_token');
-  const savedUser = localStorage.getItem('cb_user_data');
-
-  if (savedToken && savedUser) {
-    try {
-      authToken = savedToken;
-      currentUser = JSON.parse(savedUser);
-      currentRole = currentUser.role || 'aluno';
-
-      updateHeaderUserInfo();
-
-      if (currentUser.senha_provisoria === 1) {
-        showScreen('screen-reset-password');
-      } else if (currentRole === 'instrutor' || currentRole === 'admin') {
-        showScreen('screen-instrutoria');
-      } else {
-        loadModule(1);
-        showScreen('screen-classroom');
-      }
-    } catch (e) {
-      logoutSession();
-    }
-  }
+  // Garantir que ao abrir a URL o portal exija sempre o login inicial na tela de acesso
+  authToken = '';
+  currentUser = null;
+  currentRole = 'aluno';
+  localStorage.removeItem('cb_auth_token');
+  localStorage.removeItem('cb_user_data');
+  updateHeaderUserInfo();
+  showScreen('screen-login');
 }
 
 function logoutSession() {
