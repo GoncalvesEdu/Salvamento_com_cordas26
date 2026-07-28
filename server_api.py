@@ -777,7 +777,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             if not attempt_row:
                 attempt_id = str(uuid.uuid4())
                 
-                cur.execute('SELECT id, question_text FROM quiz_questions WHERE curso_id = ? AND modulo_id = ?', (curso_id, modulo_id))
+                cur.execute('SELECT id, question_text FROM quiz_questions WHERE curso_id = ? AND CAST(modulo_id AS TEXT) = ?', (curso_id, str(modulo_id)))
                 q_rows = cur.fetchall()
 
                 if not q_rows:

@@ -930,6 +930,14 @@
                 <span style="font-size: 0.75rem;">Escadas &amp; Tripés</span>
               </div>
             </button>
+
+            <button class="menu-item" id="btn-mod-final" data-mod="final" onclick="loadModule('final')" style="border-color: var(--color-gold-patch); background: rgba(245, 194, 61, 0.08);">
+              <i class="fa-solid fa-trophy" style="color: var(--color-gold-patch);"></i>
+              <div>
+                <strong style="display: block; font-size: 0.88rem; color: var(--color-gold-patch);">PROVA FINAL</strong>
+                <span style="font-size: 0.75rem; color: var(--color-gold-patch);">20 Questões (Certificação)</span>
+              </div>
+            </button>
           </div>
 
           <!-- Botão da Calculadora Tática Interativa -->
@@ -973,10 +981,13 @@
             </div>
           </div>
 
-          <!-- Card da Avaliação / Quiz Anti-Cheat -->
+          <!-- Card da Avaliação / Prova Final -->
           <div class="quiz-card hidden" id="quiz-card-element">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-              <span class="summary-badge-success"><i class="fa-solid fa-graduation-cap"></i> Avaliação do Módulo</span>
+              <span class="summary-badge-success" id="quiz-title-badge"><i class="fa-solid fa-graduation-cap"></i> Avaliação do Módulo</span>
+              <span id="quiz-question-counter" style="font-size: 0.85rem; font-weight: 800; color: var(--color-gold-patch); background: rgba(245, 194, 61, 0.15); border: 1px solid var(--color-gold-patch); padding: 3px 12px; border-radius: 20px; display: none;">
+                Questão 1 de 20
+              </span>
             </div>
 
             <h3 id="quiz-question-text" style="font-size: 1.35rem; font-weight: 800; color: #fff; margin-bottom: 1.5rem; line-height: 1.4;">
@@ -987,9 +998,19 @@
               <!-- Alternativas Dinâmicas via option_id -->
             </div>
 
-            <button type="button" class="btn-primary" id="btn-submit-quiz">
-              Submeter Resposta da Avaliação <i class="fa-solid fa-paper-plane"></i>
-            </button>
+            <div id="quiz-nav-group" style="display: flex; justify-content: space-between; gap: 1rem; align-items: center;">
+              <button type="button" class="btn-slide-nav" id="btn-quiz-prev-q" style="display: none;" onclick="navigateQuizQuestion(-1)">
+                <i class="fa-solid fa-chevron-left"></i> Questão Anterior
+              </button>
+              
+              <button type="button" class="btn-primary" id="btn-submit-quiz" style="margin-top: 0; flex: 1;">
+                Submeter Resposta da Avaliação <i class="fa-solid fa-paper-plane"></i>
+              </button>
+
+              <button type="button" class="btn-slide-nav primary" id="btn-quiz-next-q" style="display: none;" onclick="navigateQuizQuestion(1)">
+                Próxima Questão <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
           </div>
 
         </div>

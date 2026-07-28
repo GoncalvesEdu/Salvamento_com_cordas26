@@ -255,6 +255,24 @@ const modulesData = {
         ]
       }
     ]
+  },
+  final: {
+    title: "Exame de Certificação: Prova Final (20 Questões)",
+    subtitle: "Avaliação teórica integradora abrangendo as 6 Estações de Resgate e Protocolo PHTLS 10ª Edição",
+    slides: [
+      {
+        tag: "EXAME DE CERTIFICAÇÃO - 20 QUESTÕES",
+        title: "Prova Final de Salvamento com Cordas & APH",
+        subtitle: "Avaliação abrangente para emissão do Certificado Oficial do 2º GB.",
+        image: "images/logo_salvamento_2gb.png",
+        bullets: [
+          "<strong>Estrutura do Exame:</strong> 20 questões de múltipla escolha abarcando o conteúdo técnico e de APH das 6 estações.",
+          "<strong>Critério de Aprovação:</strong> Aproveitamento mínimo de 70% de acertos para liberação do Certificado Oficial.",
+          "<strong>Navegação Interativa:</strong> Responda às 20 questões sequencialmente navegando pelos botões de Questão Anterior e Próxima.",
+          "<strong>Emissão de Certificado:</strong> Após a conclusão com sucesso, seu certificado com autenticidade em banco de dados será liberado instantaneamente."
+        ]
+      }
+    ]
   }
 };
 
@@ -265,7 +283,7 @@ let authToken = localStorage.getItem('cb_auth_token') || '';
 let currentModule = 1;
 let currentSlideIndex = 0;
 let currentStudentFilter = 'ativo';
-let userProgress = { 1: false, 2: false, 3: false, 4: false, 5: false, 6: false };
+let userProgress = { 1: false, 2: false, 3: false, 4: false, 5: false, 6: false, final: false };
 
 // Estado da Tentativa do Quiz
 let currentAttemptId = null;
@@ -1043,6 +1061,10 @@ function setupNavigationEvents() {
   });
 }
 
+let currentQuizQuestions = [];
+let currentQuizIndex = 0;
+let quizAnswersMap = {};
+
 // BUSCAR PROVA EMBARALHADA DETERMINISTICAMENTE NO BACK-END
 async function startRandomizedQuiz() {
   document.getElementById('slide-card-element')?.classList.add('hidden');
@@ -1069,74 +1091,186 @@ async function startRandomizedQuiz() {
     }
 
     currentAttemptId = data.attempt_id;
-    const qData = data.questions[0]; // Exibe primeira questão sorteada
-    currentQuestionId = qData.question_id;
-    selectedOptionId = null;
+    currentQuizQuestions = data.questions;
+    currentQuizIndex = 0;
+    quizAnswersMap = {};
 
-    document.getElementById('quiz-question-text').innerText = qData.question_text;
-    const optsBox = document.getElementById('quiz-options-list');
-
-    optsBox.innerHTML = qData.options.map(op => `
-      <button type="button" class="quiz-option-btn" data-option-id="${op.option_id}" onclick="selectQuizOptionById('${op.option_id}', this)">
-        ${op.option_text}
-      </button>
-    `).join('');
+    renderQuizQuestionState();
 
   } catch (err) {
     alert("❌ Erro de conexão ao buscar prova no servidor.");
   }
 }
 
+function renderQuizQuestionState() {
+  const qData = currentQuizQuestions[currentQuizIndex];
+  if (!qData) return;
+
+  currentQuestionId = qData.question_id;
+  selectedOptionId = quizAnswersMap[currentQuestionId] || null;
+
+  const isFinalExam = (currentModule === 'final');
+  const totalQ = currentQuizQuestions.length;
+
+  const counterEl = document.getElementById('quiz-question-counter');
+  const titleBadge = document.getElementById('quiz-title-badge');
+
+  if (isFinalExam || totalQ > 1) {
+    if (counterEl) {
+      counterEl.style.display = 'inline-block';
+      counterEl.innerText = `Questão ${currentQuizIndex + 1} de ${totalQ}`;
+    }
+    if (titleBadge) {
+      titleBadge.innerHTML = `<i class="fa-solid fa-trophy"></i> Prova Final (20 Questões)`;
+    }
+  } else {
+    if (counterEl) counterEl.style.display = 'none';
+    if (titleBadge) titleBadge.innerHTML = `<i class="fa-solid fa-graduation-cap"></i> Avaliação do Módulo`;
+  }
+
+  document.getElementById('quiz-question-text').innerText = qData.question_text;
+  const optsBox = document.getElementById('quiz-options-list');
+
+  optsBox.innerHTML = qData.options.map(op => {
+    const isSel = (op.option_id === selectedOptionId) ? 'selected' : '';
+    return `
+      <button type="button" class="quiz-option-btn ${isSel}" data-option-id="${op.option_id}" onclick="selectQuizOptionById('${op.option_id}', this)">
+        ${op.option_text}
+      </button>
+    `;
+  }).join('');
+
+  const btnPrev = document.getElementById('btn-quiz-prev-q');
+  const btnNext = document.getElementById('btn-quiz-next-q');
+  const btnSubmit = document.getElementById('btn-submit-quiz');
+
+  if (totalQ > 1) {
+    if (btnPrev) btnPrev.style.display = (currentQuizIndex > 0) ? 'inline-flex' : 'none';
+    if (btnNext) btnNext.style.display = (currentQuizIndex < totalQ - 1) ? 'inline-flex' : 'none';
+
+    if (btnSubmit) {
+      if (currentQuizIndex === totalQ - 1) {
+        btnSubmit.innerHTML = 'Finalizar Prova & Enviar Respostas <i class="fa-solid fa-paper-plane"></i>';
+        btnSubmit.style.display = 'inline-flex';
+      } else {
+        btnSubmit.style.display = 'none';
+      }
+    }
+  } else {
+    if (btnPrev) btnPrev.style.display = 'none';
+    if (btnNext) btnNext.style.display = 'none';
+    if (btnSubmit) {
+      btnSubmit.style.display = 'inline-flex';
+      btnSubmit.innerHTML = 'Submeter Resposta da Avaliação <i class="fa-solid fa-paper-plane"></i>';
+    }
+  }
+}
+
+function navigateQuizQuestion(direction) {
+  const newIndex = currentQuizIndex + direction;
+  if (newIndex >= 0 && newIndex < currentQuizQuestions.length) {
+    currentQuizIndex = newIndex;
+    renderQuizQuestionState();
+  }
+}
+
 function selectQuizOptionById(optId, el) {
   selectedOptionId = optId;
+  quizAnswersMap[currentQuestionId] = optId;
   document.querySelectorAll('.quiz-option-btn').forEach(b => b.classList.remove('selected'));
   el.classList.add('selected');
 }
 
-// SUBMETER RESPOSTA POR OPTION_ID ESTÁVEL AO SERVIDOR
+// SUBMETER RESPOSTA DA AVALIAÇÃO / PROVA FINAL AO SERVIDOR
 async function handleQuizSubmission() {
-  if (!selectedOptionId || !currentAttemptId || !currentQuestionId) {
+  const totalQ = currentQuizQuestions.length;
+
+  if (totalQ > 1) {
+    // Validar se todas as questões da Prova Final foram respondidas
+    for (let i = 0; i < totalQ; i++) {
+      const qid = currentQuizQuestions[i].question_id;
+      if (!quizAnswersMap[qid]) {
+        alert(`⚠️ Por favor, responda à Questão ${i + 1} antes de finalizar a Prova Final.`);
+        currentQuizIndex = i;
+        renderQuizQuestionState();
+        return;
+      }
+    }
+  } else if (!selectedOptionId) {
     alert("Por favor, selecione uma alternativa.");
     return;
   }
 
   try {
-    const res = await fetch(`${API_BASE_URL}/quiz/answer`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`
-      },
-      body: JSON.stringify({
-        attempt_id: currentAttemptId,
-        question_id: currentQuestionId,
-        chosen_option_id: selectedOptionId
-      })
-    });
+    if (totalQ === 1) {
+      const res = await fetch(`${API_BASE_URL}/aluno/progresso`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        },
+        body: JSON.stringify({
+          modulo_id: String(currentModule),
+          chosen_option_id: selectedOptionId
+        })
+      });
 
-    const data = await res.json();
+      const data = await res.json();
+      if (!data.success) {
+        alert(`❌ Erro ao validar avaliação: ${data.message || data.error}`);
+        return;
+      }
 
-    if (!data.success) {
-      alert(`❌ Erro ao validar avaliação: ${data.message || data.error}`);
-      return;
-    }
+      if (data.correct || data.acertou) {
+        alert(data.message || `🎉 Excelente! Resposta correta no Módulo ${currentModule}. Módulo Concluído com Nota 100!`);
+        userProgress[currentModule] = true;
+        updateCourseProgressBar();
 
-    if (data.correct) {
-      alert(data.message || `🎉 Excelente! Resposta correta no Módulo ${currentModule}. Módulo Concluído com Nota 100!`);
-      userProgress[currentModule] = true;
-      updateCourseProgressBar();
-
-      if (currentModule < 4) {
-        loadModule(currentModule + 1);
+        if (typeof currentModule === 'number' && currentModule < 6) {
+          loadModule(currentModule + 1);
+        } else {
+          loadModule('final');
+        }
       } else {
-        alert("🏆 PARABÉNS! Você concluiu todos os 4 Módulos de Instrução EAD de Salvamento com Cordas!");
-        generateCertificate();
+        alert(data.message || "❌ Resposta incorreta. Revise o material do módulo e tente novamente.");
       }
     } else {
-      alert(data.message || "❌ Resposta incorreta. Revise o material do módulo e tente novamente.");
+      // Submeter todas as 20 respostas da Prova Final
+      let correctCount = 0;
+      for (let i = 0; i < totalQ; i++) {
+        const qData = currentQuizQuestions[i];
+        const chosenOpt = quizAnswersMap[qData.question_id];
+
+        const res = await fetch(`${API_BASE_URL}/quiz/answer`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify({
+            attempt_id: currentAttemptId,
+            question_id: qData.question_id,
+            chosen_option_id: chosenOpt
+          })
+        });
+
+        const ansData = await res.json();
+        if (ansData.correct) correctCount++;
+      }
+
+      const scorePct = Math.round((correctCount / totalQ) * 100);
+
+      if (scorePct >= 70) {
+        alert(`🏆 PARABÉNS! Você foi APROVADO na Prova Final com ${scorePct}% de acertos (${correctCount} de ${totalQ} questões)!\n\nSeu Certificado Oficial do 2º GB CBMESP foi liberado com sucesso!`);
+        userProgress['final'] = true;
+        updateCourseProgressBar();
+        generateCertificate();
+      } else {
+        alert(`⚠️ Você obteve ${scorePct}% de acertos (${correctCount} de ${totalQ} questões).\n\nO aproveitamento mínimo necessário é de 70%. Revise o conteúdo das 6 estações e tente novamente.`);
+      }
     }
   } catch (e) {
-    alert("❌ Erro de conexão ao enviar resposta do quiz para validação no servidor.");
+    alert("❌ Erro de conexão ao enviar respostas da prova para o servidor.");
   }
 }
 
