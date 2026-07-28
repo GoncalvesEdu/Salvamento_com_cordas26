@@ -755,7 +755,26 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                 seed = attempt_row['seed']
                 question_order = json.loads(attempt_row['question_order'])
                 option_order = json.loads(attempt_row['option_order'])
-            else:
+
+                # Validar se as opções registradas na tentativa ainda existem no BD
+                valid_attempt = True
+                for qid in question_order:
+                    cur.execute('SELECT COUNT(*) as cnt FROM quiz_questions WHERE id = ?', (qid,))
+                    if cur.fetchone()['cnt'] == 0:
+                        valid_attempt = False
+                        break
+                    for op_id in option_order.get(qid, []):
+                        cur.execute('SELECT COUNT(*) as cnt FROM quiz_options WHERE id = ?', (op_id,))
+                        if cur.fetchone()['cnt'] == 0:
+                            valid_attempt = False
+                            break
+                
+                if not valid_attempt:
+                    cur.execute('DELETE FROM quiz_attempts WHERE id = ?', (attempt_id,))
+                    conn.commit()
+                    attempt_row = None
+
+            if not attempt_row:
                 attempt_id = str(uuid.uuid4())
                 
                 cur.execute('SELECT id, question_text FROM quiz_questions WHERE curso_id = ? AND modulo_id = ?', (curso_id, modulo_id))
