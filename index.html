@@ -883,35 +883,51 @@
           </div>
 
           <div class="menu-list">
-            <button class="menu-item active" id="btn-mod-1" data-mod="1">
-              <i class="fa-solid fa-shield-halved"></i>
+            <button class="menu-item active" id="btn-mod-1" data-mod="1" onclick="loadModule(1)">
+              <i class="fa-solid fa-person-falling"></i>
               <div>
-                <strong style="display: block; font-size: 0.88rem;">Módulo 1</strong>
-                <span style="font-size: 0.75rem;">Doutrina &amp; Fisiologia</span>
+                <strong style="display: block; font-size: 0.88rem;">Estação 1</strong>
+                <span style="font-size: 0.75rem;">Trabalhador Suspenso</span>
               </div>
             </button>
 
-            <button class="menu-item" id="btn-mod-2" data-mod="2">
-              <i class="fa-solid fa-dharmachakra"></i>
+            <button class="menu-item" id="btn-mod-2" data-mod="2" onclick="loadModule(2)">
+              <i class="fa-solid fa-circle-notch"></i>
               <div>
-                <strong style="display: block; font-size: 0.88rem;">Módulo 2</strong>
-                <span style="font-size: 0.75rem;">Nós &amp; Amarrações</span>
+                <strong style="display: block; font-size: 0.88rem;">Estação 2</strong>
+                <span style="font-size: 0.75rem;">Poço &amp; Confinado</span>
               </div>
             </button>
 
-            <button class="menu-item" id="btn-mod-3" data-mod="3">
-              <i class="fa-solid fa-network-wired"></i>
+            <button class="menu-item" id="btn-mod-3" data-mod="3" onclick="loadModule(3)">
+              <i class="fa-solid fa-building-user"></i>
               <div>
-                <strong style="display: block; font-size: 0.88rem;">Módulo 3</strong>
-                <span style="font-size: 0.75rem;">Ancoragens &amp; Vantagem</span>
+                <strong style="display: block; font-size: 0.88rem;">Estação 3</strong>
+                <span style="font-size: 0.75rem;">Estrutura Elevada</span>
               </div>
             </button>
 
-            <button class="menu-item" id="btn-mod-4" data-mod="4">
-              <i class="fa-solid fa-person-falling-burst"></i>
+            <button class="menu-item" id="btn-mod-4" data-mod="4" onclick="loadModule(4)">
+              <i class="fa-solid fa-truck-medical"></i>
               <div>
-                <strong style="display: block; font-size: 0.88rem;">Módulo 4</strong>
-                <span style="font-size: 0.75rem;">Manobras de Resgate</span>
+                <strong style="display: block; font-size: 0.88rem;">Estação 4</strong>
+                <span style="font-size: 0.75rem;">Movimentação Vítima</span>
+              </div>
+            </button>
+
+            <button class="menu-item" id="btn-mod-5" data-mod="5" onclick="loadModule(5)">
+              <i class="fa-solid fa-mountain"></i>
+              <div>
+                <strong style="display: block; font-size: 0.88rem;">Estação 5</strong>
+                <span style="font-size: 0.75rem;">Barranco &amp; Terreno</span>
+              </div>
+            </button>
+
+            <button class="menu-item" id="btn-mod-6" data-mod="6" onclick="loadModule(6)">
+              <i class="fa-solid fa-xmark"></i>
+              <div>
+                <strong style="display: block; font-size: 0.88rem;">Estação 6</strong>
+                <span style="font-size: 0.75rem;">Escadas &amp; Tripés</span>
               </div>
             </button>
           </div>
@@ -1055,11 +1071,11 @@
         </div>
 
         <!-- Estatísticas da Turma por Módulo -->
-        <div class="stats-grid-turma">
+        <div class="stats-grid-turma" style="grid-template-columns: repeat(3, 1fr);">
           <div class="stat-card-turma">
             <div class="stat-card-turma-header">
-              <span>Módulo 1: Doutrina</span>
-              <i class="fa-solid fa-shield-halved"></i>
+              <span>Estação 1: Suspenso</span>
+              <i class="fa-solid fa-person-falling"></i>
             </div>
             <div class="stat-card-pct" id="pct-mod-1">0%</div>
             <div class="mini-progress-bg"><div class="mini-progress-fill" id="fill-mod-1" style="width: 0%;"></div></div>
@@ -1068,8 +1084,8 @@
 
           <div class="stat-card-turma">
             <div class="stat-card-turma-header">
-              <span>Módulo 2: Nós</span>
-              <i class="fa-solid fa-dharmachakra"></i>
+              <span>Estação 2: Poço</span>
+              <i class="fa-solid fa-circle-notch"></i>
             </div>
             <div class="stat-card-pct" id="pct-mod-2">0%</div>
             <div class="mini-progress-bg"><div class="mini-progress-fill" id="fill-mod-2" style="width: 0%;"></div></div>
@@ -1078,8 +1094,8 @@
 
           <div class="stat-card-turma">
             <div class="stat-card-turma-header">
-              <span>Módulo 3: Ancoragens</span>
-              <i class="fa-solid fa-network-wired"></i>
+              <span>Estação 3: Elevada</span>
+              <i class="fa-solid fa-building-user"></i>
             </div>
             <div class="stat-card-pct" id="pct-mod-3">0%</div>
             <div class="mini-progress-bg"><div class="mini-progress-fill" id="fill-mod-3" style="width: 0%;"></div></div>
@@ -1088,12 +1104,32 @@
 
           <div class="stat-card-turma">
             <div class="stat-card-turma-header">
-              <span>Módulo 4: Resgate</span>
-              <i class="fa-solid fa-person-falling-burst"></i>
+              <span>Estação 4: Movimentação</span>
+              <i class="fa-solid fa-truck-medical"></i>
             </div>
             <div class="stat-card-pct" id="pct-mod-4">0%</div>
             <div class="mini-progress-bg"><div class="mini-progress-fill" id="fill-mod-4" style="width: 0%;"></div></div>
             <span style="font-size: 0.75rem; color: var(--color-text-muted);" id="sub-mod-4">0 de 0 Alunos Ativos</span>
+          </div>
+
+          <div class="stat-card-turma">
+            <div class="stat-card-turma-header">
+              <span>Estação 5: Barranco</span>
+              <i class="fa-solid fa-mountain"></i>
+            </div>
+            <div class="stat-card-pct" id="pct-mod-5">0%</div>
+            <div class="mini-progress-bg"><div class="mini-progress-fill" id="fill-mod-5" style="width: 0%;"></div></div>
+            <span style="font-size: 0.75rem; color: var(--color-text-muted);" id="sub-mod-5">0 de 0 Alunos Ativos</span>
+          </div>
+
+          <div class="stat-card-turma">
+            <div class="stat-card-turma-header">
+              <span>Estação 6: Escadas/Tripés</span>
+              <i class="fa-solid fa-xmark"></i>
+            </div>
+            <div class="stat-card-pct" id="pct-mod-6">0%</div>
+            <div class="mini-progress-bg"><div class="mini-progress-fill" id="fill-mod-6" style="width: 0%;"></div></div>
+            <span style="font-size: 0.75rem; color: var(--color-text-muted);" id="sub-mod-6">0 de 0 Alunos Ativos</span>
           </div>
         </div>
 

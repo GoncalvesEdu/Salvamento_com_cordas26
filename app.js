@@ -8,162 +8,250 @@ const API_BASE_URL = (window.location.hostname === 'localhost' || window.locatio
   ? `${window.location.protocol}//${window.location.hostname}:8082/api`
   : `${window.location.origin}/api`;
 
-// Dados Visuais dos Módulos (Imagens Fotorrealistas de Alta Fidelidade Técnica)
+// Dados Visuais dos Módulos (Imagens Fotorrealistas de Alta Fidelidade Técnica por Estação)
 const modulesData = {
   1: {
-    title: "Módulo 1: Doutrina & Fisiologia no Salvamento Vertical",
-    subtitle: "Fundamentos NFPA 1983/2500 e Proteção contra Síndrome da Suspensão Inerte",
+    title: "Estação 1: Trabalhador Suspenso & Trauma de Suspensão",
+    subtitle: "Atendimento Pré-Hospitalar (PHTLS) e Doutrina Técnica no Resgate de Suspenso Inerte",
     slides: [
       {
-        tag: "MÓDULO 1 - SLIDE 1 DE 3",
-        title: "Doutrina de Segurança & Fator de Queda (FQ)",
-        subtitle: "Conceitos fundamentais de retenção e absorção de choque.",
-        image: "images/sc_mod1_fator_queda.png",
+        tag: "ESTAÇÃO 1 - SLIDE 1 DE 3",
+        title: "Fisiopatologia da Suspensão Inerte & Fita de Alívio",
+        subtitle: "Prevenção da estagnação venosa e choque por sequestro venoso.",
+        image: "images/aph_mod1_suspensao_inerte.png",
         bullets: [
-          "<strong>Fator de Queda (FQ):</strong> Razão entre a altura da queda e o comprimento útil de corda ativa (FQ = H / L).",
-          "<strong>Limite Crítico (FQ &lt; 1):</strong> Quedas com FQ &ge; 1 geram forças de impacto perigosas no corpo e ancoragens.",
-          "<strong>Força de Choque Máxima:</strong> Normas NFPA limitam a força máxima transmitida ao bombeiro em 6 kN.",
-          "<strong>Zelo pelo Equipamento:</strong> Inspeção diária de fitas, mosquetões de aço/alumínio e cordas de capa e alma."
+          "<strong>Síndrome da Suspensão Inerte:</strong> O aprisionamento venoso nas extremidades inferiores reduz o retorno venoso e o débito cardíaco.",
+          "<strong>Janela Crítica de Atuação:</strong> Sintomas de pré-síncope e perda de consciência ocorrem entre 5 e 15 minutos de imobilidade.",
+          "<strong>Uso Obrigatório da Fita de Alívio (Pedaleira):</strong> Permite a contração da musculatura das pernas, bombeando o sangue de volta ao coração.",
+          "<strong>Checklist de Segurança:</strong> Inspeção prévia do cinto paraquedista, fitas, mosquetões de aço/alumínio e linha de vida belay."
         ]
       },
       {
-        tag: "MÓDULO 1 - SLIDE 2 DE 3",
-        title: "Síndrome da Suspensão Inerte (Trauma de Suspensão)",
-        subtitle: "Fisiopatologia da estagnação venosa e choque hipovolêmico.",
-        image: "images/sc_mod1_suspensao_inerte.png",
+        tag: "ESTAÇÃO 1 - SLIDE 2 DE 3",
+        title: "Protocolo PHTLS de Desmobilização Pós-Resgate",
+        subtitle: "Manejo da síndrome do refluxo venoso e prevenção da parada cardíaca súbita.",
+        image: "images/aph_mod1_posicao_semissentada.png",
         bullets: [
-          "<strong>Estagnação Venosa:</strong> A imobilidade no cinto (cadeira) prende o sangue nas extremidades inferiores.",
-          "<strong>Janela Crítica de Ação:</strong> Sintomas graves (pré-síncope, perda de consciência) surgem entre 5 e 15 minutos.",
-          "<strong>Fita de Alívio / Pedaleira:</strong> Utilização imediata da fita de alívio para promover a contração muscular.",
-          "<strong>Protocolo de Manejo:</strong> Nunca deitar a vítima abruptamente após o resgate para evitar sobrecarga cardíaca."
+          "<strong>Atenção Crítica no Solo:</strong> NUNCA deitar a vítima abruptamente em decúbito dorsal plano logo após a retirada do cinto.",
+          "<strong>Posição Semissentada (30° a 45°):</strong> Manter o tronco elevado inicialmente para evitar a sobrecarga aguda do ventrículo direito.",
+          "<strong>Monitoramento de Sinais Vitais:</strong> Avaliação contínua da pressão arterial, oximetria de pulso e padrão ventilatório.",
+          "<strong>Oxigenoterapia de Alto Fluxo:</strong> Oferecer suporte ventilatório com máscara de reservatório conforme indicação do PHTLS."
         ]
       },
       {
-        tag: "MÓDULO 1 - SLIDE 3 DE 3",
-        title: "Doutrina de Dupla Proteção & Linha de Vida",
-        subtitle: "Sistemas redundantes e comunicação padronizada.",
+        tag: "ESTAÇÃO 1 - SLIDE 3 DE 3",
+        title: "Doutrina de Dupla Proteção & Comunicação Tática",
+        subtitle: "Redundância estrutural e coordenação da equipe de resgate.",
         image: "images/sc_mod1_dupla_protecao.png",
         bullets: [
-          "<strong>Dupla Proteção (Redundância):</strong> Todo operador ou vítima deve estar conectado a duas linhas independentes (Trabalho + Back-up).",
-          "<strong>Comando Voz e Gesto:</strong> Padronização dos comandos: 'Mesa', 'Corda', 'Atenção', 'Livre'.",
-          "<strong>Checklist Cruzado:</strong> Verificação de mosquetões rosqueados e nós antes de liberar o sistema."
+          "<strong>Dupla Proteção (Redundância):</strong> Operador e vítima devem estar ancorados em duas linhas independentes (Trabalho + Back-up).",
+          "<strong>Padronização de Comandos:</strong> Utilização rigorosa dos comandos de voz: 'Mesa', 'Corda', 'Atenção', 'Livre'.",
+          "<strong>Checklist Cruzado (Buddy Check):</strong> Verificação dupla de mosquetões rosqueados e arremates de segurança antes do descenso."
         ]
       }
     ]
   },
   2: {
-    title: "Módulo 2: Nós e Amarrações Práticas em Operações",
-    subtitle: "Confecção, Peinagem e Aplicação Tática dos Nós de Salvamento",
+    title: "Estação 2: Poço & Espaço Confinado",
+    subtitle: "Atendimento Pré-Hospitalar em Ambientes de Risco Atmosférico e Acesso Vertical",
     slides: [
       {
-        tag: "MÓDULO 2 - SLIDE 1 DE 3",
-        title: "Nós de Enfiamento e Alça: Oito Duplo e Borboleta Alpina",
-        subtitle: "Resistência estrutural e facilidade de desatem.",
-        image: "images/sc_mod2_oito_duplo.png",
+        tag: "ESTAÇÃO 2 - SLIDE 1 DE 3",
+        title: "Avaliação Atmosférica & Suporte Aéreo PHTLS",
+        subtitle: "Segurança de cena em poços e ambientes com deficiência de oxigênio.",
+        image: "images/aph_mod2_atendimento_confinado.png",
         bullets: [
-          "<strong>Nó Oito Duplo Guiado:</strong> Nó principal de encordoamento e fixação em ancoragens. Redução de resistência: ~20-25%.",
-          "<strong>Nó Borboleta Alpina:</strong> Alça no meio da corda que suporta tração multidirecional (em 3 eixos) sem deformar.",
-          "<strong>Peinagem Obrigatória:</strong> As voltas do nó devem ser organizadas sem cruzamentos sobrepostos para distribuição uniforme de carga."
+          "<strong>Monitoramento Multigás:</strong> Verificação obrigatória de O₂, CO e H₂S antes da entrada do socorrista de APH.",
+          "<strong>Proteção Respiratória (SCBA / Ar Mandado):</strong> Uso de equipamento autônomo quando houver risco de contaminação atmosférica.",
+          "<strong>Gerenciamento de Via Aérea:</strong> Manutenção da permeabilidade com cânula orofaríngea e colar cervical de resgate.",
+          "<strong>Iluminação Tática:</strong> Emprego de lanternas intrinsecamente seguras (à prova de explosão)."
         ]
       },
       {
-        tag: "MÓDULO 2 - SLIDE 2 DE 3",
-        title: "Nós de Emenda e Conexão de Cordas",
-        subtitle: "União de cordas de mesmo diâmetro e confecção de anéis.",
-        image: "images/sc_mod2_pescador_duplo.png",
+        tag: "ESTAÇÃO 2 - SLIDE 2 DE 3",
+        title: "Imobilização Vertical com KED & Prancha Curta",
+        subtitle: "Estabilização e extração de vítima em geometria restrita.",
+        image: "images/aph_mod2_ked_poco.png",
         bullets: [
-          "<strong>Pescador Duplo (Double Fisherman):</strong> União definitiva de duas cordas ou confecção de anéis de cordinete.",
-          "<strong>Nó de Fita (Water Knot):</strong> Exclusivo para junção de fitas tubulares de poliamida com arremate de segurança.",
-          "<strong>Sobra de Segurança:</strong> Manter sobra mínima de 10 cm nas extremidades de todos os nós operacionais."
+          "<strong>Aplicação do Colete KED:</strong> Fixação sequencial (tórax, abdômen, virilha e cabeça) para rigidez espinhal no eixo vertical.",
+          "<strong>Alinhamento Neutro no Poço:</strong> Manter a cabeça estabilizada sem flexão ou extensão durante o içamento vertical.",
+          "<strong>Linha de Vida no Colete:</strong> Ancoragem de segurança dedicada no ponto dorsal do cinto/colete de extração.",
+          "<strong>Comunicação por Rádio ou Sinal de Corda:</strong> Padronização do içamento milimétrico para evitar choques nas paredes do poço."
         ]
       },
       {
-        tag: "MÓDULO 2 - SLIDE 3 DE 3",
-        title: "Nós Friccionantes / Autoblocantes",
-        subtitle: "Prusik, Machard e Bachmann para subida e trava de segurança.",
+        tag: "ESTAÇÃO 2 - SLIDE 3 DE 3",
+        title: "Nós de Conexão & Autoblocantes para Poço",
+        subtitle: "Segurança de subida e retenção de carga.",
         image: "images/sc_mod2_nos_friccionantes.png",
         bullets: [
-          "<strong>Nó Prusik:</strong> Blocagem bidirecional feita com cordinete de 6mm a 7mm sobre corda de 10.5mm ou 11mm.",
-          "<strong>Nó Machard (Klemheist):</strong> Blocagem unidirecional com desblocagem facilitada sob tensão parcial.",
-          "<strong>Regra dos Diâmetros:</strong> O cordinete friccionante deve ter entre 60% e 70% do diâmetro da corda principal."
+          "<strong>Nó Prusik & Machard:</strong> Blocagem bidirecional e unidirecional para trava de segurança em sistemas de poço.",
+          "<strong>Pescador Duplo:</strong> União definitiva de anéis de cordinete de 6mm a 7mm sobre cordas de 10.5mm ou 11mm.",
+          "<strong>Regra dos Diâmetros:</strong> Cordinete friccionante deve ter de 60% a 70% do diâmetro da corda principal."
         ]
       }
     ]
   },
   3: {
-    title: "Módulo 3: Ancoragens Equalizadas & Multiplicadores de Força",
-    subtitle: "Equalização de Ancoragens em Y e Sistemas Z-Rig 3:1",
+    title: "Estação 3: Estrutura Elevada",
+    subtitle: "Atendimento de Trauma por Queda de Altura e Operações em Plataformas",
     slides: [
       {
-        tag: "MÓDULO 3 - SLIDE 1 DE 3",
-        title: "Ancoragens Fracionadas e Equalizadas em Y",
-        subtitle: "Distribuição de cargas entre múltiplos pontos estruturais.",
+        tag: "ESTAÇÃO 3 - SLIDE 1 DE 3",
+        title: "Avaliação Primária XABCDE PHTLS em Altura",
+        subtitle: "Abordagem rápida e controle de hemorragias em locais elevados.",
+        image: "images/aph_mod3_xabcde_altura.png",
+        bullets: [
+          "<strong>Passo X (Hemorragia Exsangüinante):</strong> Aplicação imediata de torniquete tático ou curativo compressivo antes do transporte.",
+          "<strong>Passo A (Via Aérea + Cervical):</strong> Estabilização manual da coluna cervical e abertura de via aérea sem hiperextensão.",
+          "<strong>Passo B (Ventilação) & C (Circulação):</strong> Avaliação de expansibilidade torácica e perfusão periférica no local elevado.",
+          "<strong>Ancoragem da Vítima:</strong> Conectar a vítima à estrutura com fita de ancoragem dedicada durante o atendimento."
+        ]
+      },
+      {
+        tag: "ESTAÇÃO 3 - SLIDE 2 DE 3",
+        title: "Segurança e Ancoragem Dupla do Socorrista",
+        subtitle: "Protocolo de atendimento médico com proteção total contra quedas.",
+        image: "images/aph_mod3_seguranca_socorrista.png",
+        bullets: [
+          "<strong>Dupla Ancoragem do Socorrista:</strong> O socorrista de APH deve manter talabarte duplo com absorvedor de energia conectado a pontos estruturais.",
+          "<strong>Posicionamento de Trabalho:</strong> Uso de talabarte de posicionamento para manter as mãos livres durante os procedimentos de APH.",
+          "<strong>Gerenciamento de Materiais:</strong> Todos os equipamentos médicos (bolsas, colares, ambu) devem estar presos por fiel para evitar quedas.",
+          "<strong>Zona de Exclusão no Solo:</strong> Isolamento da área abaixo da estrutura contra queda de objetos."
+        ]
+      },
+      {
+        tag: "ESTAÇÃO 3 - SLIDE 3 DE 3",
+        title: "Ancoragens Equalizadas em Y & Limites de Ângulo",
+        subtitle: "Distribuição técnica de forças em pontos elevados.",
         image: "images/sc_mod3_ancoragem_y.png",
         bullets: [
-          "<strong>Equalização Autoadaptável:</strong> Permite ajuste automático do ponto central de ancoragem caso a linha de tração mude.",
-          "<strong>Regra dos Ângulos no Y:</strong><br>&bull; Ângulo 60º: Carga em cada ponto = 58% do total.<br>&bull; Ângulo 90º: Carga em cada ponto = 71% do total.<br>&bull; Ângulo 120º: Carga em cada ponto = 100% (Crítico!).",
-          "<strong>Redundância Estrutural:</strong> Ancorar sempre em estruturas bombeiras comprovadas (vigas I, pilares de concreto)."
-        ]
-      },
-      {
-        tag: "MÓDULO 3 - SLIDE 2 DE 3",
-        title: "Sistemas de Redução de Força (Desmultiplicação Z-Rig 3:1)",
-        subtitle: "Multiplicação mecânica de força com polias de alto rendimento.",
-        image: "images/sc_mod3_z_rig_31.png",
-        bullets: [
-          "<strong>Sistema Z-Rig 3:1:</strong> Utiliza 1 polia móvel na carga e 1 polia fixa na ancoragem para reduzir o esforço de tracionamento a 1/3.",
-          "<strong>Vantagem Mecânica Real vs Teórica:</strong> Devido ao atrito das polias e cordas, o rendimento real do 3:1 gira em torno de 2.5:1.",
-          "<strong>Nó Friccionante de Trava (Capture Cam):</strong> Prusik ou blocador ventral instalado na polia fixa para reter a carga a cada puxada."
-        ]
-      },
-      {
-        tag: "MÓDULO 3 - SLIDE 3 DE 3",
-        title: "Sistemas Compostos Vector 5:1 & Vantagem Mecânica",
-        subtitle: "Sistemas avançados para elevação de macas pesadas.",
-        image: "images/sc_mod3_vector_51.png",
-        bullets: [
-          "<strong>Sistema 5:1 Composto:</strong> Combinação de um sistema 3:1 tracionando um 2:1 secundário para resgates exigentes.",
-          "<strong>Gerenciamento de Corda:</strong> Controle rigoroso de sobra para evitar nós de emaranhamento durante a elevação.",
-          "<strong>Polias de Placas Oscilantes:</strong> Uso de polias duplas com rolamento de esferas selado para máxima eficiência."
+          "<strong>Equalização Autoadaptável:</strong> Distribuição de carga uniforme entre dois ou mais pontos estruturais.",
+          "<strong>Regra dos Ângulos no Y:</strong> Ângulo a 60° (58% por ponto), 90° (71% por ponto), 120° (100% por ponto - Limite Crítico!).",
+          "<strong>Pontos Bombeiros Comprovados:</strong> Fixação apenas em vigas I, colunas de concreto armado e olhais certificados."
         ]
       }
     ]
   },
   4: {
-    title: "Módulo 4: Manobras de Resgate & Manejo de Maca Sked",
-    subtitle: "Pick-Off Tático, Transposição de Borda e Maca Envelopada",
+    title: "Estação 4: Movimentação Operacional de Vítima",
+    subtitle: "Manejo em Maca Sked Envelopada, RMC PHTLS 10ª Ed e Desmultiplicação Z-Rig",
     slides: [
       {
-        tag: "MÓDULO 4 - SLIDE 1 DE 3",
-        title: "Manobras de Resgate Pick-Off (Desenganche Tático)",
-        subtitle: "Retirada de vítima suspensa por talabarte ou corda rompida.",
+        tag: "ESTAÇÃO 4 - SLIDE 1 DE 3",
+        title: "Maca Sked Envelopada & Imobilização Operacional",
+        subtitle: "Empacotamento rígido para transposição vertical e horizontal.",
+        image: "images/aph_mod4_maca_sked_envelopamento.png",
+        bullets: [
+          "<strong>Envelopamento Rígido:</strong> Passagem das tirantes fiveladas em ilhós cruzados garantindo rigidez estrutural completa.",
+          "<strong>Fixação dos Pés e Cabeça:</strong> Uso de blocos imobilizadores laterais e tirantes de pé para evitar deslocamento interno.",
+          "<strong>Tirantes de Içamento:</strong> Instalação de aranha de suspensão ajustável para alteração do ângulo (horizontal/vertical).",
+          "<strong>Protetor de Corda e Cordoalha:</strong> Verificação dos pontos de fricção com a borda antes de autorizar o içamento."
+        ]
+      },
+      {
+        tag: "ESTAÇÃO 4 - SLIDE 2 DE 3",
+        title: "Restrição de Movimentos da Coluna (RMC / PHTLS 10ª Ed)",
+        subtitle: "Diretrizes atualizadas para controle espinhal e prevenção de hipotermia.",
+        image: "images/aph_mod4_rmc_phtls.png",
+        bullets: [
+          "<strong>Indicação Seletiva de RMC:</strong> Aplicação rigorosa em pacientes com dor palpal, déficit neurológico ou mecanismo de trauma grave.",
+          "<strong>Rolamento em Bloco (4 Socorristas):</strong> Movimentação coordenada sob comando do socorrista da cabeça (via aérea).",
+          "<strong>Prevenção Ativa da Hipotermia:</strong> Envelopamento da vítima com manta térmica aluminizada antes de fechar a maca Sked.",
+          "<strong>Monitoramento Continuado:</strong> Reavaliação neurovascular periférica após o fechamento das tirantes da maca."
+        ]
+      },
+      {
+        tag: "ESTAÇÃO 4 - SLIDE 3 DE 3",
+        title: "Desmultiplicação de Força Z-Rig 3:1 & Trava de Segurança",
+        subtitle: "Vantagem mecânica com retenção automatizada de carga.",
+        image: "images/sc_mod3_z_rig_31.png",
+        bullets: [
+          "<strong>Sistema Z-Rig 3:1:</strong> Utiliza 1 polia móvel na carga e 1 polia fixa na ancoragem, reduzindo o esforço a 1/3 teórico.",
+          "<strong>Trava de Captura (Capture Cam):</strong> Nó autoblocante ou blocador mecânico na polia fixa para retenção imediata.",
+          "<strong>Rendimento Real vs Teórico:</strong> Atrito das polias e cordas reduz a vantagem mecânica real para aproximadamente 2.5:1."
+        ]
+      }
+    ]
+  },
+  5: {
+    title: "Estação 5: Barranco & Terreno Inclinado",
+    subtitle: "Atendimento Pré-Hospitalar e Transposição em Encostas e Despenhadeiros",
+    slides: [
+      {
+        tag: "ESTAÇÃO 5 - SLIDE 1 DE 3",
+        title: "Imobilização em Prancha Longa com Tirante Aranha",
+        subtitle: "Estabilização firme em superfícies irregulares e declives.",
+        image: "images/aph_mod5_prancha_barranco.png",
+        bullets: [
+          "<strong>Tirante Tipo Aranha:</strong> Ancoragem de 10 pontos para impedir o deslizamento da vítima durante a inclinação em barrancos.",
+          "<strong>Estabilização do Rolamento Secundário:</strong> Uso de estacas e anéis de ancoragem para fixar a prancha antes do tracionamento.",
+          "<strong>Proteção contra Escombros e Vegetação:</strong> Uso de óculos de proteção e manta de lona sobre o paciente.",
+          "<strong>Avaliação de Choque Hipovolêmico:</strong> Controle estrito de temperatura e pulso em ambientes úmidos/frios."
+        ]
+      },
+      {
+        tag: "ESTAÇÃO 5 - SLIDE 2 DE 3",
+        title: "Içamento em Rampa com Socorrista Acompanhante",
+        subtitle: "Suporte de APH continuado durante a subida da prancha/maca.",
+        image: "images/aph_mod5_transposicao_rampa.png",
+        bullets: [
+          "<strong>Socorrista Acompanhante:</strong> Conectado ao sistema de içamento ao lado da maca para guiar e manter a via aérea alinhada.",
+          "<strong>Linha de Tração Secundária:</strong> Sistema 3:1 ou Vector 5:1 tracionando a maca com linha belay redundante.",
+          "<strong>Gerenciamento de Esforço Físico:</strong> Revezamento dos puxadores no topo da rampa para evitar fadiga muscular da equipe.",
+          "<strong>Comunicação de Subida:</strong> Sinalização clara para pausar o tracionamento caso a vítima apresente vômito ou instabilidade."
+        ]
+      },
+      {
+        tag: "ESTAÇÃO 5 - SLIDE 3 DE 3",
+        title: "Sistemas Compostos Vector 5:1 & Proteção de Borda",
+        subtitle: "Multiplicação avançada para elevação pesada em encostas.",
+        image: "images/sc_mod3_vector_51.png",
+        bullets: [
+          "<strong>Sistema 5:1 Composto:</strong> Combinação de um sistema 3:1 tracionando um 2:1 secundário para resgates em pirambeiras pesadas.",
+          "<strong>Polias de Placa Oscilante:</strong> Eficiência superior e menor atrito durante o tracionamento continuado.",
+          "<strong>Protetor Articulado de Calha/Quina:</strong> Proteção da corda contra quinas vivas de pedras e concreto."
+        ]
+      }
+    ]
+  },
+  6: {
+    title: "Estação 6: Escadas & Tripés Operacionais",
+    subtitle: "Extração Vertical com Tripé de Resgate, Escada Prolongável e Pick-Off Tático",
+    slides: [
+      {
+        tag: "ESTAÇÃO 6 - SLIDE 1 DE 3",
+        title: "Extração Vertical com Tripé Operacional & Suporte Cervical",
+        subtitle: "Pontos de ancoragem altos para passagem limpa de maca e socorrista.",
+        image: "images/aph_mod6_tripe_resgate_aph.png",
+        bullets: [
+          "<strong>Vantagem do Ponto Alto (Tripé):</strong> Eleva a polia acima da borda, facilitando a transposição vertical do paciente imobilizado.",
+          "<strong>Suporte Cervical Continuado:</strong> Manutenção do alinhamento manual da coluna durante todo o içamento pela cabeça.",
+          "<strong>Tirantes de Pernas do Tripé:</strong> Verificação das correntes/fitas de limitação das pernas do tripé para evitar abertura.",
+          "<strong>Linha Belay no Tripé:</strong> Passagem da linha de vida independente por segunda polia no cabeçote do tripé."
+        ]
+      },
+      {
+        tag: "ESTAÇÃO 6 - SLIDE 2 DE 3",
+        title: "Transposição de Borda & Escada Prolongável",
+        subtitle: "Descenso e içamento técnico através de estruturas de escada.",
+        image: "images/aph_mod6_escada_extracao.png",
+        bullets: [
+          "<strong>Escada Guiada / Prolongável:</strong> Utilização da escada como trilho de deslizamento suave para a maca cesto/Sked.",
+          "<strong>Controle de Centro de Gravidade:</strong> Socorristas projetam o corpo para fora da borda mantendo base firme nas travessas.",
+          "<strong>Passagem de Nó sob Tensão:</strong> Transferência de carga da linha principal para nó autoblocante secundário se necessário.",
+          "<strong>Arremate de Chegada no Solo:</strong> Transferência imediata do paciente para a ambulância de suporte avançado (USA)."
+        ]
+      },
+      {
+        tag: "ESTAÇÃO 6 - SLIDE 3 DE 3",
+        title: "Manobra de Resgate Pick-Off Tático (Desenganche)",
+        subtitle: "Retirada de vítima suspensa por talabarte ou cinto rompido.",
         image: "images/sc_mod4_pick_off.png",
         bullets: [
-          "<strong>Aproximação Controlada:</strong> O resgatador desce pela corda de trabalho até posicionar-se ao lado da vítima.",
-          "<strong>Conexão Direta:</strong> Conectar a vítima ao cinto do resgatador por fita de ancoragem ajustável (linha de transferência).",
-          "<strong>Alívio de Tensão & Corte Seguro:</strong> Tracionar a vítima com pedaleira/mini-sistema para aliviar o talabarte preso antes da liberação."
-        ]
-      },
-      {
-        tag: "MÓDULO 4 - SLIDE 2 DE 3",
-        title: "Manejo e Envelopamento de Maca Sked / Cesto",
-        subtitle: "Imobilização espinhal e proteção em espaços confinados.",
-        image: "images/sc_mod4_maca_sked.png",
-        bullets: [
-          "<strong>Rigidez & Flexibilidade:</strong> A maca Sked garante imobilização completa e desliza sobre superfícies irregulares.",
-          "<strong>Amarra de Envelopamento:</strong> Passagem das fitas em ilhós cruzados para travamento do paciente.",
-          "<strong>Suspensão Horizontal e Vertical:</strong> Ajuste das tirantes de içamento conforme a geometria do poço ou edificação."
-        ]
-      },
-      {
-        tag: "MÓDULO 4 - SLIDE 3 DE 3",
-        title: "Transposição de Borda & Passagem de Nó",
-        subtitle: "Superação de quinas vivas e arremate final de resgate.",
-        image: "images/sc_mod4_transposicao_borda.png",
-        bullets: [
-          "<strong>Protetores de Corda:</strong> Instalação obrigatória de protetores articulados de alumínio ou lona em quinas de concreto.",
-          "<strong>Técnica de Transposição:</strong> Manter o centro de gravidade projetado para fora da borda com pé de apoio alto.",
-          "<strong>Passagem de Nó em Descenso:</strong> Transferência de carga da linha de descenso para nó autoblocante secundário."
+          "<strong>Conexão Direta à Vítima:</strong> Transferência da carga da vítima para o cinto do resgatador por fita ajustável.",
+          "<strong>Alívio da Tensão Presa:</strong> Uso de mini-sistema ou pedaleira para aliviar a tensão do talabarte da vítima antes de soltá-lo.",
+          "<strong>Descenso Duplo Controlado:</strong> Descer com a vítima acoplada usando descensor autofrenante com controle de velocidade."
         ]
       }
     ]
@@ -177,7 +265,7 @@ let authToken = localStorage.getItem('cb_auth_token') || '';
 let currentModule = 1;
 let currentSlideIndex = 0;
 let currentStudentFilter = 'ativo';
-let userProgress = { 1: false, 2: false, 3: false, 4: false };
+let userProgress = { 1: false, 2: false, 3: false, 4: false, 5: false, 6: false };
 
 // Estado da Tentativa do Quiz
 let currentAttemptId = null;
