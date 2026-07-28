@@ -49,7 +49,13 @@ else:
 
 print(f"[SERVER API] Utilizando banco de dados em: {DB_PATH}")
 
-UPLOAD_DIR = os.path.join(PERSISTENT_DIR, 'uploads') if os.path.exists(PERSISTENT_DIR) and os.path.isdir(PERSISTENT_DIR) else os.path.join(os.path.dirname(__file__), 'uploads')
+if os.path.exists(PERSISTENT_DIR) and os.path.isdir(PERSISTENT_DIR):
+    UPLOAD_DIR = os.environ.get('UPLOADS_DIR', os.path.join(PERSISTENT_DIR, 'uploads'))
+else:
+    UPLOAD_DIR = os.path.join(os.path.dirname(__file__), 'uploads')
+
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+print(f"[SERVER API] Utilizando pasta de uploads em: {UPLOAD_DIR}")
 SESSIONS = {}
 
 LOGIN_ATTEMPTS = {}

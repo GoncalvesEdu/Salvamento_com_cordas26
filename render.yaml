@@ -9,6 +9,8 @@ services:
         value: /data/salvamento_2gb.db
       - key: PERSISTENT_DIR
         value: /data
+      - key: UPLOADS_DIR
+        value: /data/uploads
     disk:
       name: salvamento-cordas-data
       mountPath: /data
