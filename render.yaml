@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: salvamento-com-cordas26
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python server_api.py
+    envVars:
+      - key: DB_PATH
+        value: /data/salvamento_2gb.db
+      - key: PERSISTENT_DIR
+        value: /data
+    disk:
+      name: salvamento-cordas-data
+      mountPath: /data
+      sizeGB: 1

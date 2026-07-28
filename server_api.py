@@ -24,8 +24,32 @@ import random
 from datetime import datetime
 
 PORT = 8082
-DB_PATH = 'salvamento_2gb.db'
-UPLOAD_DIR = os.path.join(os.path.dirname(__file__), 'uploads')
+
+# ------------------------------------------------------------------
+# CONFIGURAÇÃO DE CAMINHO DO BANCO DE DADOS (PERSISTENT DISK READY)
+# ------------------------------------------------------------------
+ENV_DB_PATH = os.environ.get('DB_PATH', '')
+PERSISTENT_DIR = os.environ.get('PERSISTENT_DIR', '/data')
+
+if ENV_DB_PATH:
+    DB_PATH = ENV_DB_PATH
+elif os.path.exists(PERSISTENT_DIR) and os.path.isdir(PERSISTENT_DIR):
+    target_db = os.path.join(PERSISTENT_DIR, 'salvamento_2gb.db')
+    if not os.path.exists(target_db):
+        seed_db = os.path.join(os.path.dirname(__file__), 'salvamento_2gb.db')
+        if os.path.exists(seed_db):
+            try:
+                shutil.copy2(seed_db, target_db)
+                print(f"[PERSISTENT DISK] Banco inicial copiado para {target_db}")
+            except Exception as e:
+                print(f"[PERSISTENT DISK] Erro ao copiar banco inicial: {e}")
+    DB_PATH = target_db
+else:
+    DB_PATH = os.path.join(os.path.dirname(__file__), 'salvamento_2gb.db')
+
+print(f"[SERVER API] Utilizando banco de dados em: {DB_PATH}")
+
+UPLOAD_DIR = os.path.join(PERSISTENT_DIR, 'uploads') if os.path.exists(PERSISTENT_DIR) and os.path.isdir(PERSISTENT_DIR) else os.path.join(os.path.dirname(__file__), 'uploads')
 SESSIONS = {}
 
 LOGIN_ATTEMPTS = {}
