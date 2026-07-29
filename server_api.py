@@ -58,6 +58,46 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 print(f"[SERVER API] Utilizando pasta de uploads em: {UPLOAD_DIR}")
 SESSIONS = {}
 
+def calculate_student_pacing_status(modulos_concluidos, total_modulos=7, current_dt=None):
+    if current_dt is None:
+        current_dt = date.today()
+    elif isinstance(current_dt, datetime):
+        current_dt = current_dt.date()
+
+    start_date = date(2026, 8, 3)
+    end_date = date(2026, 8, 13)
+    total_course_days = (end_date - start_date).days + 1
+
+    if current_dt < start_date:
+        expected_modules = 0
+    elif current_dt >= end_date:
+        expected_modules = total_modulos
+    else:
+        days_elapsed = (current_dt - start_date).days + 1
+        expected_modules = math.ceil((days_elapsed / float(total_course_days)) * total_modulos)
+
+    if modulos_concluidos == 0:
+        status_key = 'nao_iniciado'
+        status_label = 'Não iniciado'
+        status_color = '#f87171'
+    elif modulos_concluidos < expected_modules:
+        status_key = 'atrasado'
+        status_label = 'Atrasado'
+        status_color = '#f5c23d'
+    else:
+        status_key = 'em_dia'
+        status_label = 'Em dia'
+        status_color = '#4ade80'
+
+    return {
+        'status_key': status_key,
+        'status_label': status_label,
+        'status_color': status_color,
+        'expected_modules': expected_modules,
+        'modulos_concluidos': modulos_concluidos,
+        'total_modulos': total_modulos
+    }
+
 LOGIN_ATTEMPTS = {}
 MAX_LOGIN_ATTEMPTS = 5
 LOCKOUT_TIME_SECONDS = 300
@@ -644,45 +684,6 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                     'porcentagem': pct
                 }
 
-def calculate_student_pacing_status(modulos_concluidos, total_modulos=7, current_dt=None):
-    if current_dt is None:
-        current_dt = date.today()
-    elif isinstance(current_dt, datetime):
-        current_dt = current_dt.date()
-
-    start_date = date(2026, 8, 3)
-    end_date = date(2026, 8, 13)
-    total_course_days = (end_date - start_date).days + 1
-
-    if current_dt < start_date:
-        expected_modules = 0
-    elif current_dt >= end_date:
-        expected_modules = total_modulos
-    else:
-        days_elapsed = (current_dt - start_date).days + 1
-        expected_modules = math.ceil((days_elapsed / float(total_course_days)) * total_modulos)
-
-    if modulos_concluidos == 0:
-        status_key = 'nao_iniciado'
-        status_label = 'Não iniciado'
-        status_color = '#f87171'
-    elif modulos_concluidos < expected_modules:
-        status_key = 'atrasado'
-        status_label = 'Atrasado'
-        status_color = '#f5c23d'
-    else:
-        status_key = 'em_dia'
-        status_label = 'Em dia'
-        status_color = '#4ade80'
-
-    return {
-        'status_key': status_key,
-        'status_label': status_label,
-        'status_color': status_color,
-        'expected_modules': expected_modules,
-        'modulos_concluidos': modulos_concluidos,
-        'total_modulos': total_modulos
-    }
             today_str = datetime.now().strftime('%Y-%m-%d')
             alertas = []
             alertas_atencao = []
