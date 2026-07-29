@@ -36,3 +36,17 @@ Sempre que novas questões ou módulos forem criados:
 ## 4. Recomendações de Segurança e Staging
 
 - **Ambiente de Homologação (Staging)**: Recomenda-se criar um segundo serviço Web no Render (ex: `salvamento-cordas-staging.onrender.com`) vinculado a uma branch `staging` do Git para validar novas questões e recursos antes de promover para a branch `main` de produção.
+
+---
+
+## 5. Política Permanente de Testes em Produção
+
+Para garantir a integridade dos dados e o progresso real dos alunos da corporação:
+1. **Conta de Teste Fictícia Dedicada**:
+   - Todo e qualquer teste automatizado, simulação de quiz, teste de persistência ou estresse em ambiente ao vivo deve utilizar **EXCLUSIVAMENTE** a conta de teste dedicada:
+     - **RE**: `999999-9`
+     - **Nome**: `ALUNO DE TESTE (NÃO USAR EM PRODUÇÃO)`
+     - **Senha**: `999999-9`
+2. **Proibição de Testes em REs Reais**:
+   - É estritamente proibido rodar scripts de teste, rotinas de limpeza (`DELETE`) ou simulações de fluxo utilizando REs de alunos reais importados da corporação.
+   - A conta fictícia `123456-7` foi mantida apenas para legado inicial, e a conta `999999-9` passa a ser a conta oficial padrão de testes técnicos.

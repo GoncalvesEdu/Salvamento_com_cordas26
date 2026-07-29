@@ -252,6 +252,14 @@ def init_db():
         ON CONFLICT(username) DO UPDATE SET senha_hash = excluded.senha_hash, role = 'instrutor'
     ''', (instrutor_pass,))
 
+    # Inserir Conta Fictícia Dedicada para Testes de Produção (RE: 999999-9)
+    teste_pass = hash_password_pbkdf2('999999-9')
+    cur.execute('''
+        INSERT INTO usuarios (username, senha_hash, nome, re, estacao, role, senha_provisoria, status)
+        VALUES ('999999-9', ?, 'ALUNO DE TESTE (NÃO USAR EM PRODUÇÃO)', '999999-9', '2º GB / TESTE', 'aluno', 0, 'ativo')
+        ON CONFLICT(username) DO UPDATE SET senha_hash = excluded.senha_hash, role = 'aluno'
+    ''', (teste_pass,))
+
     conn.commit()
     conn.close()
     try:
