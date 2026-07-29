@@ -644,10 +644,69 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                     'porcentagem': pct
                 }
 
+def calculate_student_pacing_status(modulos_concluidos, total_modulos=7, current_dt=None):
+    if current_dt is None:
+        current_dt = date.today()
+    elif isinstance(current_dt, datetime):
+        current_dt = current_dt.date()
+
+    start_date = date(2026, 8, 3)
+    end_date = date(2026, 8, 13)
+    total_course_days = (end_date - start_date).days + 1
+
+    if current_dt < start_date:
+        expected_modules = 0
+    elif current_dt >= end_date:
+        expected_modules = total_modulos
+    else:
+        days_elapsed = (current_dt - start_date).days + 1
+        expected_modules = math.ceil((days_elapsed / float(total_course_days)) * total_modulos)
+
+    if modulos_concluidos == 0:
+        status_key = 'nao_iniciado'
+        status_label = 'Não iniciado'
+        status_color = '#f87171'
+    elif modulos_concluidos < expected_modules:
+        status_key = 'atrasado'
+        status_label = 'Atrasado'
+        status_color = '#f5c23d'
+    else:
+        status_key = 'em_dia'
+        status_label = 'Em dia'
+        status_color = '#4ade80'
+
+    return {
+        'status_key': status_key,
+        'status_label': status_label,
+        'status_color': status_color,
+        'expected_modules': expected_modules,
+        'modulos_concluidos': modulos_concluidos,
+        'total_modulos': total_modulos
+    }
             today_str = datetime.now().strftime('%Y-%m-%d')
             alertas = []
+            alertas_atencao = []
+            cnt_nao_iniciados = 0
+            cnt_atrasados = 0
+            cnt_em_dia = 0
+
             for a in alunos:
+                pacing = calculate_student_pacing_status(a['modulos_concluidos'], total_modulos_curso)
+                a['status_ritmo'] = pacing['status_key']
+                a['status_ritmo_label'] = pacing['status_label']
+                a['status_ritmo_color'] = pacing['status_color']
+                a['modulos_esperados'] = pacing['expected_modules']
+
                 if a['status'] == 'ativo':
+                    if pacing['status_key'] == 'nao_iniciado':
+                        cnt_nao_iniciados += 1
+                        alertas_atencao.append(a)
+                    elif pacing['status_key'] == 'atrasado':
+                        cnt_atrasados += 1
+                        alertas_atencao.append(a)
+                    else:
+                        cnt_em_dia += 1
+
                     ult_acesso = str(a['data_cadastro'])[:10] if a['data_cadastro'] else ''
                     pendente = a['modulos_concluidos'] < total_modulos_curso
                     nao_acessou_hoje = (ult_acesso != today_str)
@@ -667,6 +726,8 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
 
             conn.close()
 
+            pacing_sample = calculate_student_pacing_status(0, total_modulos_curso)
+
             return self.send_json({
                 'success': True,
                 'total_ativos': total_ativos,
@@ -674,7 +735,16 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                 'total_modulos': total_modulos_curso,
                 'alunos': alunos,
                 'conclusao_por_turma': conclusao_por_modulo,
-                'alertas': alertas
+                'alertas': alertas,
+                'alertas_atencao': alertas_atencao,
+                'resumo_atencao': {
+                    'total_precisam_atencao': len(alertas_atencao),
+                    'cnt_nao_iniciados': cnt_nao_iniciados,
+                    'cnt_atrasados': cnt_atrasados,
+                    'cnt_em_dia': cnt_em_dia,
+                    'prazo_certificacao': '13/08/2026',
+                    'ritmo_esperado_hoje': pacing_sample['expected_modules']
+                }
             })
 
         elif path == '/api/instrutoria/certificados':

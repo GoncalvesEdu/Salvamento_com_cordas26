@@ -814,6 +814,55 @@ async function loadDatabaseStudentReport() {
       alertBox.innerHTML = `<span style="color: #2a9d68; font-weight: 700;">✅ Nenhuma pendência ou senha provisória pendente na turma de alunos ativos.</span>`;
     }
 
+    // Renderizar Seção de Alunos que Precisam de Atenção / Ritmo
+    const attentionBox = document.getElementById('attention-students-list');
+    const attentionSummaryBadge = document.getElementById('attention-summary-badge');
+    const pacingExpectedBadge = document.getElementById('pacing-expected-badge');
+    const alertasAtencao = data.alertas_atencao || [];
+    const resumoAtencao = data.resumo_atencao || {};
+
+    if (pacingExpectedBadge) {
+      pacingExpectedBadge.innerText = `${resumoAtencao.ritmo_esperado_hoje || 0} de ${totalModulos} Módulos Concluídos`;
+    }
+
+    if (attentionSummaryBadge) {
+      const tot = resumoAtencao.total_precisam_atencao || 0;
+      attentionSummaryBadge.innerText = `${tot} Aluno${tot !== 1 ? 's' : ''} Requerem Atenção`;
+    }
+
+    if (attentionBox) {
+      if (alertasAtencao.length === 0) {
+        attentionBox.innerHTML = `<span style="color: #4ade80; font-weight: 700; font-size: 0.85rem;"><i class="fa-solid fa-circle-check"></i> Excelente! 100% dos alunos da turma estão em dia com o ritmo esperado de estudos.</span>`;
+      } else {
+        attentionBox.innerHTML = alertasAtencao.map(a => {
+          const modConc = Number(a.modulos_concluidos || 0);
+          const modEsp = Number(a.modulos_esperados || 0);
+          const isNaoIniciado = a.status_ritmo === 'nao_iniciado';
+          
+          const tagBg = isNaoIniciado ? 'background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #f87171;' : 'background: rgba(245, 194, 61, 0.15); border: 1px solid #f5c23d; color: #f5c23d;';
+          const iconStr = isNaoIniciado ? '<i class="fa-solid fa-user-xmark"></i> Não iniciado' : '<i class="fa-solid fa-clock"></i> Atrasado';
+          const descMsg = isNaoIniciado 
+            ? 'Nenhum módulo concluído no portal.' 
+            : `Concluiu <strong>${modConc}</strong> módulo(s), mas o esperado para hoje eram <strong>${modEsp}</strong>.`;
+
+          return `
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="${tagBg} padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 800;">${iconStr}</span>
+                <div>
+                  <strong style="color: #fff; font-size: 0.9rem;">${a.nome}</strong>
+                  <span style="font-size: 0.78rem; color: var(--color-text-muted); margin-left: 8px;">RE: <code>${a.re}</code> &bull; ${a.estacao}</span>
+                </div>
+              </div>
+              <div style="font-size: 0.8rem; color: var(--color-text-main);">
+                ${descMsg}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
     if (data.alunos.length === 0) {
       tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: 2rem;">Nenhum aluno encontrado no filtro selecionado (${currentStudentFilter.toUpperCase()}).</td></tr>`;
       return;
@@ -834,6 +883,10 @@ async function loadDatabaseStudentReport() {
         statusBadge = `<span style="color: #2a9d68; background: rgba(42, 157, 104, 0.15); border: 1px solid #2a9d68; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 800;"><i class="fa-solid fa-user-check"></i> Ativo</span>`;
       }
 
+      const pacingColor = a.status_ritmo_color || '#4ade80';
+      const pacingLabel = a.status_ritmo_label || 'Em dia';
+      const pacingBadge = `<span style="color: ${pacingColor}; background: rgba(255, 255, 255, 0.05); border: 1px solid ${pacingColor}; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; margin-left: 6px;">${pacingLabel}</span>`;
+
       let btnToggleStatus = isDesligado
         ? `<button class="nav-btn" onclick="reactivateStudent('${a.re}', '${a.nome}')" style="padding: 4px 10px; font-size: 0.78rem; background: rgba(42, 157, 104, 0.2); border-color: #2a9d68; color: #2a9d68;"><i class="fa-solid fa-user-plus"></i> Reativar</button>`
         : `<button class="nav-btn btn-action-soft-delete" onclick="softDeleteStudent('${a.re}', '${a.nome}')" style="padding: 4px 10px; font-size: 0.78rem;"><i class="fa-solid fa-user-minus"></i> Desligar</button>`;
@@ -843,7 +896,7 @@ async function loadDatabaseStudentReport() {
           <td><strong>${a.nome}</strong></td>
           <td><code>${a.re}</code></td>
           <td>${a.estacao}</td>
-          <td>${statusBadge}</td>
+          <td>${statusBadge} ${pacingBadge}</td>
           <td>
             <div style="display: flex; align-items: center; gap: 8px;">
               <span style="font-weight: 800; color: var(--color-gold-patch);" id="student-progress-ratio-${a.re}">${modConcluidos}/${totalModulos} (${pctProgresso}%)</span>

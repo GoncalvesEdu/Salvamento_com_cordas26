@@ -1158,6 +1158,27 @@
           </div>
         </div>
 
+        <!-- Card de Alunos que Precisam de Atenção / Cobrança de Prazo -->
+        <div class="alerts-card" id="attention-students-card" style="border-color: #f87171; background: rgba(239, 68, 68, 0.05); margin-bottom: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <strong style="color: #f87171; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-triangle-exclamation"></i> Alunos que Precisam de Atenção / Cobrança
+              </strong>
+              <span style="font-size: 0.8rem; color: var(--color-text-muted);">
+                Prazo Final da Certificação por Estações: <strong style="color: var(--color-gold-patch);">13/08/2026</strong> &bull; Ritmo Esperado Hoje: <strong style="color: #fff;" id="pacing-expected-badge">0 Módulos Concluídos</strong>
+              </span>
+            </div>
+            <span id="attention-summary-badge" style="background: rgba(239, 68, 68, 0.2); border: 1px solid #f87171; color: #f87171; padding: 4px 12px; border-radius: 12px; font-size: 0.82rem; font-weight: 800;">
+              0 Alunos Requerem Atenção
+            </span>
+          </div>
+
+          <div id="attention-students-list" style="display: flex; flex-direction: column; gap: 8px;">
+            <!-- Carregado Dinamicamente -->
+          </div>
+        </div>
+
         <!-- Alertas de Pendências -->
         <div class="alerts-card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
