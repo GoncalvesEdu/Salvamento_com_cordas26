@@ -693,7 +693,48 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             ''')
             certificados = [dict(r) for r in cur.fetchall()]
             conn.close()
-            return self.send_json({'success': True, 'certificados': certificados})
+        elif path == '/api/instrutoria/relatorio-erros':
+            user = self.authenticate_request(required_role=['instrutor', 'admin'])
+            if not user:
+                return
+
+            conn = get_db()
+            cur = conn.cursor()
+            cur.execute('''
+                SELECT 
+                    q.id AS question_id,
+                    q.modulo_id,
+                    q.question_text,
+                    COUNT(a.is_correct) AS total_respostas,
+                    SUM(CASE WHEN a.is_correct = 0 THEN 1 ELSE 0 END) AS total_erros,
+                    SUM(CASE WHEN a.is_correct = 1 THEN 1 ELSE 0 END) AS total_acertos,
+                    ROUND(CAST(SUM(CASE WHEN a.is_correct = 0 THEN 1 ELSE 0 END) AS FLOAT) * 100.0 / COUNT(a.is_correct), 1) AS percentual_erro
+                FROM quiz_answers a
+                JOIN quiz_questions q ON a.question_id = q.id
+                GROUP BY q.id, q.modulo_id, q.question_text
+                ORDER BY percentual_erro DESC, total_respostas DESC
+            ''')
+            relatorio = [dict(r) for r in cur.fetchall()]
+
+            cur.execute('''
+                SELECT 
+                    q.modulo_id,
+                    COUNT(a.is_correct) AS total_respostas_modulo,
+                    SUM(CASE WHEN a.is_correct = 0 THEN 1 ELSE 0 END) AS total_erros_modulo,
+                    ROUND(CAST(SUM(CASE WHEN a.is_correct = 0 THEN 1 ELSE 0 END) AS FLOAT) * 100.0 / COUNT(a.is_correct), 1) AS percentual_erro_modulo
+                FROM quiz_answers a
+                JOIN quiz_questions q ON a.question_id = q.id
+                GROUP BY q.modulo_id
+                ORDER BY percentual_erro_modulo DESC
+            ''')
+            por_modulo = [dict(r) for r in cur.fetchall()]
+            conn.close()
+
+            return self.send_json({
+                'success': True,
+                'relatorio_questoes': relatorio,
+                'resumo_modulos': por_modulo
+            })
 
         elif path == '/api/instrutoria/arquivos':
             user = self.authenticate_request(required_role=['aluno', 'instrutor', 'admin'])

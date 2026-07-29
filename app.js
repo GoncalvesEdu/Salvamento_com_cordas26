@@ -768,6 +768,9 @@ async function loadDatabaseStudentReport() {
   const tbody = document.getElementById('db-students-table-body');
   const alertBox = document.getElementById('alerts-list-box');
   const alertCountBadge = document.getElementById('alert-count-badge');
+
+  loadErrorQuestionsReport();
+
   if (!tbody) return;
 
   try {
@@ -998,6 +1001,89 @@ function openLibraryModal() {
 
 function closeLibraryModal() {
   document.getElementById('modal-library')?.classList.add('hidden');
+}
+
+let cachedErrorQuestions = [];
+
+async function loadErrorQuestionsReport() {
+  const tbody = document.getElementById('error-questions-tbody');
+  if (!tbody) return;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/instrutoria/relatorio-erros`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    const data = await res.json();
+
+    if (!data.success) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--color-text-muted); padding: 1rem;">Erro ao carregar o relatório pedagógico de erros.</td></tr>`;
+      return;
+    }
+
+    cachedErrorQuestions = data.relatorio_questoes || [];
+    renderErrorQuestionsReport();
+
+  } catch (err) {
+    console.error("Erro ao buscar relatório pedagógico de erros:", err);
+  }
+}
+
+function renderErrorQuestionsReport() {
+  const tbody = document.getElementById('error-questions-tbody');
+  const filterSelect = document.getElementById('filter-error-module-select');
+  if (!tbody) return;
+
+  const selectedMod = filterSelect ? filterSelect.value : 'todos';
+
+  let filtered = cachedErrorQuestions;
+  if (selectedMod !== 'todos') {
+    filtered = cachedErrorQuestions.filter(q => String(q.modulo_id) === String(selectedMod));
+  }
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align: center; color: var(--color-text-muted); padding: 1.25rem;">
+          <i class="fa-solid fa-circle-check" style="color: #22c55e; margin-right: 6px;"></i> Nenhuma tentativa ou erro registrado nesta categoria até o momento.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(q => {
+    const isCritical = q.percentual_erro >= 50.0 && q.total_respostas >= 3;
+    const isSmallSample = q.total_respostas < 3;
+    
+    const rowBg = isCritical ? 'background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444;' : '';
+    
+    let rateBadge = `<span style="font-weight: 800; color: #4ade80;">${q.percentual_erro}%</span>`;
+    if (isCritical) {
+      rateBadge = `
+        <span style="background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #f87171; padding: 2px 8px; border-radius: 4px; font-weight: 800; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 4px;">
+          <i class="fa-solid fa-triangle-exclamation"></i> ${q.percentual_erro}%
+        </span>
+      `;
+    } else if (q.percentual_erro > 0) {
+      rateBadge = `<span style="font-weight: 800; color: #f5c23d;">${q.percentual_erro}%</span>`;
+    }
+
+    const modLabel = q.modulo_id === 'final' ? 'Prova Final' : `Estação ${q.modulo_id}`;
+    const sampleBadge = isSmallSample ? `<span style="font-size: 0.7rem; color: var(--color-text-muted); display: block;">(Amostra reduzida &lt; 3)</span>` : '';
+
+    return `
+      <tr style="${rowBg}">
+        <td><strong>${modLabel}</strong></td>
+        <td>
+          <span style="color: #fff; font-weight: 600;">${q.question_text}</span>
+          ${isCritical ? '<div style="font-size: 0.72rem; color: #f87171; margin-top: 3px;">⚠️ Alto índice de erro (&ge; 50% em 3+ respostas). Verificar clareza do enunciado ou reforçar o tema na aula prática.</div>' : ''}
+        </td>
+        <td style="text-align: center;">${q.total_respostas} ${sampleBadge}</td>
+        <td style="text-align: center; color: #f87171; font-weight: 700;">${q.total_erros}</td>
+        <td style="text-align: center;">${rateBadge}</td>
+      </tr>
+    `;
+  }).join('');
 }
 
 // ------------------------------------------------------------------
