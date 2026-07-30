@@ -339,13 +339,15 @@ def sync_uploaded_files_in_db():
                     sz_str = f"{sz_mb:.2f} MB"
                     mime = mimetypes.guess_type(file_path)[0] or 'application/pdf'
 
+                    fn_low = fn.lower()
+                    visib = 'todos' if any(k in fn_low for k in ['qts', 'manual', 'dip', 'salvamento']) else 'instrutor'
                     cur.execute('SELECT COUNT(*) as cnt FROM arquivos_instrutoria WHERE nome_arquivo = ? OR nome_original = ? OR nome_salvo = ?', (fn, fn, fn))
                     if cur.fetchone()['cnt'] == 0:
                         cur.execute('''
-                            INSERT INTO arquivos_instrutoria (nome_arquivo, nome_original, nome_salvo, caminho_arquivo, tamanho, mime_type)
-                            VALUES (?, ?, ?, ?, ?, ?)
-                        ''', (fn, fn, fn, file_path, sz_str, mime))
-                        print(f"[AUTO-SYNC] Registrado no BD: {fn}")
+                            INSERT INTO arquivos_instrutoria (nome_arquivo, nome_original, nome_salvo, caminho_arquivo, tamanho, mime_type, visivel_para)
+                            VALUES (?, ?, ?, ?, ?, ?, ?)
+                        ''', (fn, fn, fn, file_path, sz_str, mime, visib))
+                        print(f"[AUTO-SYNC] Registrado no BD ({visib}): {fn}")
 
         conn.commit()
         conn.close()
@@ -834,7 +836,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                     f_dict['nome_original'] = f_dict.get('nome_arquivo', 'Manual de Salvamento em Altura v3.pdf')
                 if 'visivel_para' not in f_dict or not f_dict['visivel_para']:
                     fn_low = f_dict['nome_original'].lower()
-                    f_dict['visivel_para'] = 'todos' if ('qts' in fn_low or 'manual' in fn_low) else 'instrutor'
+                    f_dict['visivel_para'] = 'todos' if any(k in fn_low for k in ['qts', 'manual', 'dip', 'salvamento']) else 'instrutor'
                 arquivos.append(f_dict)
 
             return self.send_json({'success': True, 'arquivos': arquivos})
