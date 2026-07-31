@@ -12,6 +12,9 @@ import json
 import sqlite3
 import urllib.parse
 import os
+import psycopg2
+from psycopg2.extras import RealDictCursor
+from psycopg2 import errors
 import hashlib
 import secrets
 import uuid
@@ -141,10 +144,10 @@ def verify_password(password, stored_hash):
     return legacy_hash == stored_hash
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH, timeout=10.0)
-    conn.row_factory = sqlite3.Row
-    conn.execute('PRAGMA journal_mode=WAL;')
-    conn.execute('PRAGMA busy_timeout=5000;')
+    conn = psycopg2.connect(
+        os.environ.get("DATABASE_URL"),
+        cursor_factory=RealDictCursor
+    )
     return conn
 
 def init_db():
@@ -153,14 +156,14 @@ def init_db():
 
     cur.execute('''
         CREATE TABLE IF NOT EXISTS usuarios (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             username TEXT UNIQUE NOT NULL,
             senha_hash TEXT NOT NULL,
             nome TEXT NOT NULL,
             re TEXT UNIQUE NOT NULL,
             estacao TEXT NOT NULL,
             role TEXT CHECK(role IN ('aluno', 'instrutor', 'admin')) NOT NULL,
-            senha_provisoria INTEGER DEFAULT 1,
+            senha_provisoria SMALLINT DEFAULT 1,
             primeiro_acesso_em TIMESTAMP DEFAULT NULL,
             status TEXT DEFAULT 'ativo',
             desligado_em TIMESTAMP DEFAULT NULL,
@@ -168,24 +171,24 @@ def init_db():
         );
     ''')
 
-    cur.execute("PRAGMA table_info(usuarios)")
-    usr_cols = [c[1] for c in cur.fetchall()]
+    cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name = %s", ('usuarios',))
+    usr_cols = [c['column_name'] for c in cur.fetchall()]
     if 'senha_provisoria' not in usr_cols:
-        try: cur.execute("ALTER TABLE usuarios ADD COLUMN senha_provisoria INTEGER DEFAULT 1")
-        except sqlite3.OperationalError: pass
+        try: cur.execute("ALTER TABLE usuarios ADD COLUMN senha_provisoria SMALLINT DEFAULT 1")
+        except Exception: pass
     if 'primeiro_acesso_em' not in usr_cols:
         try: cur.execute("ALTER TABLE usuarios ADD COLUMN primeiro_acesso_em TIMESTAMP DEFAULT NULL")
-        except sqlite3.OperationalError: pass
+        except Exception: pass
     if 'status' not in usr_cols:
         try: cur.execute("ALTER TABLE usuarios ADD COLUMN status TEXT DEFAULT 'ativo'")
-        except sqlite3.OperationalError: pass
+        except Exception: pass
     if 'desligado_em' not in usr_cols:
         try: cur.execute("ALTER TABLE usuarios ADD COLUMN desligado_em TIMESTAMP DEFAULT NULL")
-        except sqlite3.OperationalError: pass
+        except Exception: pass
 
     cur.execute('''
         CREATE TABLE IF NOT EXISTS alunos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             nome TEXT NOT NULL,
             re TEXT UNIQUE NOT NULL,
             estacao TEXT NOT NULL,
@@ -198,10 +201,10 @@ def init_db():
 
     cur.execute('''
         CREATE TABLE IF NOT EXISTS progresso_modulos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             aluno_re TEXT NOT NULL,
             modulo_id INTEGER NOT NULL,
-            nota REAL DEFAULT 0.0,
+            nota DOUBLE PRECISION DEFAULT 0.0,
             tempo_gasto INTEGER DEFAULT 0,
             status TEXT DEFAULT 'concluido',
             data_conclusao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -211,7 +214,7 @@ def init_db():
 
     cur.execute('''
         CREATE TABLE IF NOT EXISTS certificados (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             aluno_re TEXT NOT NULL,
             codigo_hash TEXT UNIQUE NOT NULL,
             data_emissao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -221,20 +224,26 @@ def init_db():
 
     cur.execute('''
         CREATE TABLE IF NOT EXISTS arquivos_instrutoria (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             nome_arquivo TEXT NOT NULL,
             nome_original TEXT NOT NULL,
             nome_salvo TEXT NOT NULL,
             caminho_arquivo TEXT NOT NULL,
             tamanho TEXT NOT NULL,
             mime_type TEXT DEFAULT 'application/pdf',
+            visivel_para TEXT DEFAULT 'todos',
             data_upload TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
     ''')
 
+    try:
+        cur.execute("ALTER TABLE arquivos_instrutoria ADD COLUMN visivel_para TEXT DEFAULT 'todos'")
+    except Exception:
+        pass
+
     cur.execute('''
         CREATE TABLE IF NOT EXISTS logs_auditoria (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             acao TEXT NOT NULL,
             executado_por TEXT NOT NULL,
             detalhes TEXT NOT NULL,
@@ -271,7 +280,7 @@ def init_db():
             option_order TEXT NOT NULL,
             started_at TEXT NOT NULL,
             submitted_at TEXT,
-            score REAL
+            score DOUBLE PRECISION
         );
     ''')
 
@@ -289,7 +298,7 @@ def init_db():
     instrutor_pass = hash_password_pbkdf2('2gb2026')
     cur.execute('''
         INSERT INTO usuarios (username, senha_hash, nome, re, estacao, role, senha_provisoria, status)
-        VALUES ('instrutor.2gb', ?, 'Comando de Instrução 2º GB', 'INSTRUTOR-01', '2º GB / Comando', 'instrutor', 0, 'ativo')
+        VALUES ('instrutor.2gb', %s, 'Comando de Instrução 2º GB', 'INSTRUTOR-01', '2º GB / Comando', 'instrutor', 0, 'ativo')
         ON CONFLICT(username) DO UPDATE SET senha_hash = excluded.senha_hash, role = 'instrutor'
     ''', (instrutor_pass,))
 
@@ -297,7 +306,7 @@ def init_db():
     teste_pass = hash_password_pbkdf2('999999-9')
     cur.execute('''
         INSERT INTO usuarios (username, senha_hash, nome, re, estacao, role, senha_provisoria, status)
-        VALUES ('999999-9', ?, 'ALUNO DE TESTE (NÃO USAR EM PRODUÇÃO)', '999999-9', '2º GB / TESTE', 'aluno', 0, 'ativo')
+        VALUES ('999999-9', %s, 'ALUNO DE TESTE (NÃO USAR EM PRODUÇÃO)', '999999-9', '2º GB / TESTE', 'aluno', 0, 'ativo')
         ON CONFLICT(username) DO UPDATE SET senha_hash = excluded.senha_hash, role = 'aluno'
     ''', (teste_pass,))
 
@@ -341,11 +350,11 @@ def sync_uploaded_files_in_db():
 
                     fn_low = fn.lower()
                     visib = 'todos' if any(k in fn_low for k in ['qts', 'manual', 'dip', 'salvamento']) else 'instrutor'
-                    cur.execute('SELECT COUNT(*) as cnt FROM arquivos_instrutoria WHERE nome_arquivo = ? OR nome_original = ? OR nome_salvo = ?', (fn, fn, fn))
+                    cur.execute('SELECT COUNT(*) as cnt FROM arquivos_instrutoria WHERE nome_arquivo = %s OR nome_original = %s OR nome_salvo = %s', (fn, fn, fn))
                     if cur.fetchone()['cnt'] == 0:
                         cur.execute('''
                             INSERT INTO arquivos_instrutoria (nome_arquivo, nome_original, nome_salvo, caminho_arquivo, tamanho, mime_type, visivel_para)
-                            VALUES (?, ?, ?, ?, ?, ?, ?)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s)
                         ''', (fn, fn, fn, file_path, sz_str, mime, visib))
                         print(f"[AUTO-SYNC] Registrado no BD ({visib}): {fn}")
 
@@ -563,7 +572,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
 
             conn = get_db()
             cur = conn.cursor()
-            cur.execute('SELECT * FROM arquivos_instrutoria WHERE id = ?', (file_id,))
+            cur.execute('SELECT * FROM arquivos_instrutoria WHERE id = %s', (file_id,))
             file_row = cur.fetchone()
             conn.close()
 
@@ -631,7 +640,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             total_modulos_curso = max(len(modulos_ativos_ids), 1)
 
             if modulos_ativos_ids:
-                placeholders = ', '.join(['?'] * len(modulos_ativos_ids))
+                placeholders = ', '.join(['%s'] * len(modulos_ativos_ids))
                 params_filter = modulos_ativos_ids * 3
             else:
                 placeholders = "'-1'"
@@ -672,7 +681,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                         SELECT COUNT(DISTINCT p.aluno_re) as count_concluidos
                         FROM progresso_modulos p
                         JOIN usuarios u ON p.aluno_re = u.re
-                        WHERE CAST(p.modulo_id AS TEXT) = ? AND COALESCE(u.status, 'ativo') = 'ativo'
+                        WHERE CAST(p.modulo_id AS TEXT) = %s AND COALESCE(u.status, 'ativo') = 'ativo'
                     ''', (str(m_id),))
                     c_count = cur.fetchone()['count_concluidos']
                     pct = round((c_count / total_ativos) * 100)
@@ -848,7 +857,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
 
             conn = get_db()
             cur = conn.cursor()
-            cur.execute('SELECT modulo_id, nota, status, data_conclusao FROM progresso_modulos WHERE aluno_re = ?', (user['re'],))
+            cur.execute('SELECT modulo_id, nota, status, data_conclusao FROM progresso_modulos WHERE aluno_re = %s', (user['re'],))
             progresso = [dict(r) for r in cur.fetchall()]
             conn.close()
 
@@ -896,7 +905,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             cur = conn.cursor()
 
             # Buscar usuário pelo RE ou Username no Banco de Dados
-            cur.execute('SELECT id, username, senha_hash, nome, re, estacao, role, senha_provisoria, primeiro_acesso_em, COALESCE(status, "ativo") as status FROM usuarios WHERE username = ? OR re = ?', (username, username))
+            cur.execute('SELECT id, username, senha_hash, nome, re, estacao, role, senha_provisoria, primeiro_acesso_em, COALESCE(status, "ativo") as status FROM usuarios WHERE username = %s OR re = %s', (username, username))
             user_row = cur.fetchone()
 
             # MUDANÇA 3: Recusar login se o RE não estiver pré-cadastrado no BD (via CSV ou cadastro manual)
@@ -910,7 +919,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             user_dict = dict(user_row)
 
             # Buscar Nome e Estação (Cia/OPM) oficiais da tabela de alunos caso existam
-            cur.execute('SELECT nome, estacao FROM alunos WHERE re = ?', (user_dict['re'],))
+            cur.execute('SELECT nome, estacao FROM alunos WHERE re = %s', (user_dict['re'],))
             aluno_row = cur.fetchone()
             if aluno_row:
                 user_dict['nome'] = aluno_row['nome']
@@ -944,7 +953,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                 'created_at': datetime.now().isoformat()
             }
 
-            cur.execute('SELECT modulo_id, nota FROM progresso_modulos WHERE aluno_re = ?', (user_dict['re'],))
+            cur.execute('SELECT modulo_id, nota FROM progresso_modulos WHERE aluno_re = %s', (user_dict['re'],))
             progresso = [dict(r) for r in cur.fetchall()]
             conn.close()
 
@@ -979,7 +988,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
 
             cur.execute('''
                 SELECT id, seed, question_order, option_order FROM quiz_attempts
-                WHERE aluno_re = ? AND curso_id = ? AND modulo_id = ? AND submitted_at IS NULL
+                WHERE aluno_re = %s AND curso_id = %s AND modulo_id = %s AND submitted_at IS NULL
                 ORDER BY started_at DESC LIMIT 1
             ''', (aluno_re, curso_id, modulo_id))
             attempt_row = cur.fetchone()
@@ -993,25 +1002,25 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                 # Validar se as opções registradas na tentativa ainda existem no BD
                 valid_attempt = True
                 for qid in question_order:
-                    cur.execute('SELECT COUNT(*) as cnt FROM quiz_questions WHERE id = ?', (qid,))
+                    cur.execute('SELECT COUNT(*) as cnt FROM quiz_questions WHERE id = %s', (qid,))
                     if cur.fetchone()['cnt'] == 0:
                         valid_attempt = False
                         break
                     for op_id in option_order.get(qid, []):
-                        cur.execute('SELECT COUNT(*) as cnt FROM quiz_options WHERE id = ?', (op_id,))
+                        cur.execute('SELECT COUNT(*) as cnt FROM quiz_options WHERE id = %s', (op_id,))
                         if cur.fetchone()['cnt'] == 0:
                             valid_attempt = False
                             break
                 
                 if not valid_attempt:
-                    cur.execute('DELETE FROM quiz_attempts WHERE id = ?', (attempt_id,))
+                    cur.execute('DELETE FROM quiz_attempts WHERE id = %s', (attempt_id,))
                     conn.commit()
                     attempt_row = None
 
             if not attempt_row:
                 attempt_id = str(uuid.uuid4())
                 
-                cur.execute('SELECT id, question_text FROM quiz_questions WHERE curso_id = ? AND CAST(modulo_id AS TEXT) = ?', (curso_id, str(modulo_id)))
+                cur.execute('SELECT id, question_text FROM quiz_questions WHERE curso_id = %s AND CAST(modulo_id AS TEXT) = %s', (curso_id, str(modulo_id)))
                 q_rows = cur.fetchall()
 
                 if not q_rows:
@@ -1022,7 +1031,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                 options_by_q = {}
 
                 for qid in q_ids:
-                    cur.execute('SELECT id FROM quiz_options WHERE question_id = ?', (qid,))
+                    cur.execute('SELECT id FROM quiz_options WHERE question_id = %s', (qid,))
                     op_rows = cur.fetchall()
                     options_by_q[qid] = [r['id'] for r in op_rows]
 
@@ -1033,13 +1042,13 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                 now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 cur.execute('''
                     INSERT INTO quiz_attempts (id, aluno_re, curso_id, modulo_id, seed, question_order, option_order, started_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 ''', (attempt_id, aluno_re, curso_id, modulo_id, seed, json.dumps(question_order), json.dumps(option_order), now_str))
                 conn.commit()
 
             questions_payload = []
             for qid in question_order:
-                cur.execute('SELECT question_text FROM quiz_questions WHERE id = ?', (qid,))
+                cur.execute('SELECT question_text FROM quiz_questions WHERE id = %s', (qid,))
                 q_row = cur.fetchone()
                 if not q_row: continue
 
@@ -1047,7 +1056,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                 options_payload = []
 
                 for op_id in ordered_op_ids:
-                    cur.execute('SELECT option_text FROM quiz_options WHERE id = ?', (op_id,))
+                    cur.execute('SELECT option_text FROM quiz_options WHERE id = %s', (op_id,))
                     op_row = cur.fetchone()
                     if op_row:
                         options_payload.append({
@@ -1089,7 +1098,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             conn = get_db()
             cur = conn.cursor()
 
-            cur.execute('SELECT is_correct FROM quiz_options WHERE id = ? AND question_id = ?', (chosen_option_id, question_id))
+            cur.execute('SELECT is_correct FROM quiz_options WHERE id = %s AND question_id = %s', (chosen_option_id, question_id))
             op_row = cur.fetchone()
 
             if not op_row:
@@ -1099,11 +1108,14 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             is_correct_val = op_row['is_correct']
 
             cur.execute('''
-                INSERT OR REPLACE INTO quiz_answers (attempt_id, question_id, chosen_option_id, is_correct)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO quiz_answers (attempt_id, question_id, chosen_option_id, is_correct)
+                VALUES (%s, %s, %s, %s)
+                ON CONFLICT (attempt_id, question_id) DO UPDATE SET
+                    chosen_option_id = EXCLUDED.chosen_option_id,
+                    is_correct = EXCLUDED.is_correct
             ''', (attempt_id, question_id, chosen_option_id, is_correct_val))
 
-            cur.execute('SELECT modulo_id, question_order FROM quiz_attempts WHERE id = ?', (attempt_id,))
+            cur.execute('SELECT modulo_id, question_order FROM quiz_attempts WHERE id = %s', (attempt_id,))
             att_row = cur.fetchone()
             
             attempt_completed = False
@@ -1115,7 +1127,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                 q_order = json.loads(att_row['question_order'])
                 total_q = len(q_order)
 
-                cur.execute('SELECT COUNT(*) as answered_count, SUM(is_correct) as correct_count FROM quiz_answers WHERE attempt_id = ?', (attempt_id,))
+                cur.execute('SELECT COUNT(*) as answered_count, SUM(is_correct) as correct_count FROM quiz_answers WHERE attempt_id = %s', (attempt_id,))
                 ans_summary = cur.fetchone()
 
                 if ans_summary['answered_count'] >= total_q:
@@ -1125,13 +1137,18 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
 
                     cur.execute('''
                         UPDATE quiz_attempts
-                        SET submitted_at = ?, score = ?
-                        WHERE id = ?
+                        SET submitted_at = %s, score = %s
+                        WHERE id = %s
                     ''', (now_str, score, attempt_id))
 
                     cur.execute('''
-                        INSERT OR REPLACE INTO progresso_modulos (aluno_re, modulo_id, nota, tempo_gasto, status, data_conclusao)
-                        VALUES (?, ?, ?, 300, 'concluido', ?)
+                        INSERT INTO progresso_modulos (aluno_re, modulo_id, nota, tempo_gasto, status, data_conclusao)
+                        VALUES (%s, %s, %s, 300, 'concluido', %s)
+                        ON CONFLICT (aluno_re, modulo_id) DO UPDATE SET
+                            nota = EXCLUDED.nota,
+                            tempo_gasto = EXCLUDED.tempo_gasto,
+                            status = EXCLUDED.status,
+                            data_conclusao = EXCLUDED.data_conclusao
                     ''', (user['re'], mod_id_val, score, now_str))
 
             conn.commit()
@@ -1167,7 +1184,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             conn = get_db()
             cur = conn.cursor()
 
-            cur.execute('SELECT is_correct FROM quiz_options WHERE id = ? AND question_id = ?', (chosen_option_id, qid))
+            cur.execute('SELECT is_correct FROM quiz_options WHERE id = %s AND question_id = %s', (chosen_option_id, qid))
             op_row = cur.fetchone()
 
             if not op_row:
@@ -1189,7 +1206,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             cur.execute('''
                 INSERT INTO progresso_modulos (aluno_re, modulo_id, nota, tempo_gasto, status, data_conclusao)
-                VALUES (?, ?, 100.0, 300, 'concluido', ?)
+                VALUES (%s, %s, 100.0, 300, 'concluido', %s)
             ''', (user['re'], int(modulo_id_str), now_str))
 
             conn.commit()
@@ -1252,7 +1269,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
 
                 cur.execute('''
                     INSERT INTO arquivos_instrutoria (nome_arquivo, nome_original, nome_salvo, caminho_arquivo, tamanho, mime_type, visivel_para, data_upload)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 ''', (orig_name, orig_name, saved_name, physical_path, size_str, mime, visib_val, now_str))
                 
                 new_id = cur.lastrowid
@@ -1319,7 +1336,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                     erros_list.append(f"Linha {line_idx} (RE {re_val}): Nome do aluno é obrigatório.")
                     continue
 
-                cur.execute('SELECT id, nome FROM usuarios WHERE re = ? OR username = ?', (re_val, re_val))
+                cur.execute('SELECT id, nome FROM usuarios WHERE re = %s OR username = %s', (re_val, re_val))
                 dup = cur.fetchone()
                 if dup:
                     erros_list.append(f"Linha {line_idx} (RE {re_val}): RE já cadastrado no banco para '{dup['nome']}'.")
@@ -1329,12 +1346,12 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                     re_hash = hash_password_pbkdf2(re_val)
                     cur.execute('''
                         INSERT INTO usuarios (username, senha_hash, nome, re, estacao, role, senha_provisoria, status)
-                        VALUES (?, ?, ?, ?, ?, 'aluno', 1, 'ativo')
+                        VALUES (%s, %s, %s, %s, %s, 'aluno', 1, 'ativo')
                     ''', (re_val, re_hash, nome_completo, re_val, estacao_val))
 
                     cur.execute('''
                         INSERT INTO alunos (nome, re, estacao, status)
-                        VALUES (?, ?, ?, 'ativo')
+                        VALUES (%s, %s, %s, 'ativo')
                         ON CONFLICT(re) DO UPDATE SET nome=excluded.nome, estacao=excluded.estacao
                     ''', (nome_completo, re_val, estacao_val))
 
@@ -1353,7 +1370,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             log_det = f"IMPORTAÇÃO CSV LOTE: Total={total_linhas}, Sucesso={len(sucesso_list)}, Erros={len(erros_list)}"
             cur.execute('''
                 INSERT INTO logs_auditoria (acao, executado_por, detalhes)
-                VALUES ('IMPORTACAO_LOTE_CSV', ?, ?)
+                VALUES ('IMPORTACAO_LOTE_CSV', %s, %s)
             ''', (user['username'], log_det))
             conn.commit()
 
@@ -1385,14 +1402,14 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             cur = conn.cursor()
             cur.execute('''
                 UPDATE usuarios
-                SET status = 'desligado', desligado_em = ?
-                WHERE re = ? AND role = 'aluno'
+                SET status = 'desligado', desligado_em = %s
+                WHERE re = %s AND role = 'aluno'
             ''', (now_str, aluno_re))
 
             cur.execute('''
                 UPDATE alunos
-                SET status = 'desligado', desligado_em = ?
-                WHERE re = ?
+                SET status = 'desligado', desligado_em = %s
+                WHERE re = %s
             ''', (now_str, aluno_re))
 
             for t, u in list(SESSIONS.items()):
@@ -1421,13 +1438,13 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             cur.execute('''
                 UPDATE usuarios
                 SET status = 'ativo', desligado_em = NULL
-                WHERE re = ? AND role = 'aluno'
+                WHERE re = %s AND role = 'aluno'
             ''', (aluno_re,))
 
             cur.execute('''
                 UPDATE alunos
                 SET status = 'ativo', desligado_em = NULL
-                WHERE re = ?
+                WHERE re = %s
             ''', (aluno_re,))
 
             conn.commit()
@@ -1452,7 +1469,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             conn = get_db()
             cur = conn.cursor()
 
-            cur.execute('SELECT nome FROM usuarios WHERE re = ? AND role = "aluno"', (aluno_re,))
+            cur.execute('SELECT nome FROM usuarios WHERE re = %s AND role = "aluno"', (aluno_re,))
             row = cur.fetchone()
 
             if not row:
@@ -1470,13 +1487,13 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             detalhes_log = f"EXCLUSÃO PERMANENTE: RE={aluno_re}, Nome={nome_real}, ExecutadoPor={user['username']}"
             cur.execute('''
                 INSERT INTO logs_auditoria (acao, executado_por, detalhes)
-                VALUES ('EXCLUSAO_DEFINITIVA_ALUNO', ?, ?)
+                VALUES ('EXCLUSAO_DEFINITIVA_ALUNO', %s, %s)
             ''', (user['username'], detalhes_log))
 
-            cur.execute('DELETE FROM progresso_modulos WHERE aluno_re = ?', (aluno_re,))
-            cur.execute('DELETE FROM certificados WHERE aluno_re = ?', (aluno_re,))
-            cur.execute('DELETE FROM alunos WHERE re = ?', (aluno_re,))
-            cur.execute('DELETE FROM usuarios WHERE re = ?', (aluno_re,))
+            cur.execute('DELETE FROM progresso_modulos WHERE aluno_re = %s', (aluno_re,))
+            cur.execute('DELETE FROM certificados WHERE aluno_re = %s', (aluno_re,))
+            cur.execute('DELETE FROM alunos WHERE re = %s', (aluno_re,))
+            cur.execute('DELETE FROM usuarios WHERE re = %s', (aluno_re,))
 
             for t, u in list(SESSIONS.items()):
                 if u.get('re') == aluno_re:
@@ -1514,8 +1531,8 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             cur = conn.cursor()
             cur.execute('''
                 UPDATE usuarios
-                SET senha_hash = ?, senha_provisoria = 0, primeiro_acesso_em = ?
-                WHERE id = ? OR username = ? OR re = ?
+                SET senha_hash = %s, senha_provisoria = 0, primeiro_acesso_em = %s
+                WHERE id = %s OR username = %s OR re = %s
             ''', (novo_hash, now_str, user['user_id'], user['username'], user['re']))
 
             conn.commit()
@@ -1545,8 +1562,8 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             cur = conn.cursor()
             cur.execute('''
                 UPDATE usuarios
-                SET senha_hash = ?, senha_provisoria = 1, primeiro_acesso_em = NULL
-                WHERE re = ? AND role = 'aluno'
+                SET senha_hash = %s, senha_provisoria = 1, primeiro_acesso_em = NULL
+                WHERE re = %s AND role = 'aluno'
             ''', (re_hash, aluno_re))
 
             if cur.rowcount == 0:
@@ -1580,12 +1597,12 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             try:
                 cur.execute('''
                     INSERT INTO certificados (aluno_re, codigo_hash)
-                    VALUES (?, ?)
+                    VALUES (%s, %s)
                 ''', (aluno_re, codigo_hash))
                 conn.commit()
                 conn.close()
                 return self.send_json({'success': True, 'message': 'Certificado registrado no BD'})
-            except sqlite3.IntegrityError:
+            except errors.UniqueViolation:
                 conn.close()
                 return self.send_json({'success': True, 'message': 'Certificado já existente'})
 

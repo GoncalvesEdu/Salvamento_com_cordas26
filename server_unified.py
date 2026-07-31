@@ -8,6 +8,9 @@ import json
 import sqlite3
 import urllib.parse
 import os
+import psycopg2
+from psycopg2.extras import RealDictCursor
+from psycopg2 import errors
 from datetime import datetime
 
 PORT = 8081
@@ -19,7 +22,7 @@ def init_db():
 
     cur.execute('''
         CREATE TABLE IF NOT EXISTS alunos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             nome TEXT NOT NULL,
             re TEXT UNIQUE NOT NULL,
             estacao TEXT NOT NULL,
@@ -30,15 +33,15 @@ def init_db():
 
     try:
         cur.execute('ALTER TABLE alunos ADD COLUMN ultimo_acesso TIMESTAMP DEFAULT CURRENT_TIMESTAMP')
-    except sqlite3.OperationalError:
+    except Exception:
         pass
 
     cur.execute('''
         CREATE TABLE IF NOT EXISTS progresso_modulos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             aluno_re TEXT NOT NULL,
             modulo_id INTEGER NOT NULL,
-            nota REAL DEFAULT 0.0,
+            nota DOUBLE PRECISION DEFAULT 0.0,
             tempo_gasto INTEGER DEFAULT 0,
             status TEXT DEFAULT 'concluido',
             data_inicio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -49,17 +52,17 @@ def init_db():
 
     try:
         cur.execute('ALTER TABLE progresso_modulos ADD COLUMN tempo_gasto INTEGER DEFAULT 180')
-    except sqlite3.OperationalError:
+    except Exception:
         pass
 
     try:
         cur.execute("ALTER TABLE progresso_modulos ADD COLUMN status TEXT DEFAULT 'concluido'")
-    except sqlite3.OperationalError:
+    except Exception:
         pass
 
     cur.execute('''
         CREATE TABLE IF NOT EXISTS certificados (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             aluno_re TEXT NOT NULL,
             codigo_hash TEXT UNIQUE NOT NULL,
             data_emissao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -69,7 +72,7 @@ def init_db():
 
     cur.execute('''
         CREATE TABLE IF NOT EXISTS arquivos_instrutoria (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             nome_arquivo TEXT NOT NULL,
             caminho_arquivo TEXT NOT NULL,
             tamanho TEXT,
@@ -81,8 +84,10 @@ def init_db():
     conn.close()
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = psycopg2.connect(
+        os.environ.get("DATABASE_URL"),
+        cursor_factory=RealDictCursor
+    )
     return conn
 
 class UnifiedPortalHandler(http.server.SimpleHTTPRequestHandler):
@@ -132,7 +137,7 @@ class UnifiedPortalHandler(http.server.SimpleHTTPRequestHandler):
                     cur.execute('''
                         SELECT COUNT(DISTINCT aluno_re) as count_concluidos
                         FROM progresso_modulos
-                        WHERE modulo_id = ?
+                        WHERE modulo_id = %s
                     ''', (m,))
                     c_count = cur.fetchone()['count_concluidos']
                     pct = round((c_count / total_alunos) * 100)
@@ -226,13 +231,13 @@ class UnifiedPortalHandler(http.server.SimpleHTTPRequestHandler):
 
             cur.execute('''
                 INSERT INTO alunos (nome, re, estacao, data_cadastro)
-                VALUES (?, ?, ?, ?)
+                VALUES (%s, %s, %s, %s)
                 ON CONFLICT(re) DO UPDATE SET nome=excluded.nome, estacao=excluded.estacao
             ''', (nome, re, estacao, now_str))
 
             conn.commit()
 
-            cur.execute('SELECT modulo_id, nota FROM progresso_modulos WHERE aluno_re = ?', (re,))
+            cur.execute('SELECT modulo_id, nota FROM progresso_modulos WHERE aluno_re = %s', (re,))
             progresso = [dict(r) for r in cur.fetchall()]
             conn.close()
 
@@ -258,7 +263,7 @@ class UnifiedPortalHandler(http.server.SimpleHTTPRequestHandler):
 
             cur.execute('''
                 INSERT INTO progresso_modulos (aluno_re, modulo_id, nota, tempo_gasto, data_conclusao)
-                VALUES (?, ?, ?, ?, ?)
+                VALUES (%s, %s, %s, %s, %s)
             ''', (aluno_re, modulo_id, nota, tempo_gasto, now_str))
 
             conn.commit()
@@ -278,12 +283,12 @@ class UnifiedPortalHandler(http.server.SimpleHTTPRequestHandler):
             try:
                 cur.execute('''
                     INSERT INTO certificados (aluno_re, codigo_hash)
-                    VALUES (?, ?)
+                    VALUES (%s, %s)
                 ''', (aluno_re, codigo_hash))
                 conn.commit()
                 conn.close()
                 return self.send_json({'success': True, 'message': 'Certificado registrado no BD'})
-            except sqlite3.IntegrityError:
+            except errors.UniqueViolation:
                 conn.close()
                 return self.send_json({'success': True, 'message': 'Certificado já existente'})
 
@@ -295,7 +300,7 @@ class UnifiedPortalHandler(http.server.SimpleHTTPRequestHandler):
             cur = conn.cursor()
             cur.execute('''
                 INSERT INTO arquivos_instrutoria (nome_arquivo, caminho_arquivo, tamanho)
-                VALUES (?, ?, ?)
+                VALUES (%s, %s, %s)
             ''', (nome_arquivo, f'uploads/{nome_arquivo}', tamanho))
             conn.commit()
             conn.close()

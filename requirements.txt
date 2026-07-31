@@ -1,1 +1,1 @@
-# Dependências do Portal 2º GB (Usa biblioteca padrão do Python)
+psycopg2-binary==2.9.9
