@@ -218,6 +218,7 @@ const modulesData = {
   6: {
     title: "Estação 6: Escadas & Tripés Operacionais",
     subtitle: "Extração Vertical com Tripé de Resgate, Escada Prolongável e Pick-Off Tático",
+    youtubeId: "KUlGl2laKwc",
     slides: [
       {
         tag: "ESTAÇÃO 6 - SLIDE 1 DE 3",
