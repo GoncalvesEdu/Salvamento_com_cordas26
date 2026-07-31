@@ -153,16 +153,10 @@ def init_db():
             );
         ''')
 
-        cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name = %s", ('usuarios',))
-        usr_cols = [c['column_name'] for c in cur.fetchall()]
-        if 'senha_provisoria' not in usr_cols:
-            cur.execute("ALTER TABLE usuarios ADD COLUMN senha_provisoria SMALLINT DEFAULT 1")
-        if 'primeiro_acesso_em' not in usr_cols:
-            cur.execute("ALTER TABLE usuarios ADD COLUMN primeiro_acesso_em TIMESTAMP DEFAULT NULL")
-        if 'status' not in usr_cols:
-            cur.execute("ALTER TABLE usuarios ADD COLUMN status TEXT DEFAULT 'ativo'")
-        if 'desligado_em' not in usr_cols:
-            cur.execute("ALTER TABLE usuarios ADD COLUMN desligado_em TIMESTAMP DEFAULT NULL")
+        cur.execute("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS senha_provisoria SMALLINT DEFAULT 1")
+        cur.execute("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS primeiro_acesso_em TIMESTAMP DEFAULT NULL")
+        cur.execute("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'ativo'")
+        cur.execute("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS desligado_em TIMESTAMP DEFAULT NULL")
 
         cur.execute('''
             CREATE TABLE IF NOT EXISTS alunos (
@@ -214,10 +208,7 @@ def init_db():
             );
         ''')
 
-        cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name = %s", ('arquivos_instrutoria',))
-        arq_cols = [c['column_name'] for c in cur.fetchall()]
-        if 'visivel_para' not in arq_cols:
-            cur.execute("ALTER TABLE arquivos_instrutoria ADD COLUMN visivel_para TEXT DEFAULT 'todos'")
+        cur.execute("ALTER TABLE arquivos_instrutoria ADD COLUMN IF NOT EXISTS visivel_para TEXT DEFAULT 'todos'")
 
         cur.execute('''
             CREATE TABLE IF NOT EXISTS logs_auditoria (
