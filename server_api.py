@@ -27,7 +27,7 @@ import random
 from datetime import datetime, date
 import math
 
-PORT = 8082
+PORT = int(os.environ.get('PORT', 8082))
 
 # ------------------------------------------------------------------
 # CONFIGURAÇÃO DE CONEXÃO COM O BANCO DE DADOS POSTGRESQL

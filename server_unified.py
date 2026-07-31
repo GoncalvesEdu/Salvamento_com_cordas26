@@ -13,7 +13,7 @@ from psycopg2.extras import RealDictCursor
 from psycopg2 import errors
 from datetime import datetime
 
-PORT = 8081
+PORT = int(os.environ.get('PORT', 8081))
 
 def init_db():
     conn = get_db()
