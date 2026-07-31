@@ -1086,11 +1086,8 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             is_correct_val = op_row['is_correct']
 
             cur.execute('''
-                INSERT INTO quiz_answers (attempt_id, question_id, chosen_option_id, is_correct)
+                INSERT OR REPLACE INTO quiz_answers (attempt_id, question_id, chosen_option_id, is_correct)
                 VALUES (?, ?, ?, ?)
-                ON CONFLICT(attempt_id, question_id) DO UPDATE SET
-                    chosen_option_id = excluded.chosen_option_id,
-                    is_correct = excluded.is_correct
             ''', (attempt_id, question_id, chosen_option_id, is_correct_val))
 
             cur.execute('SELECT modulo_id, question_order FROM quiz_attempts WHERE id = ?', (attempt_id,))
@@ -1120,12 +1117,8 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                     ''', (now_str, score, attempt_id))
 
                     cur.execute('''
-                        INSERT INTO progresso_modulos (aluno_re, modulo_id, nota, tempo_gasto, status, data_conclusao)
+                        INSERT OR REPLACE INTO progresso_modulos (aluno_re, modulo_id, nota, tempo_gasto, status, data_conclusao)
                         VALUES (?, ?, ?, 300, 'concluido', ?)
-                        ON CONFLICT(aluno_re, modulo_id) DO UPDATE SET
-                            nota = MAX(progresso_modulos.nota, excluded.nota),
-                            status = 'concluido',
-                            data_conclusao = excluded.data_conclusao
                     ''', (user['re'], mod_id_val, score, now_str))
 
             conn.commit()
