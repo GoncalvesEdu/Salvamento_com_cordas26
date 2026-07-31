@@ -317,6 +317,8 @@ function showScreen(screenId) {
   if (screenId === 'screen-instrutoria') {
     loadDatabaseStudentReport();
     loadInstructorFiles();
+  } else if (screenId === 'screen-classroom') {
+    fetchStudentProgressAndRender();
   }
 }
 
@@ -367,8 +369,12 @@ async function handleLogin() {
     authToken = data.token;
     localStorage.setItem('cb_auth_token', authToken);
     currentUser = data.user;
-    currentRole = data.user.role; // ROLE VEIO RIGOROSAMENTE DO BD DO SERVIDORE
+    currentRole = data.user.role;
     localStorage.setItem('cb_user_data', JSON.stringify(currentUser));
+
+    if (data.progresso) {
+      applyStudentProgress(data.progresso);
+    }
 
     updateHeaderUserInfo();
 
@@ -1439,15 +1445,63 @@ async function handleQuizSubmission() {
   }
 }
 
+function applyStudentProgress(progressoArray) {
+  userProgress = { 1: false, 2: false, 3: false, 4: false, 5: false, 6: false, final: false };
+  if (Array.isArray(progressoArray)) {
+    progressoArray.forEach(p => {
+      let mId = String(p.modulo_id);
+      if (mId !== 'final' && !isNaN(parseInt(mId))) {
+        mId = parseInt(mId);
+      }
+      userProgress[mId] = true;
+    });
+  }
+  updateCourseProgressBar();
+}
+
+async function fetchStudentProgressAndRender() {
+  if (!authToken || !currentUser) return;
+  try {
+    const res = await fetch(`${API_BASE_URL}/aluno/meu-progresso?_t=${Date.now()}`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    const data = await res.json();
+    if (data.success && Array.isArray(data.progresso)) {
+      applyStudentProgress(data.progresso);
+    }
+  } catch (err) {
+    console.error("Erro ao sincronizar progresso do aluno:", err);
+  }
+}
+
 function updateCourseProgressBar() {
-  const completed = Object.values(userProgress).filter(Boolean).length;
-  const pct = (completed / 4) * 100;
+  const allModules = [1, 2, 3, 4, 5, 6, 'final'];
+  const completed = allModules.filter(m => userProgress[m] === true).length;
+  const pct = Math.round((completed / 7) * 100);
   
   const fill = document.getElementById('course-progress-bar-fill');
   if (fill) fill.style.width = `${pct}%`;
 
   const txt = document.getElementById('course-progress-text');
-  if (txt) txt.innerText = `${completed} de 4 Módulos Concluídos`;
+  if (txt) txt.innerText = `${completed} de 7 Módulos Concluídos (${pct}%)`;
+
+  allModules.forEach(mId => {
+    const btn = document.getElementById(`btn-mod-${mId}`);
+    if (btn) {
+      let badge = btn.querySelector('.mod-completion-badge');
+      if (userProgress[mId]) {
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'mod-completion-badge';
+          badge.style.cssText = 'background: rgba(42, 157, 104, 0.25); border: 1px solid #4ade80; color: #4ade80; font-size: 0.7rem; font-weight: 800; padding: 2px 6px; border-radius: 10px; margin-left: auto; display: inline-flex; align-items: center; gap: 4px;';
+          badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Concluído';
+          btn.appendChild(badge);
+        }
+      } else {
+        if (badge) badge.remove();
+      }
+    }
+  });
 }
 
 function generateCertificate() {

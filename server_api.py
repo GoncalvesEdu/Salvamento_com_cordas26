@@ -841,6 +841,19 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
 
             return self.send_json({'success': True, 'arquivos': arquivos})
 
+        elif path == '/api/aluno/meu-progresso':
+            user = self.authenticate_request(required_role=['aluno', 'instrutor', 'admin'])
+            if not user:
+                return
+
+            conn = get_db()
+            cur = conn.cursor()
+            cur.execute('SELECT modulo_id, nota, status, data_conclusao FROM progresso_modulos WHERE aluno_re = ?', (user['re'],))
+            progresso = [dict(r) for r in cur.fetchall()]
+            conn.close()
+
+            return self.send_json({'success': True, 'progresso': progresso})
+
         else:
             super().do_GET()
 
