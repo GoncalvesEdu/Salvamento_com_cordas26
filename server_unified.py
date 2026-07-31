@@ -14,10 +14,9 @@ from psycopg2 import errors
 from datetime import datetime
 
 PORT = 8081
-DB_PATH = 'salvamento_2gb.db'
 
 def init_db():
-    conn = sqlite3.connect(DB_PATH)
+    conn = get_db()
     cur = conn.cursor()
 
     cur.execute('''

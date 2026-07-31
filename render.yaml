@@ -5,6 +5,8 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: python server_api.py
     envVars:
+      - key: DATABASE_URL
+        value: postgresql://db_salvamento_com_cordas_user:nZvQsGoE6ED6ne026zkML02fjEbtlKWo@dpg-d9mc56ijobas73ao7fk0-a/db_salvamento_com_cordas
       - key: DB_PATH
         value: /data/salvamento_2gb.db
       - key: PERSISTENT_DIR
