@@ -1198,7 +1198,8 @@ function setupNavigationEvents() {
 
   document.querySelectorAll('.menu-item').forEach(btn => {
     btn.addEventListener('click', () => {
-      const modId = parseInt(btn.getAttribute('data-mod'));
+      const rawMod = btn.getAttribute('data-mod');
+      const modId = (rawMod === 'final') ? 'final' : (parseInt(rawMod) || 1);
       loadModule(modId);
     });
   });
@@ -1234,6 +1235,7 @@ async function startRandomizedQuiz() {
   quizCard?.classList.remove('hidden');
 
   try {
+    const modIdToSend = String(currentModule === 'NaN' || !currentModule ? '1' : currentModule);
     const res = await fetch(`${API_BASE_URL}/quiz/start`, {
       method: 'POST',
       headers: {
@@ -1242,13 +1244,14 @@ async function startRandomizedQuiz() {
       },
       body: JSON.stringify({
         curso_id: 'salvamento_cordas',
-        modulo_id: String(currentModule)
+        modulo_id: modIdToSend
       })
     });
 
     const data = await res.json();
-    if (!data.success || !data.questions || data.questions.length === 0) {
-      alert("❌ Erro ao iniciar avaliação no servidor.");
+    if (!res.ok || !data.success || !data.questions || data.questions.length === 0) {
+      const errMsg = data.message || data.error || "Erro ao iniciar avaliação no servidor.";
+      alert(`❌ ${errMsg}`);
       return;
     }
 
@@ -1260,7 +1263,7 @@ async function startRandomizedQuiz() {
     renderQuizQuestionState();
 
   } catch (err) {
-    alert("❌ Erro de conexão ao buscar prova no servidor.");
+    alert(`❌ Erro de conexão ao buscar prova no servidor: ${err.message || err}`);
   }
 }
 

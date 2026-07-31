@@ -1100,7 +1100,8 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             score = 0.0
 
             if att_row:
-                mod_id_num = int(att_row['modulo_id'])
+                raw_mod_id = str(att_row['modulo_id'])
+                mod_id_val = int(raw_mod_id) if raw_mod_id.isdigit() else raw_mod_id
                 q_order = json.loads(att_row['question_order'])
                 total_q = len(q_order)
 
@@ -1118,11 +1119,14 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                         WHERE id = ?
                     ''', (now_str, score, attempt_id))
 
-                    if score >= 100.0:
-                        cur.execute('''
-                            INSERT INTO progresso_modulos (aluno_re, modulo_id, nota, tempo_gasto, status, data_conclusao)
-                            VALUES (?, ?, ?, 300, 'concluido', ?)
-                        ''', (user['re'], mod_id_num, score, now_str))
+                    cur.execute('''
+                        INSERT INTO progresso_modulos (aluno_re, modulo_id, nota, tempo_gasto, status, data_conclusao)
+                        VALUES (?, ?, ?, 300, 'concluido', ?)
+                        ON CONFLICT(aluno_re, modulo_id) DO UPDATE SET
+                            nota = MAX(progresso_modulos.nota, excluded.nota),
+                            status = 'concluido',
+                            data_conclusao = excluded.data_conclusao
+                    ''', (user['re'], mod_id_val, score, now_str))
 
             conn.commit()
             conn.close()
