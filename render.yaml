@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: salvamento-com-cordas26
+    name: Salvamento_com_cordas26
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: python server_api.py
