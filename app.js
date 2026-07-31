@@ -178,6 +178,7 @@ const modulesData = {
   5: {
     title: "Estação 5: Barranco & Terreno Inclinado",
     subtitle: "Atendimento Pré-Hospitalar e Transposição em Encostas e Despenhadeiros",
+    youtubeId: "6eC2oqs43pQ",
     slides: [
       {
         tag: "ESTAÇÃO 5 - SLIDE 1 DE 3",
