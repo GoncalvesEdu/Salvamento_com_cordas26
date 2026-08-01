@@ -18,69 +18,64 @@ PORT = int(os.environ.get('PORT', 8081))
 def init_db():
     conn = get_db()
     cur = conn.cursor()
-
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS alunos (
-            id SERIAL PRIMARY KEY,
-            nome TEXT NOT NULL,
-            re TEXT UNIQUE NOT NULL,
-            estacao TEXT NOT NULL,
-            ultimo_acesso TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-    ''')
-
     try:
-        cur.execute('ALTER TABLE alunos ADD COLUMN ultimo_acesso TIMESTAMP DEFAULT CURRENT_TIMESTAMP')
-    except Exception:
-        pass
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS alunos (
+                id SERIAL PRIMARY KEY,
+                nome TEXT NOT NULL,
+                re TEXT UNIQUE NOT NULL,
+                estacao TEXT NOT NULL,
+                ultimo_acesso TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        ''')
 
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS progresso_modulos (
-            id SERIAL PRIMARY KEY,
-            aluno_re TEXT NOT NULL,
-            modulo_id INTEGER NOT NULL,
-            nota DOUBLE PRECISION DEFAULT 0.0,
-            tempo_gasto INTEGER DEFAULT 0,
-            status TEXT DEFAULT 'concluido',
-            data_inicio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            data_conclusao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (aluno_re) REFERENCES alunos(re)
-        );
-    ''')
+        cur.execute('ALTER TABLE alunos ADD COLUMN IF NOT EXISTS ultimo_acesso TIMESTAMP DEFAULT CURRENT_TIMESTAMP')
 
-    try:
-        cur.execute('ALTER TABLE progresso_modulos ADD COLUMN tempo_gasto INTEGER DEFAULT 180')
-    except Exception:
-        pass
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS progresso_modulos (
+                id SERIAL PRIMARY KEY,
+                aluno_re TEXT NOT NULL,
+                modulo_id INTEGER NOT NULL,
+                nota DOUBLE PRECISION DEFAULT 0.0,
+                tempo_gasto INTEGER DEFAULT 0,
+                status TEXT DEFAULT 'concluido',
+                data_inicio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                data_conclusao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (aluno_re) REFERENCES alunos(re)
+            );
+        ''')
 
-    try:
-        cur.execute("ALTER TABLE progresso_modulos ADD COLUMN status TEXT DEFAULT 'concluido'")
-    except Exception:
-        pass
+        cur.execute('ALTER TABLE progresso_modulos ADD COLUMN IF NOT EXISTS tempo_gasto INTEGER DEFAULT 180')
+        cur.execute("ALTER TABLE progresso_modulos ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'concluido'")
 
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS certificados (
-            id SERIAL PRIMARY KEY,
-            aluno_re TEXT NOT NULL,
-            codigo_hash TEXT UNIQUE NOT NULL,
-            data_emissao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (aluno_re) REFERENCES alunos(re)
-        );
-    ''')
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS certificados (
+                id SERIAL PRIMARY KEY,
+                aluno_re TEXT NOT NULL,
+                codigo_hash TEXT UNIQUE NOT NULL,
+                data_emissao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (aluno_re) REFERENCES alunos(re)
+            );
+        ''')
 
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS arquivos_instrutoria (
-            id SERIAL PRIMARY KEY,
-            nome_arquivo TEXT NOT NULL,
-            caminho_arquivo TEXT NOT NULL,
-            tamanho TEXT,
-            data_upload TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
-    ''')
+        cur.execute('''
+            CREATE TABLE IF NOT EXISTS arquivos_instrutoria (
+                id SERIAL PRIMARY KEY,
+                nome_arquivo TEXT NOT NULL,
+                caminho_arquivo TEXT NOT NULL,
+                tamanho TEXT,
+                data_upload TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        ''')
 
-    conn.commit()
-    conn.close()
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        print(f"[INIT_DB UNIFIED ERROR] {e}")
+        raise e
+    finally:
+        conn.close()
 
 def get_db():
     db_url = os.environ.get("DATABASE_URL") or "postgresql://db_salvamento_com_cordas_user:nZvQsGoE6ED6ne026zkML02fjEbtlKWo@dpg-d9mc56ijobas73ao7fk0-a.oregon-postgres.render.com/db_salvamento_com_cordas"
