@@ -134,159 +134,161 @@ def get_db():
     return conn
 
 def init_db():
-    conn = get_db()
-    cur = conn.cursor()
     try:
-        cur.execute('''
-            CREATE TABLE IF NOT EXISTS usuarios (
-                id SERIAL PRIMARY KEY,
-                username TEXT UNIQUE NOT NULL,
-                senha_hash TEXT NOT NULL,
-                nome TEXT NOT NULL,
-                re TEXT UNIQUE NOT NULL,
-                estacao TEXT NOT NULL,
-                role TEXT CHECK(role IN ('aluno', 'instrutor', 'admin')) NOT NULL,
-                senha_provisoria SMALLINT DEFAULT 1,
-                primeiro_acesso_em TIMESTAMP DEFAULT NULL,
-                status TEXT DEFAULT 'ativo',
-                desligado_em TIMESTAMP DEFAULT NULL,
-                data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        ''')
+        conn = get_db()
+        cur = conn.cursor()
+        try:
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS usuarios (
+                    id SERIAL PRIMARY KEY,
+                    username TEXT UNIQUE NOT NULL,
+                    senha_hash TEXT NOT NULL,
+                    nome TEXT NOT NULL,
+                    re TEXT UNIQUE NOT NULL,
+                    estacao TEXT NOT NULL,
+                    role TEXT CHECK(role IN ('aluno', 'instrutor', 'admin')) NOT NULL,
+                    senha_provisoria SMALLINT DEFAULT 1,
+                    primeiro_acesso_em TIMESTAMP DEFAULT NULL,
+                    status TEXT DEFAULT 'ativo',
+                    desligado_em TIMESTAMP DEFAULT NULL,
+                    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+            ''')
 
-        cur.execute("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS senha_provisoria SMALLINT DEFAULT 1")
-        cur.execute("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS primeiro_acesso_em TIMESTAMP DEFAULT NULL")
-        cur.execute("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'ativo'")
-        cur.execute("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS desligado_em TIMESTAMP DEFAULT NULL")
+            cur.execute("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS senha_provisoria SMALLINT DEFAULT 1")
+            cur.execute("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS primeiro_acesso_em TIMESTAMP DEFAULT NULL")
+            cur.execute("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'ativo'")
+            cur.execute("ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS desligado_em TIMESTAMP DEFAULT NULL")
 
-        cur.execute('''
-            CREATE TABLE IF NOT EXISTS alunos (
-                id SERIAL PRIMARY KEY,
-                nome TEXT NOT NULL,
-                re TEXT UNIQUE NOT NULL,
-                estacao TEXT NOT NULL,
-                status TEXT DEFAULT 'ativo',
-                desligado_em TIMESTAMP DEFAULT NULL,
-                ultimo_acesso TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        ''')
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS alunos (
+                    id SERIAL PRIMARY KEY,
+                    nome TEXT NOT NULL,
+                    re TEXT UNIQUE NOT NULL,
+                    estacao TEXT NOT NULL,
+                    status TEXT DEFAULT 'ativo',
+                    desligado_em TIMESTAMP DEFAULT NULL,
+                    ultimo_acesso TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+            ''')
 
-        cur.execute('''
-            CREATE TABLE IF NOT EXISTS progresso_modulos (
-                id SERIAL PRIMARY KEY,
-                aluno_re TEXT NOT NULL,
-                modulo_id INTEGER NOT NULL,
-                nota DOUBLE PRECISION DEFAULT 0.0,
-                tempo_gasto INTEGER DEFAULT 0,
-                status TEXT DEFAULT 'concluido',
-                data_conclusao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (aluno_re) REFERENCES alunos(re)
-            );
-        ''')
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS progresso_modulos (
+                    id SERIAL PRIMARY KEY,
+                    aluno_re TEXT NOT NULL,
+                    modulo_id INTEGER NOT NULL,
+                    nota DOUBLE PRECISION DEFAULT 0.0,
+                    tempo_gasto INTEGER DEFAULT 0,
+                    status TEXT DEFAULT 'concluido',
+                    data_conclusao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (aluno_re) REFERENCES alunos(re)
+                );
+            ''')
 
-        cur.execute('''
-            CREATE TABLE IF NOT EXISTS certificados (
-                id SERIAL PRIMARY KEY,
-                aluno_re TEXT NOT NULL,
-                codigo_hash TEXT UNIQUE NOT NULL,
-                data_emissao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (aluno_re) REFERENCES alunos(re)
-            );
-        ''')
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS certificados (
+                    id SERIAL PRIMARY KEY,
+                    aluno_re TEXT NOT NULL,
+                    codigo_hash TEXT UNIQUE NOT NULL,
+                    data_emissao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (aluno_re) REFERENCES alunos(re)
+                );
+            ''')
 
-        cur.execute('''
-            CREATE TABLE IF NOT EXISTS arquivos_instrutoria (
-                id SERIAL PRIMARY KEY,
-                nome_arquivo TEXT NOT NULL,
-                nome_original TEXT NOT NULL,
-                nome_salvo TEXT NOT NULL,
-                caminho_arquivo TEXT NOT NULL,
-                tamanho TEXT NOT NULL,
-                mime_type TEXT DEFAULT 'application/pdf',
-                visivel_para TEXT DEFAULT 'todos',
-                data_upload TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        ''')
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS arquivos_instrutoria (
+                    id SERIAL PRIMARY KEY,
+                    nome_arquivo TEXT NOT NULL,
+                    nome_original TEXT NOT NULL,
+                    nome_salvo TEXT NOT NULL,
+                    caminho_arquivo TEXT NOT NULL,
+                    tamanho TEXT NOT NULL,
+                    mime_type TEXT DEFAULT 'application/pdf',
+                    visivel_para TEXT DEFAULT 'todos',
+                    data_upload TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+            ''')
 
-        cur.execute("ALTER TABLE arquivos_instrutoria ADD COLUMN IF NOT EXISTS visivel_para TEXT DEFAULT 'todos'")
+            cur.execute("ALTER TABLE arquivos_instrutoria ADD COLUMN IF NOT EXISTS visivel_para TEXT DEFAULT 'todos'")
 
-        cur.execute('''
-            CREATE TABLE IF NOT EXISTS logs_auditoria (
-                id SERIAL PRIMARY KEY,
-                acao TEXT NOT NULL,
-                executado_por TEXT NOT NULL,
-                detalhes TEXT NOT NULL,
-                data_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        ''')
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS logs_auditoria (
+                    id SERIAL PRIMARY KEY,
+                    acao TEXT NOT NULL,
+                    executado_por TEXT NOT NULL,
+                    detalhes TEXT NOT NULL,
+                    data_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+            ''')
 
-        cur.execute('''
-            CREATE TABLE IF NOT EXISTS quiz_questions (
-                id TEXT PRIMARY KEY,
-                curso_id TEXT NOT NULL,
-                modulo_id TEXT NOT NULL,
-                question_text TEXT NOT NULL
-            );
-        ''')
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS quiz_questions (
+                    id TEXT PRIMARY KEY,
+                    curso_id TEXT NOT NULL,
+                    modulo_id TEXT NOT NULL,
+                    question_text TEXT NOT NULL
+                );
+            ''')
 
-        cur.execute('''
-            CREATE TABLE IF NOT EXISTS quiz_options (
-                id TEXT PRIMARY KEY,
-                question_id TEXT NOT NULL REFERENCES quiz_questions(id),
-                option_text TEXT NOT NULL,
-                is_correct INTEGER NOT NULL DEFAULT 0
-            );
-        ''')
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS quiz_options (
+                    id TEXT PRIMARY KEY,
+                    question_id TEXT NOT NULL REFERENCES quiz_questions(id),
+                    option_text TEXT NOT NULL,
+                    is_correct INTEGER NOT NULL DEFAULT 0
+                );
+            ''')
 
-        cur.execute('''
-            CREATE TABLE IF NOT EXISTS quiz_attempts (
-                id TEXT PRIMARY KEY,
-                aluno_re TEXT NOT NULL,
-                curso_id TEXT NOT NULL,
-                modulo_id TEXT NOT NULL,
-                seed TEXT NOT NULL,
-                question_order TEXT NOT NULL,
-                option_order TEXT NOT NULL,
-                started_at TEXT NOT NULL,
-                submitted_at TEXT,
-                score DOUBLE PRECISION
-            );
-        ''')
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS quiz_attempts (
+                    id TEXT PRIMARY KEY,
+                    aluno_re TEXT NOT NULL,
+                    curso_id TEXT NOT NULL,
+                    modulo_id TEXT NOT NULL,
+                    seed TEXT NOT NULL,
+                    question_order TEXT NOT NULL,
+                    option_order TEXT NOT NULL,
+                    started_at TEXT NOT NULL,
+                    submitted_at TEXT,
+                    score DOUBLE PRECISION
+                );
+            ''')
 
-        cur.execute('''
-            CREATE TABLE IF NOT EXISTS quiz_answers (
-                attempt_id TEXT NOT NULL REFERENCES quiz_attempts(id),
-                question_id TEXT NOT NULL,
-                chosen_option_id TEXT NOT NULL,
-                is_correct INTEGER NOT NULL,
-                PRIMARY KEY (attempt_id, question_id)
-            );
-        ''')
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS quiz_answers (
+                    attempt_id TEXT NOT NULL REFERENCES quiz_attempts(id),
+                    question_id TEXT NOT NULL,
+                    chosen_option_id TEXT NOT NULL,
+                    is_correct INTEGER NOT NULL,
+                    PRIMARY KEY (attempt_id, question_id)
+                );
+            ''')
 
-        # Inserir Usuário Instrutor Padronizado
-        instrutor_pass = hash_password_pbkdf2('2gb2026')
-        cur.execute('''
-            INSERT INTO usuarios (username, senha_hash, nome, re, estacao, role, senha_provisoria, status)
-            VALUES ('instrutor.2gb', %s, 'Comando de Instrução 2º GB', 'INSTRUTOR-01', '2º GB / Comando', 'instrutor', 0, 'ativo')
-            ON CONFLICT (username) DO UPDATE SET senha_hash = EXCLUDED.senha_hash, role = 'instrutor'
-        ''', (instrutor_pass,))
+            # Inserir Usuário Instrutor Padronizado
+            instrutor_pass = hash_password_pbkdf2('2gb2026')
+            cur.execute('''
+                INSERT INTO usuarios (username, senha_hash, nome, re, estacao, role, senha_provisoria, status)
+                VALUES ('instrutor.2gb', %s, 'Comando de Instrução 2º GB', 'INSTRUTOR-01', '2º GB / Comando', 'instrutor', 0, 'ativo')
+                ON CONFLICT (username) DO UPDATE SET senha_hash = EXCLUDED.senha_hash, role = 'instrutor'
+            ''', (instrutor_pass,))
 
-        # Inserir Conta Fictícia Dedicada para Testes de Produção (RE: 999999-9)
-        teste_pass = hash_password_pbkdf2('999999-9')
-        cur.execute('''
-            INSERT INTO usuarios (username, senha_hash, nome, re, estacao, role, senha_provisoria, status)
-            VALUES ('999999-9', %s, 'ALUNO DE TESTE (NÃO USAR EM PRODUÇÃO)', '999999-9', '2º GB / TESTE', 'aluno', 0, 'ativo')
-            ON CONFLICT (username) DO UPDATE SET senha_hash = EXCLUDED.senha_hash, role = 'aluno'
-        ''', (teste_pass,))
+            # Inserir Conta Fictícia Dedicada para Testes de Produção (RE: 999999-9)
+            teste_pass = hash_password_pbkdf2('999999-9')
+            cur.execute('''
+                INSERT INTO usuarios (username, senha_hash, nome, re, estacao, role, senha_provisoria, status)
+                VALUES ('999999-9', %s, 'ALUNO DE TESTE (NÃO USAR EM PRODUÇÃO)', '999999-9', '2º GB / TESTE', 'aluno', 0, 'ativo')
+                ON CONFLICT (username) DO UPDATE SET senha_hash = EXCLUDED.senha_hash, role = 'aluno'
+            ''', (teste_pass,))
 
-        conn.commit()
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            print(f"[INIT_DB ERROR] Erro durante inicializacao do banco PostgreSQL: {e}")
+        finally:
+            conn.close()
     except Exception as e:
-        conn.rollback()
-        print(f"[INIT_DB ERROR] Erro durante inicializacao do banco PostgreSQL: {e}")
-        raise e
-    finally:
-        conn.close()
+        print(f"[INIT_DB CONNECTION ERROR] Nao foi possivel conectar ao PostgreSQL: {e}")
     try:
         sync_uploaded_files_in_db()
     except Exception:
