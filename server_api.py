@@ -619,9 +619,9 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             cur = conn.cursor()
 
             # Consultar dinamicamente os módulos ativos cadastrados no curso
-            cur.execute("SELECT DISTINCT CAST(modulo_id AS TEXT) as mod_id FROM quiz_questions WHERE curso_id = 'salvamento_cordas' ORDER BY CAST(modulo_id AS INTEGER)")
+            cur.execute("SELECT DISTINCT modulo_id FROM quiz_questions WHERE curso_id = 'salvamento_cordas'")
             modulos_ativos_rows = cur.fetchall()
-            modulos_ativos_ids = [r['mod_id'] for r in modulos_ativos_rows]
+            modulos_ativos_ids = sorted([str(r['modulo_id']) for r in modulos_ativos_rows], key=lambda x: int(x) if str(x).isdigit() else 999)
             total_modulos_curso = max(len(modulos_ativos_ids), 1)
 
             if modulos_ativos_ids:
