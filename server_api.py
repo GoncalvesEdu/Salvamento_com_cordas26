@@ -852,19 +852,18 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             super().do_GET()
 
     def do_POST(self):
-        try:
-            parsed = urllib.parse.urlparse(self.path)
-            path = parsed.path
-            length = int(self.headers.get('Content-Length', 0))
-            content_type = self.headers.get('Content-Type', '')
+        parsed = urllib.parse.urlparse(self.path)
+        path = parsed.path
+        length = int(self.headers.get('Content-Length', 0))
+        content_type = self.headers.get('Content-Type', '')
 
-            payload = {}
-            if length > 0 and 'multipart/form-data' not in content_type:
-                try:
-                    body_data = self.rfile.read(length).decode('utf-8', errors='ignore')
-                    payload = json.loads(body_data)
-                except Exception:
-                    payload = {}
+        payload = {}
+        if length > 0 and 'multipart/form-data' not in content_type:
+            try:
+                body_data = self.rfile.read(length).decode('utf-8', errors='ignore')
+                payload = json.loads(body_data)
+            except Exception:
+                payload = {}
 
         # ------------------------------------------------------------------
         # LOGIN DE USUÁRIO - SEGURANÇA RBAC BLINDADA
@@ -1594,11 +1593,6 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
 
         else:
             return self.send_json({'error': 'Endpoint não encontrado (404)'}, 404)
-        except Exception as e:
-            import traceback
-            err_msg = f"Erro no processamento da requisicao: {str(e)}"
-            print(f"[SERVER API DO_POST ERROR] {err_msg}\n{traceback.format_exc()}")
-            return self.send_json({'success': False, 'message': err_msg}, 500)
 
 if __name__ == '__main__':
     init_db()
