@@ -312,7 +312,7 @@ class UnifiedPortalHandler(http.server.SimpleHTTPRequestHandler):
 
 if __name__ == '__main__':
     init_db()
-    socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.TCPServer(("", PORT), UnifiedPortalHandler) as httpd:
-        print(f"Servidor Unificado (Web + BD) rodando em http://localhost:{PORT}")
+    socketserver.ThreadingTCPServer.allow_reuse_address = True
+    with socketserver.ThreadingTCPServer(("0.0.0.0", PORT), UnifiedPortalHandler) as httpd:
+        print(f"Servidor Unificado rodando em 0.0.0.0:{PORT}")
         httpd.serve_forever()
