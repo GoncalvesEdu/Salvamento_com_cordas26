@@ -99,7 +99,11 @@ class UnifiedPortalHandler(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
 
     def send_json(self, data, code=200):
-        body = json.dumps(data, ensure_ascii=False).encode('utf-8')
+        def default_serializer(o):
+            if isinstance(o, (datetime, date)):
+                return o.isoformat()
+            return str(o)
+        body = json.dumps(data, ensure_ascii=False, default=default_serializer).encode('utf-8')
         self.send_response(code)
         self.send_header('Content-Type', 'application/json; charset=utf-8')
         self.send_header('Content-Length', str(len(body)))
