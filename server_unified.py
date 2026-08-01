@@ -78,7 +78,9 @@ def init_db():
         conn.close()
 
 def get_db():
-    db_url = os.environ.get("DATABASE_URL") or "postgresql://db_salvamento_com_cordas_user:nZvQsGoE6ED6ne026zkML02fjEbtlKWo@dpg-d9mc56ijobas73ao7fk0-a.oregon-postgres.render.com/db_salvamento_com_cordas"
+    db_url = os.environ.get("DATABASE_URL", "")
+    if not db_url or "oregon-postgres.render.com" not in db_url:
+        db_url = "postgresql://db_salvamento_com_cordas_user:nZvQsGoE6ED6ne026zkML02fjEbtlKWo@dpg-d9mc56ijobas73ao7fk0-a.oregon-postgres.render.com/db_salvamento_com_cordas"
     try:
         conn = psycopg2.connect(db_url, cursor_factory=RealDictCursor)
         return conn
