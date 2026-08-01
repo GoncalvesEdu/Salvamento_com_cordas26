@@ -127,7 +127,7 @@ class UnifiedPortalHandler(http.server.SimpleHTTPRequestHandler):
                        COALESCE(SUM(p.tempo_gasto), 0) as tempo_total_segundos
                 FROM alunos a
                 LEFT JOIN progresso_modulos p ON a.re = p.aluno_re
-                GROUP BY a.id
+                GROUP BY a.id, a.nome, a.re, a.estacao, a.senha_provisoria
                 ORDER BY a.id DESC
             ''')
             alunos = [dict(r) for r in cur.fetchall()]

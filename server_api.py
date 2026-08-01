@@ -646,7 +646,8 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                 FROM usuarios u
                 LEFT JOIN progresso_modulos p ON u.re = p.aluno_re
                 WHERE u.role = 'aluno' {where_status}
-                GROUP BY u.id ORDER BY u.id DESC
+                GROUP BY u.id, u.nome, u.re, u.estacao, u.senha_provisoria, u.primeiro_acesso_em, u.status, u.desligado_em, u.data_criacao
+                ORDER BY u.id DESC
             '''
 
             cur.execute(sql_query, params_filter)
