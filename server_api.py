@@ -1586,7 +1586,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
 
 if __name__ == '__main__':
     init_db()
-    socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.TCPServer(("", PORT), RBACPortalHandler) as httpd:
+    socketserver.ThreadingTCPServer.allow_reuse_address = True
+    with socketserver.ThreadingTCPServer(("", PORT), RBACPortalHandler) as httpd:
         print(f"Servidor API com Core RBAC Blindado (Role do BD) rodando em http://localhost:{PORT}")
         httpd.serve_forever()
