@@ -127,11 +127,13 @@ def verify_password(password, stored_hash):
 
 def get_db():
     db_url = os.environ.get("DATABASE_URL") or "postgresql://db_salvamento_com_cordas_user:nZvQsGoE6ED6ne026zkML02fjEbtlKWo@dpg-d9mc56ijobas73ao7fk0-a.oregon-postgres.render.com/db_salvamento_com_cordas"
-    conn = psycopg2.connect(
-        db_url,
-        cursor_factory=RealDictCursor
-    )
-    return conn
+    try:
+        conn = psycopg2.connect(db_url, cursor_factory=RealDictCursor)
+        return conn
+    except Exception as e:
+        print(f"[GET_DB WARNING] Falha na conexao principal ({e}), tentando URL externa...")
+        ext_url = "postgresql://db_salvamento_com_cordas_user:nZvQsGoE6ED6ne026zkML02fjEbtlKWo@dpg-d9mc56ijobas73ao7fk0-a.oregon-postgres.render.com/db_salvamento_com_cordas"
+        return psycopg2.connect(ext_url, cursor_factory=RealDictCursor)
 
 def init_db():
     try:
