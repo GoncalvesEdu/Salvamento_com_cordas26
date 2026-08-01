@@ -464,64 +464,185 @@ header {
 }
 
 /* ==========================================================================
-   RESPONSIVIDADE MOBILE COMPLETA PARA A ÁREA DA INSTRUTORIA (375px & 414px)
+   RESPONSIVIDADE MOBILE COMPLETA PARA A ÁREA DA INSTRUTORIA & ALUNO (375px, 414px, 768px)
+   Nota: Nenhuma regra fora de @media afeta telas desktop (>= 901px).
    ========================================================================== */
+
+@media (max-width: 900px) {
+  .classroom-layout { grid-template-columns: 1fr !important; }
+  .stats-grid-turma { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+}
+
 @media (max-width: 768px) {
-  .instrutoria-header-actions {
+  /* Header Global */
+  header {
+    padding: 0.65rem 1rem !important;
+  }
+  .logo-section h1 {
+    font-size: 1.05rem !important;
+  }
+  .logo-section span {
+    display: none !important;
+  }
+  .nav-btn {
+    padding: 6px 12px !important;
+    font-size: 0.78rem !important;
+  }
+
+  /* Área da Instrutoria - Card principal e espaçamentos */
+  #screen-instrutoria {
+    padding: 1.25rem 0.5rem !important;
+  }
+  .instrutoria-panel-card {
+    padding: 1.25rem 0.85rem !important;
+    border-radius: var(--border-radius-md) !important;
+  }
+
+  /* Header interno do Painel do Instrutor */
+  .instrutoria-header-bar {
     flex-direction: column !important;
     align-items: stretch !important;
+    gap: 1rem !important;
+    padding-bottom: 1rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+  .instrutoria-title-badges-box {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+  .instrutoria-title-badges-box h2 {
+    font-size: 1.35rem !important;
+    width: 100% !important;
+  }
+  .instrutoria-header-actions {
+    flex-direction: column !important;
+    width: 100% !important;
     gap: 8px !important;
   }
-  
   .instrutoria-header-actions button,
   .instrutoria-header-actions label {
     width: 100% !important;
     justify-content: center !important;
+    text-align: center !important;
   }
 
-  .turma-stats-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
+  /* Card de Alunos que Precisam de Atenção */
+  .attention-card-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
     gap: 8px !important;
   }
+  .attention-item-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px !important;
+  }
+  .attention-item-row > div {
+    flex-wrap: wrap !important;
+  }
 
-  .table-responsive-wrapper,
-  .students-table-container {
+  /* Diagnóstico Pedagógico */
+  .pedagogico-card-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+  .pedagogico-filter-box {
+    width: 100% !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .pedagogico-filter-box select {
+    width: 100% !important;
+  }
+
+  /* Listagem de Alunos no Banco de Dados */
+  .students-list-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+  .filter-btn-group {
+    width: 100% !important;
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+  }
+  .filter-btn {
+    flex: 1 1 auto !important;
+    text-align: center !important;
+    padding: 8px 4px !important;
+    font-size: 0.72rem !important;
+  }
+
+  /* Tabelas com Scroll Horizontal Interno */
+  .table-responsive-wrapper {
     width: 100% !important;
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch;
     border-radius: var(--border-radius-md);
     margin-bottom: 1rem;
   }
-
   .db-students-table,
   .db-table {
-    min-width: 650px !important;
+    min-width: 720px !important;
   }
-
+  .db-table th, .db-table td {
+    padding: 8px 10px !important;
+    white-space: nowrap !important;
+    font-size: 0.82rem !important;
+  }
   .error-questions-table {
-    min-width: 600px !important;
+    min-width: 620px !important;
   }
 
-  .attention-item-row {
+  /* Repositório de Arquivos & Dropzone */
+  .instrutoria-dropzone {
+    padding: 1.5rem 0.85rem !important;
+    margin: 1rem 0 !important;
+  }
+  .dropzone-visib-box {
     flex-direction: column !important;
-    align-items: flex-start !important;
     gap: 6px !important;
   }
+  .file-item-card {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+  .file-item-card > div:last-child {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: space-between !important;
+  }
 
-  .attention-item-msg {
-    font-size: 0.78rem !important;
+  /* Sala de Aula Aluno - Mobile */
+  #screen-classroom {
+    padding: 1rem 0.5rem !important;
+  }
+  .slide-card, .quiz-card {
+    padding: 1.25rem 0.85rem !important;
+    border-radius: var(--border-radius-md) !important;
+  }
+  .slide-media-container {
+    height: 220px !important;
+  }
+  .slide-footer-nav {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  .btn-slide-nav {
+    width: 100% !important;
+    justify-content: center !important;
   }
 }
 
 @media (max-width: 480px) {
-  .turma-stats-grid {
+  .stats-grid-turma {
     grid-template-columns: 1fr !important;
   }
-
   .stat-card-turma {
-    padding: 0.75rem !important;
+    padding: 0.85rem !important;
   }
-
   .alerts-card {
     padding: 0.85rem !important;
   }

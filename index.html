@@ -1073,9 +1073,9 @@
     <section class="screen" id="screen-instrutoria">
       <div class="instrutoria-panel-card">
         
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid var(--color-dark-700); padding-bottom: 1.5rem;">
-          <div>
-            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
+        <div class="instrutoria-header-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid var(--color-dark-700); padding-bottom: 1.5rem;">
+          <div class="instrutoria-header-left">
+            <div class="instrutoria-title-badges-box" style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
               <h2 style="font-size: 1.8rem; font-weight: 900; color: #fff;">Painel do Instrutor</h2>
               <span class="db-status-badge"><i class="fa-solid fa-database"></i> SQLite Conectado (WAL Mode)</span>
               <span class="live-monitor-badge"><i class="fa-solid fa-chart-line"></i> Monitor de Turma 2º GB</span>
@@ -1083,7 +1083,7 @@
             <p style="color: var(--color-text-muted); font-size: 0.9rem;">Gestão de Alunos, Históricos de Notas, Resets de Senha e Cadastro em Lote</p>
           </div>
 
-          <div style="display: flex; gap: 10px;">
+          <div class="instrutoria-header-actions" style="display: flex; gap: 10px;">
             <label class="nav-btn" style="background: rgba(42, 157, 104, 0.2); border-color: #2a9d68; color: #2a9d68; cursor: pointer;">
               <i class="fa-solid fa-file-csv"></i> Importar Alunos em Lote (CSV)
               <input type="file" id="csv-file-input" accept=".csv" onchange="handleImportarCSVAlunos(event)" style="display: none;">
@@ -1096,7 +1096,7 @@
         </div>
 
         <!-- Estatísticas da Turma por Módulo -->
-        <div class="stats-grid-turma" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="stats-grid-turma">
           <div class="stat-card-turma">
             <div class="stat-card-turma-header">
               <span>Estação 1: Suspenso</span>
@@ -1196,7 +1196,7 @@
 
         <!-- Card de Relatório Pedagógico: Questões com Mais Dificuldade -->
         <div class="alerts-card" style="border-color: var(--color-tactical-blue); margin-top: 1.5rem; background: rgba(15, 23, 42, 0.6);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 10px;">
+          <div class="pedagogico-card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 10px;">
             <div>
               <strong style="color: var(--color-gold-patch); font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
                 <i class="fa-solid fa-chart-pie"></i> Diagnóstico Pedagógico: Questões com Mais Erros na Turma
@@ -1207,7 +1207,7 @@
             </div>
             
             <!-- Filtro por Estação/Módulo -->
-            <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="pedagogico-filter-box" style="display: flex; align-items: center; gap: 8px;">
               <label style="color: var(--color-text-muted); font-size: 0.8rem; font-weight: 700;">Filtrar Estação:</label>
               <select id="filter-error-module-select" onchange="renderErrorQuestionsReport()" style="background: #1e293b; color: #fff; border: 1px solid var(--color-border); padding: 4px 10px; border-radius: 6px; font-size: 0.8rem;">
                 <option value="todos" selected>Todas as Estações &amp; Prova Final</option>
@@ -1232,8 +1232,8 @@
           </div>
 
           <!-- Tabela de Questões com Mais Dificuldade -->
-          <div style="overflow-x: auto;">
-            <table class="students-table" style="width: 100%; font-size: 0.85rem;">
+          <div class="table-responsive-wrapper" style="overflow-x: auto;">
+            <table class="students-table error-questions-table" style="width: 100%; font-size: 0.85rem;">
               <thead>
                 <tr>
                   <th style="width: 15%;">Mód. / Estação</th>
@@ -1252,7 +1252,7 @@
 
         <!-- Tabela de Alunos Cadastrados no Banco -->
         <div style="margin-top: 2rem;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <div class="students-list-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
             <h3 style="font-size: 1.2rem; font-weight: 800; color: #fff;">
               <i class="fa-solid fa-users"></i> Listagem de Alunos no Banco de Dados
             </h3>
@@ -1271,8 +1271,8 @@
             </div>
           </div>
 
-          <div style="overflow-x: auto;">
-            <table class="db-table">
+          <div class="table-responsive-wrapper" style="overflow-x: auto;">
+            <table class="db-table db-students-table">
               <thead>
                 <tr>
                   <th>NOME COMPLETO DO MILITAR</th>
@@ -1303,7 +1303,7 @@
             <strong style="color: #fff; font-size: 1.1rem; display: block;">Clique para Upload de Novo PDF/Apostila no Servidor</strong>
             <span style="color: var(--color-text-muted); font-size: 0.85rem;">Os arquivos físicos são salvos no diretório persistente e disponibilizados para download.</span>
             
-            <div style="margin-top: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px;" onclick="event.stopPropagation();">
+            <div class="dropzone-visib-box" style="margin-top: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px;" onclick="event.stopPropagation();">
               <label style="color: var(--color-text-muted); font-size: 0.85rem; font-weight: 700;">Visibilidade do Novo Arquivo:</label>
               <select id="upload-visibilidade-select" style="background: #1e293b; color: #fff; border: 1px solid var(--color-border); padding: 5px 12px; border-radius: 6px; font-size: 0.85rem;">
                 <option value="instrutor" selected>🔒 Apenas Instrutoria (Privado)</option>

@@ -11,6 +11,7 @@ const modulesData = {
   1: {
     title: "Estação 1: Trabalhador Suspenso & Trauma de Suspensão",
     subtitle: "Atendimento Pré-Hospitalar (PHTLS) e Doutrina Técnica no Resgate de Suspenso Inerte",
+    youtubeId: "qzvVESMHxXs",
     slides: [
       {
         tag: "ESTAÇÃO 1 - SLIDE 1 DE 3",
@@ -52,6 +53,7 @@ const modulesData = {
   2: {
     title: "Estação 2: Poço & Espaço Confinado",
     subtitle: "Atendimento Pré-Hospitalar em Ambientes de Risco Atmosférico e Acesso Vertical",
+    youtubeId: "aQD-0JYT1Ok",
     slides: [
       {
         tag: "ESTAÇÃO 2 - SLIDE 1 DE 3",
@@ -93,6 +95,7 @@ const modulesData = {
   3: {
     title: "Estação 3: Estrutura Elevada",
     subtitle: "Atendimento de Trauma por Queda de Altura e Operações em Plataformas",
+    youtubeId: "kACDQnv6Cfo",
     slides: [
       {
         tag: "ESTAÇÃO 3 - SLIDE 1 DE 3",
@@ -853,7 +856,7 @@ async function loadDatabaseStudentReport() {
             : `Concluiu <strong>${modConc}</strong> módulo(s), mas o esperado para hoje eram <strong>${modEsp}</strong>.`;
 
           return `
-            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <div class="attention-item-row" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
               <div style="display: flex; align-items: center; gap: 10px;">
                 <span style="${tagBg} padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 800;">${iconStr}</span>
                 <div>
@@ -1172,7 +1175,30 @@ function renderSlide() {
   document.getElementById('slide-counter').innerText = `Slide ${currentSlideIndex + 1} de ${mData.slides.length}`;
   document.getElementById('slide-title').innerText = slide.title;
   document.getElementById('slide-subtitle').innerText = slide.subtitle;
-  document.getElementById('slide-img').src = slide.image;
+
+  const mediaContainer = document.querySelector('.slide-media-container');
+  if (mediaContainer) {
+    if (mData && mData.youtubeId && currentSlideIndex === 0) {
+      mediaContainer.innerHTML = `
+        <div style="width: 100%; margin-bottom: 1.25rem;">
+          <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; border: 1px solid rgba(245, 194, 61, 0.4); box-shadow: 0 12px 35px rgba(0,0,0,0.6); background: #000;">
+            <iframe src="https://www.youtube-nocookie.com/embed/${mData.youtubeId}?autoplay=0&rel=0" 
+                    title="${mData.title}" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen 
+                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 12px;">
+            </iframe>
+          </div>
+          <div style="font-size: 0.85rem; color: var(--color-gold-patch); font-weight: 800; text-align: center; margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <i class="fa-solid fa-circle-play" style="font-size: 1rem;"></i> 🎬 Vídeoaula Oficial & Explicativa (Estação ${currentModule})
+          </div>
+        </div>
+      `;
+    } else {
+      mediaContainer.innerHTML = `<img id="slide-img" src="${slide.image}" alt="Ilustração do Módulo" class="slide-img">`;
+    }
+  }
 
   const bulletsContainer = document.getElementById('slide-bullets');
   bulletsContainer.innerHTML = `<ul>${slide.bullets.map(b => `<li>${b}</li>`).join('')}</ul>`;
