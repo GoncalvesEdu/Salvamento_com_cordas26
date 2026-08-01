@@ -574,25 +574,46 @@ header {
     font-size: 0.72rem !important;
   }
 
-  /* Tabelas com Scroll Horizontal Interno */
-  .table-responsive-wrapper {
-    width: 100% !important;
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch;
-    border-radius: var(--border-radius-md);
-    margin-bottom: 1rem;
+  /* CONVERSÃO NATIVA DE TABELAS PARA CARDS VERTICAIS NO MOBILE */
+  .mobile-card-mode thead {
+    display: none !important;
   }
-  .db-students-table,
-  .db-table {
-    min-width: 720px !important;
+  .mobile-card-mode tbody {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
   }
-  .db-table th, .db-table td {
-    padding: 8px 10px !important;
-    white-space: nowrap !important;
-    font-size: 0.82rem !important;
+  .mobile-card-mode tr {
+    display: flex !important;
+    flex-direction: column !important;
+    background: var(--color-dark-900) !important;
+    border: 1px solid var(--color-dark-700) !important;
+    border-radius: var(--border-radius-md) !important;
+    padding: 12px 14px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
   }
-  .error-questions-table {
-    min-width: 620px !important;
+  .mobile-card-mode td {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+    padding: 8px 0 !important;
+    white-space: normal !important;
+    font-size: 0.85rem !important;
+  }
+  .mobile-card-mode td:last-child {
+    border-bottom: none !important;
+    margin-top: 4px;
+  }
+  .mobile-card-mode td::before {
+    content: attr(data-label);
+    font-weight: 800;
+    color: var(--color-gold-patch);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    margin-right: 12px;
+    text-align: left;
   }
 
   /* Repositório de Arquivos & Dropzone */
@@ -633,6 +654,18 @@ header {
   .btn-slide-nav {
     width: 100% !important;
     justify-content: center !important;
+    min-height: 48px !important;
+  }
+
+  /* Quiz Touch Targets & Progress Bar */
+  .quiz-option-btn {
+    min-height: 48px !important;
+    padding: 12px 14px !important;
+    font-size: 0.9rem !important;
+    border-radius: var(--border-radius-md) !important;
+  }
+  .form-control, .btn-primary {
+    min-height: 48px !important;
   }
 }
 
@@ -645,5 +678,77 @@ header {
   }
   .alerts-card {
     padding: 0.85rem !important;
+  }
+}
+
+/* ==========================================================================
+   NAVEGAÇÃO INFERIOR FIXA NATIVA DE APP (BOTTOM TAB BAR FOR MOBILE)
+   ========================================================================== */
+.mobile-bottom-nav {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .mobile-bottom-nav {
+    display: flex !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 62px !important;
+    background: rgba(11, 15, 25, 0.96) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border-top: 2px solid var(--color-gold-patch) !important;
+    z-index: 2000 !important;
+    box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.7) !important;
+    padding: 0 6px !important;
+  }
+
+  .mobile-nav-group {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .mobile-tab-item {
+    background: transparent;
+    border: none;
+    color: var(--color-text-muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 6px 4px;
+    flex: 1;
+    min-height: 48px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: var(--transition-smooth);
+    border-radius: 8px;
+  }
+
+  .mobile-tab-item i {
+    font-size: 1.2rem;
+  }
+
+  .mobile-tab-item span {
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+
+  .mobile-tab-item.active,
+  .mobile-tab-item:active {
+    color: var(--color-gold-patch);
+    background: rgba(245, 194, 61, 0.12);
+  }
+
+  /* Espaçamento inferior para a barra de navegação não sobrepor o conteúdo */
+  #screen-instrutoria,
+  #screen-classroom,
+  #screen-login {
+    padding-bottom: 80px !important;
   }
 }

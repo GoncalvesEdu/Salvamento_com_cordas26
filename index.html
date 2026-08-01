@@ -1233,7 +1233,7 @@
 
           <!-- Tabela de Questões com Mais Dificuldade -->
           <div class="table-responsive-wrapper" style="overflow-x: auto;">
-            <table class="students-table error-questions-table" style="width: 100%; font-size: 0.85rem;">
+            <table class="students-table error-questions-table mobile-card-mode" style="width: 100%; font-size: 0.85rem;">
               <thead>
                 <tr>
                   <th style="width: 15%;">Mód. / Estação</th>
@@ -1251,7 +1251,7 @@
         </div>
 
         <!-- Tabela de Alunos Cadastrados no Banco -->
-        <div style="margin-top: 2rem;">
+        <div id="db-students-section" style="margin-top: 2rem;">
           <div class="students-list-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
             <h3 style="font-size: 1.2rem; font-weight: 800; color: #fff;">
               <i class="fa-solid fa-users"></i> Listagem de Alunos no Banco de Dados
@@ -1272,7 +1272,7 @@
           </div>
 
           <div class="table-responsive-wrapper" style="overflow-x: auto;">
-            <table class="db-table db-students-table">
+            <table class="db-table db-students-table mobile-card-mode">
               <thead>
                 <tr>
                   <th>NOME COMPLETO DO MILITAR</th>
@@ -1292,7 +1292,7 @@
         </div>
 
         <!-- Repositório de Arquivos da Instrutoria -->
-        <div style="margin-top: 3.5rem; border-top: 1px solid var(--color-dark-700); padding-top: 2rem;">
+        <div id="repositorio-arqs-section" style="margin-top: 3.5rem; border-top: 1px solid var(--color-dark-700); padding-top: 2rem;">
           <h3 style="font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom: 1rem;">
             <i class="fa-solid fa-folder-open"></i> Repositório de Arquivos &amp; Manuais em Disco (/uploads/)
           </h3>
@@ -1506,7 +1506,52 @@
         <!-- Carregado Dinamicamente -->
       </div>
     </div>
-  </div>
+  <!-- NAVEGAÇÃO INFERIOR FIXA PARA MOBILE (BOTTOM TAB BAR NATIVA DE APP) -->
+  <nav class="mobile-bottom-nav" id="mobile-bottom-nav">
+    <!-- Abas do Aluno -->
+    <div id="mobile-nav-aluno" class="mobile-nav-group" style="display: flex;">
+      <button type="button" class="mobile-tab-item active" id="mtab-modulos" onclick="showScreen('screen-classroom')">
+        <i class="fa-solid fa-book-open"></i>
+        <span>Módulos</span>
+      </button>
+      <button type="button" class="mobile-tab-item" id="mtab-quiz" onclick="scrollToQuizMobile()">
+        <i class="fa-solid fa-circle-question"></i>
+        <span>Quiz</span>
+      </button>
+      <button type="button" class="mobile-tab-item" id="mtab-cert" onclick="openLibraryModal()">
+        <i class="fa-solid fa-book-bookmark"></i>
+        <span>Manuais</span>
+      </button>
+      <button type="button" class="mobile-tab-item" id="mtab-sair" onclick="logout()">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span>Sair</span>
+      </button>
+    </div>
+
+    <!-- Abas da Instrutoria -->
+    <div id="mobile-nav-instrutor" class="mobile-nav-group" style="display: none;">
+      <button type="button" class="mobile-tab-item active" id="mtab-inst-painel" onclick="mobileScrollToSection('screen-instrutoria')">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Painel</span>
+      </button>
+      <button type="button" class="mobile-tab-item" id="mtab-inst-atencao" onclick="mobileScrollToSection('attention-students-card')">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>Atenção</span>
+      </button>
+      <button type="button" class="mobile-tab-item" id="mtab-inst-alunos" onclick="mobileScrollToSection('db-students-section')">
+        <i class="fa-solid fa-users"></i>
+        <span>Alunos</span>
+      </button>
+      <button type="button" class="mobile-tab-item" id="mtab-inst-arqs" onclick="mobileScrollToSection('repositorio-arqs-section')">
+        <i class="fa-solid fa-folder-open"></i>
+        <span>Arquivos</span>
+      </button>
+      <button type="button" class="mobile-tab-item" id="mtab-inst-sair" onclick="logout()">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span>Sair</span>
+      </button>
+    </div>
+  </nav>
 
   <script src="app.js?v=20260801_v100"></script>
 </body>

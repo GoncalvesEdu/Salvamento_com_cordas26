@@ -1550,6 +1550,9 @@ function updateHeaderUserInfo() {
   const headerBtnInstrutoria = document.getElementById('btn-header-instrutoria');
   const sessionInfoHeader = document.getElementById('session-info-header');
   const headerUserRe = document.getElementById('header-user-re');
+  const mNavAluno = document.getElementById('mobile-nav-aluno');
+  const mNavInstrutor = document.getElementById('mobile-nav-instrutor');
+  const mBottomNav = document.getElementById('mobile-bottom-nav');
 
   if (currentUser) {
     if (sessionInfoHeader) sessionInfoHeader.style.display = 'flex';
@@ -1557,15 +1560,42 @@ function updateHeaderUserInfo() {
       headerUserRe.innerText = `Bem-vindo, ${currentUser.nome || 'Militar'} — ${currentUser.estacao || '2º GB'}`;
     }
 
+    if (mBottomNav) mBottomNav.style.display = 'flex';
     if (currentUser.role === 'instrutor' || currentUser.role === 'admin') {
       if (headerBtnInstrutoria) headerBtnInstrutoria.style.display = 'flex';
+      if (mNavAluno) mNavAluno.style.display = 'none';
+      if (mNavInstrutor) mNavInstrutor.style.display = 'flex';
     } else {
       if (headerBtnInstrutoria) headerBtnInstrutoria.style.display = 'none';
+      if (mNavAluno) mNavAluno.style.display = 'flex';
+      if (mNavInstrutor) mNavInstrutor.style.display = 'none';
     }
   } else {
     if (sessionInfoHeader) sessionInfoHeader.style.display = 'none';
     if (headerBtnInstrutoria) headerBtnInstrutoria.style.display = 'none';
+    if (mBottomNav) mBottomNav.style.display = 'none';
   }
+}
+
+function mobileScrollToSection(sectionId) {
+  const el = document.getElementById(sectionId);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function scrollToQuizMobile() {
+  showScreen('screen-classroom');
+  setTimeout(() => {
+    const el = document.getElementById('quiz-card');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, 150);
+}
+
+function logout() {
+  logoutSession();
 }
 
 function checkExistingSession() {
