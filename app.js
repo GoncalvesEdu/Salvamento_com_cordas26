@@ -324,6 +324,8 @@ function showScreen(screenId) {
   } else if (screenId === 'screen-classroom') {
     fetchStudentProgressAndRender();
   }
+
+  updateHeaderUserInfo();
 }
 
 function setupLoginForm() {
@@ -1557,10 +1559,13 @@ function updateHeaderUserInfo() {
   if (currentUser) {
     if (sessionInfoHeader) sessionInfoHeader.style.display = 'flex';
     if (headerUserRe) {
-      headerUserRe.innerText = `Bem-vindo, ${currentUser.nome || 'Militar'} — ${currentUser.estacao || '2º GB'}`;
+      headerUserRe.innerText = `${currentUser.nome || 'Militar'}`;
     }
 
-    if (mBottomNav) mBottomNav.style.display = 'flex';
+    if (mBottomNav) {
+      mBottomNav.classList.add('active');
+      mBottomNav.style.display = 'flex';
+    }
     if (currentUser.role === 'instrutor' || currentUser.role === 'admin') {
       if (headerBtnInstrutoria) headerBtnInstrutoria.style.display = 'flex';
       if (mNavAluno) mNavAluno.style.display = 'none';
@@ -1573,7 +1578,10 @@ function updateHeaderUserInfo() {
   } else {
     if (sessionInfoHeader) sessionInfoHeader.style.display = 'none';
     if (headerBtnInstrutoria) headerBtnInstrutoria.style.display = 'none';
-    if (mBottomNav) mBottomNav.style.display = 'none';
+    if (mBottomNav) {
+      mBottomNav.classList.remove('active');
+      mBottomNav.style.display = 'none';
+    }
   }
 }
 

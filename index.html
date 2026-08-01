@@ -10,6 +10,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Stylesheet Tático -->
+  <link rel="stylesheet" href="styles.css?v=20260801_v200">
   
   <style>
     :root {
@@ -748,9 +750,437 @@
       font-size: 0.9rem;
     }
 
-    @media (max-width: 900px) {
-      .classroom-layout { grid-template-columns: 1fr; }
-      .stats-grid-turma { grid-template-columns: 1fr 1fr; }
+    @media (max-width: 768px) {
+      /* Header Global e Logo */
+      header {
+        padding: 0.5rem 0.5rem !important;
+        max-width: 100vw !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+      }
+      .logo-section h1 {
+        font-size: 0.85rem !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        max-width: 130px !important;
+        line-height: 1.2 !important;
+      }
+      .logo-section span {
+        display: inline-block !important;
+        font-size: 0.58rem !important;
+        padding: 1px 4px !important;
+        white-space: nowrap !important;
+        max-width: 130px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+      .logo-emblem {
+        width: 32px !important;
+        height: 32px !important;
+      }
+      .header-actions-box {
+        max-width: 160px !important;
+        overflow: hidden !important;
+        gap: 4px !important;
+      }
+      #btn-toggle-bg-canvas {
+        display: none !important;
+      }
+      #btn-header-instrutoria {
+        padding: 3px 6px !important;
+        font-size: 0.7rem !important;
+      }
+      #session-info-header {
+        gap: 4px !important;
+        max-width: 150px !important;
+        overflow: hidden !important;
+      }
+      #session-info-header > div {
+        font-size: 0.68rem !important;
+        padding: 2px 5px !important;
+        max-width: 85px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+      }
+      #header-user-re {
+        display: inline-block !important;
+        max-width: 45px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+      }
+      #btn-sair-sessao {
+        padding: 3px 6px !important;
+        font-size: 0.68rem !important;
+      }
+
+      /* Problema 1: Tela de Login - Redução do Título e Ajuste de Badges */
+      #login-title, .login-title-text {
+        font-size: 1.35rem !important;
+        line-height: 1.3 !important;
+        margin-bottom: 4px !important;
+      }
+      .login-sub-text {
+        font-size: 0.82rem !important;
+        margin-bottom: 1rem !important;
+      }
+      .login-emblem-large {
+        width: 60px !important;
+        height: 60px !important;
+        margin-bottom: 0.5rem !important;
+      }
+      .login-container {
+        padding: 1.25rem 0.85rem !important;
+        margin: 0.5rem auto !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      /* Problema 2: Área da Instrutoria - Painel, Badges e Ações sem Overflow */
+      #screen-instrutoria {
+        padding: 1rem 0.4rem !important;
+        box-sizing: border-box !important;
+        max-width: 100vw !important;
+      }
+      .instrutoria-panel-card {
+        padding: 1.1rem 0.75rem !important;
+        border-radius: var(--border-radius-md) !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      .instrutoria-header-bar {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        margin-bottom: 1.25rem !important;
+        padding-bottom: 1rem !important;
+        border-bottom: 1px solid var(--color-dark-700) !important;
+      }
+      .instrutoria-header-left {
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+      .instrutoria-title-badges-box {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 6px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+      .instrutoria-title-badges-box h2 {
+        font-size: 1.35rem !important;
+        line-height: 1.2 !important;
+        margin: 0 0 4px 0 !important;
+        width: 100% !important;
+      }
+      .db-status-badge,
+      .live-monitor-badge {
+        display: inline-flex !important;
+        font-size: 0.72rem !important;
+        padding: 3px 8px !important;
+        border-radius: 12px !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+      }
+      .instrutoria-header-actions {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+      .instrutoria-header-actions button,
+      .instrutoria-header-actions label {
+        width: 100% !important;
+        justify-content: center !important;
+        text-align: center !important;
+        box-sizing: border-box !important;
+        font-size: 0.85rem !important;
+        min-height: 48px !important;
+      }
+
+      /* Card de Alunos que Precisam de Atenção */
+      .attention-card-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+      }
+      .attention-item-row {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 6px !important;
+      }
+      .attention-item-row > div {
+        flex-wrap: wrap !important;
+      }
+
+      /* Diagnóstico Pedagógico */
+      .pedagogico-card-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+      }
+      .pedagogico-filter-box {
+        width: 100% !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+      }
+      .pedagogico-filter-box select {
+        width: 100% !important;
+      }
+
+      /* Listagem de Alunos no Banco de Dados */
+      .students-list-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        width: 100% !important;
+      }
+      .filter-btn-group {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        gap: 6px !important;
+      }
+      .filter-btn {
+        width: 100% !important;
+        text-align: center !important;
+        justify-content: center !important;
+        padding: 8px 4px !important;
+        font-size: 0.8rem !important;
+        min-height: 44px !important;
+      }
+
+      /* CONVERSÃO NATIVA DE TABELAS PARA CARDS VERTICAIS NO MOBILE COM ZERO OVERFLOW */
+      .table-responsive-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+        box-sizing: border-box !important;
+      }
+
+      table.mobile-card-mode,
+      table.db-students-table,
+      table.error-questions-table,
+      .mobile-card-mode {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+        display: block !important;
+      }
+
+      table.mobile-card-mode thead,
+      .mobile-card-mode thead {
+        display: none !important;
+      }
+
+      table.mobile-card-mode tbody,
+      .mobile-card-mode tbody {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      table.mobile-card-mode tr,
+      .mobile-card-mode tr {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        background: var(--color-dark-900) !important;
+        border: 1px solid var(--color-dark-700) !important;
+        border-radius: var(--border-radius-md) !important;
+        padding: 12px 14px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+        box-sizing: border-box !important;
+      }
+
+      table.mobile-card-mode td,
+      .mobile-card-mode td {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        width: 100% !important;
+        border: none !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+        padding: 8px 0 !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+        font-size: 0.85rem !important;
+        box-sizing: border-box !important;
+      }
+
+      table.mobile-card-mode td:last-child,
+      .mobile-card-mode td:last-child {
+        border-bottom: none !important;
+        margin-top: 4px;
+      }
+
+      table.mobile-card-mode td::before,
+      .mobile-card-mode td::before {
+        content: attr(data-label);
+        font-weight: 800;
+        color: var(--color-gold-patch);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        margin-right: 12px;
+        text-align: left;
+      }
+
+      /* Repositório de Arquivos & Dropzone */
+      .instrutoria-dropzone {
+        padding: 1.25rem 0.75rem !important;
+        margin: 1rem 0 !important;
+        box-sizing: border-box !important;
+      }
+      .dropzone-visib-box {
+        flex-direction: column !important;
+        gap: 6px !important;
+      }
+      .file-item-card {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+      }
+      .file-item-card > div:last-child {
+        width: 100% !important;
+        display: flex !important;
+        justify-content: space-between !important;
+      }
+
+      /* Sala de Aula Aluno - Mobile */
+      #screen-classroom {
+        padding: 1rem 0.4rem !important;
+        box-sizing: border-box !important;
+      }
+      .slide-card, .quiz-card {
+        padding: 1.1rem 0.75rem !important;
+        border-radius: var(--border-radius-md) !important;
+        box-sizing: border-box !important;
+      }
+      .slide-media-container {
+        height: 220px !important;
+      }
+      .slide-footer-nav {
+        flex-direction: column !important;
+        gap: 8px !important;
+      }
+      .btn-slide-nav {
+        width: 100% !important;
+        justify-content: center !important;
+        min-height: 48px !important;
+      }
+
+      /* Quiz Touch Targets & Progress Bar */
+      .quiz-option-btn {
+        min-height: 48px !important;
+        padding: 12px 14px !important;
+        font-size: 0.9rem !important;
+        border-radius: var(--border-radius-md) !important;
+        box-sizing: border-box !important;
+      }
+      .form-control, .btn-primary {
+        min-height: 48px !important;
+        box-sizing: border-box !important;
+      }
+
+      /* CONTENÇÃO ESTRITA E ABSOLUTA DE OVERFLOW LATERAL NA PÁGINA */
+      html, body, main, .screen, .instrutoria-panel-card, .login-container, .alerts-card, .table-responsive-wrapper {
+        max-width: 100vw !important;
+        overflow-x: hidden !important;
+        box-sizing: border-box !important;
+      }
+
+      /* Problema 3: NAVEGAÇÃO INFERIOR FIXA NATIVA DE APP (BOTTOM TAB BAR FOR MOBILE) */
+      .mobile-bottom-nav {
+        display: none !important;
+      }
+
+      @media (min-width: 769px) {
+        .mobile-bottom-nav {
+          display: none !important;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .mobile-bottom-nav.active,
+        nav.mobile-bottom-nav.active {
+          display: flex !important;
+          position: fixed !important;
+          bottom: 0 !important;
+          left: 0 !important;
+          right: 0 !important;
+          width: 100vw !important;
+          height: 62px !important;
+          background: rgba(11, 15, 25, 0.98) !important;
+          backdrop-filter: blur(16px) !important;
+          -webkit-backdrop-filter: blur(16px) !important;
+          border-top: 2px solid var(--color-gold-patch) !important;
+          z-index: 99999 !important;
+          box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.8) !important;
+          padding: 0 4px !important;
+          box-sizing: border-box !important;
+        }
+
+        .mobile-nav-group {
+          width: 100%;
+          display: flex;
+          justify-content: space-around;
+          align-items: center;
+        }
+
+        .mobile-tab-item {
+          background: transparent;
+          border: none;
+          color: var(--color-text-muted);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 3px;
+          padding: 6px 4px;
+          flex: 1;
+          min-height: 48px;
+          cursor: pointer;
+          font-family: inherit;
+          transition: var(--transition-smooth);
+          border-radius: 8px;
+        }
+
+        .mobile-tab-item i {
+          font-size: 1.2rem;
+        }
+
+        .mobile-tab-item span {
+          font-size: 0.7rem;
+          font-weight: 700;
+        }
+
+        .mobile-tab-item.active,
+        .mobile-tab-item:active {
+          color: var(--color-gold-patch);
+          background: rgba(245, 194, 61, 0.12);
+        }
+
+        /* Espaçamento inferior para a barra de navegação não sobrepor o conteúdo */
+        #screen-instrutoria,
+        #screen-classroom,
+        #screen-login {
+          padding-bottom: 80px !important;
+        }
+      }
     }
   </style>
 </head>
@@ -766,7 +1196,7 @@
       </div>
     </div>
 
-    <div style="display: flex; align-items: center; gap: 12px;">
+    <div class="header-actions-box" style="display: flex; align-items: center; gap: 12px;">
       <button class="nav-btn btn-bg-toggle" id="btn-toggle-bg-canvas">
         <i class="fa-solid fa-palette"></i> Fundo Limpo (Estúdio)
       </button>
@@ -1073,17 +1503,17 @@
     <section class="screen" id="screen-instrutoria">
       <div class="instrutoria-panel-card">
         
-        <div class="instrutoria-header-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid var(--color-dark-700); padding-bottom: 1.5rem;">
+        <div class="instrutoria-header-bar">
           <div class="instrutoria-header-left">
-            <div class="instrutoria-title-badges-box" style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
+            <div class="instrutoria-title-badges-box">
               <h2 style="font-size: 1.8rem; font-weight: 900; color: #fff;">Painel do Instrutor</h2>
-              <span class="db-status-badge"><i class="fa-solid fa-database"></i> SQLite Conectado (WAL Mode)</span>
+              <span class="db-status-badge"><i class="fa-solid fa-database"></i> PostgreSQL Conectado (Render)</span>
               <span class="live-monitor-badge"><i class="fa-solid fa-chart-line"></i> Monitor de Turma 2º GB</span>
             </div>
             <p style="color: var(--color-text-muted); font-size: 0.9rem;">Gestão de Alunos, Históricos de Notas, Resets de Senha e Cadastro em Lote</p>
           </div>
 
-          <div class="instrutoria-header-actions" style="display: flex; gap: 10px;">
+          <div class="instrutoria-header-actions">
             <label class="nav-btn" style="background: rgba(42, 157, 104, 0.2); border-color: #2a9d68; color: #2a9d68; cursor: pointer;">
               <i class="fa-solid fa-file-csv"></i> Importar Alunos em Lote (CSV)
               <input type="file" id="csv-file-input" accept=".csv" onchange="handleImportarCSVAlunos(event)" style="display: none;">
