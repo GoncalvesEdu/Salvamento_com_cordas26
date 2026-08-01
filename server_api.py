@@ -880,7 +880,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             cur = conn.cursor()
 
             # Buscar usuário pelo RE ou Username no Banco de Dados
-            cur.execute('SELECT id, username, senha_hash, nome, re, estacao, role, senha_provisoria, primeiro_acesso_em, COALESCE(status, "ativo") as status FROM usuarios WHERE username = %s OR re = %s', (username, username))
+            cur.execute("SELECT id, username, senha_hash, nome, re, estacao, role, senha_provisoria, primeiro_acesso_em, COALESCE(status, 'ativo') as status FROM usuarios WHERE username = %s OR re = %s", (username, username))
             user_row = cur.fetchone()
 
             # MUDANÇA 3: Recusar login se o RE não estiver pré-cadastrado no BD (via CSV ou cadastro manual)
@@ -1444,7 +1444,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             conn = get_db()
             cur = conn.cursor()
 
-            cur.execute('SELECT nome FROM usuarios WHERE re = %s AND role = "aluno"', (aluno_re,))
+            cur.execute("SELECT nome FROM usuarios WHERE re = %s AND role = 'aluno'", (aluno_re,))
             row = cur.fetchone()
 
             if not row:
