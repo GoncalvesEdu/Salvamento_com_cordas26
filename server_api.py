@@ -313,6 +313,16 @@ def sync_uploaded_files_in_db():
                     clean_fn = get_safe_basename(raw_path) or get_safe_basename(er.get('nome_salvo')) or get_safe_basename(er.get('nome_arquivo'))
                     clean_path = os.path.join(UPLOAD_DIR, clean_fn)
                     cur.execute("UPDATE arquivos_instrutoria SET caminho_arquivo = %s WHERE id = %s;", (clean_path, er['id']))
+
+            # Remover duplicatas mantendo apenas o registro mais recente por nome de arquivo
+            cur.execute("""
+                DELETE FROM arquivos_instrutoria
+                WHERE id NOT IN (
+                    SELECT MAX(id)
+                    FROM arquivos_instrutoria
+                    GROUP BY LOWER(COALESCE(nome_original, nome_arquivo))
+                );
+            """)
             conn.commit()
         except Exception as e_clean:
             conn.rollback()
