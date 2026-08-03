@@ -303,6 +303,20 @@ def sync_uploaded_files_in_db():
         conn = get_db()
         cur = conn.cursor()
 
+        # Higienizar caminhos legados com barras invertidas do Windows no BD
+        try:
+            cur.execute("SELECT id, caminho_arquivo, nome_arquivo, nome_salvo FROM arquivos_instrutoria;")
+            existing_rows = cur.fetchall()
+            for er in existing_rows:
+                raw_path = er.get('caminho_arquivo', '')
+                if '\\' in str(raw_path):
+                    clean_fn = get_safe_basename(raw_path) or get_safe_basename(er.get('nome_salvo')) or get_safe_basename(er.get('nome_arquivo'))
+                    clean_path = os.path.join(UPLOAD_DIR, clean_fn)
+                    cur.execute("UPDATE arquivos_instrutoria SET caminho_arquivo = %s WHERE id = %s;", (clean_path, er['id']))
+            conn.commit()
+        except Exception as e_clean:
+            conn.rollback()
+
         repo_dir = os.path.dirname(__file__)
         repo_uploads = os.path.join(repo_dir, 'uploads')
         search_dirs = [UPLOAD_DIR, repo_uploads, repo_dir]
@@ -331,7 +345,7 @@ def sync_uploaded_files_in_db():
 
                     fn_low = fn.lower()
                     visib = 'todos' if any(k in fn_low for k in ['qts', 'manual', 'dip', 'salvamento']) else 'instrutor'
-                    cur.execute('SELECT COUNT(*) as cnt FROM arquivos_instrutoria WHERE nome_arquivo = %s OR nome_original = %s OR nome_salvo = %s', (fn, fn, fn))
+                    cur.execute('SELECT COUNT(*) as cnt FROM arquivos_instrutoria WHERE LOWER(nome_arquivo) = LOWER(%s) OR LOWER(nome_original) = LOWER(%s) OR LOWER(nome_salvo) = LOWER(%s)', (fn, fn, fn))
                     if cur.fetchone()['cnt'] == 0:
                         cur.execute('''
                             INSERT INTO arquivos_instrutoria (nome_arquivo, nome_original, nome_salvo, caminho_arquivo, tamanho, mime_type, visivel_para)
@@ -386,8 +400,14 @@ def record_failed_attempt(key):
 def clear_rate_limit(key):
     LOGIN_ATTEMPTS.pop(key, None)
 
+def get_safe_basename(path_str):
+    if not path_str:
+        return ""
+    clean_path = str(path_str).replace('\\', '/')
+    return os.path.basename(clean_path).strip()
+
 def sanitize_filename(filename):
-    clean_name = os.path.basename(filename)
+    clean_name = get_safe_basename(filename)
     clean_name = clean_name.replace('..', '').replace('/', '').replace('\\', '')
     return clean_name if clean_name else 'arquivo_upload.pdf'
 
@@ -573,24 +593,28 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             if visib == 'instrutor' and user_role not in ('instrutor', 'admin'):
                 return self.send_json({'error': 'Acesso Proibido (403)', 'message': 'Acesso exclusivo para instrutores credenciados.'}, 403)
 
-            physical_path = file_dict['caminho_arquivo']
-            safe_base_filename = os.path.basename(physical_path)
-            physical_path = os.path.join(UPLOAD_DIR, safe_base_filename)
+            safe_base_filename = (
+                get_safe_basename(file_dict.get('nome_salvo')) or 
+                get_safe_basename(file_dict.get('nome_arquivo')) or 
+                get_safe_basename(file_dict.get('caminho_arquivo'))
+            )
             original_name = file_dict.get('nome_original') or file_dict.get('nome_arquivo') or safe_base_filename
 
-            if not os.path.exists(physical_path):
-                candidates = [
-                    os.path.join(UPLOAD_DIR, safe_base_filename),
-                    os.path.join(UPLOAD_DIR, 'Manual de Salvamento em Altura v3.pdf'),
-                    os.path.join(os.path.dirname(__file__), 'Manual de Salvamento em Altura v3.pdf')
-                ]
-                for cand in candidates:
-                    if os.path.exists(cand):
-                        physical_path = cand
-                        break
+            repo_dir = os.path.dirname(__file__)
+            candidates = [
+                os.path.join(UPLOAD_DIR, safe_base_filename),
+                os.path.join(repo_dir, 'uploads', safe_base_filename),
+                os.path.join(repo_dir, safe_base_filename)
+            ]
 
-            if not os.path.exists(physical_path):
-                return self.send_json({'error': f'Arquivo físico não encontrado em disco'}, 404)
+            physical_path = None
+            for cand in candidates:
+                if os.path.exists(cand) and os.path.isfile(cand):
+                    physical_path = cand
+                    break
+
+            if not physical_path:
+                return self.send_json({'error': f"Arquivo físico '{safe_base_filename}' não encontrado em disco (404)"}, 404)
 
             try:
                 with open(physical_path, 'rb') as f:
