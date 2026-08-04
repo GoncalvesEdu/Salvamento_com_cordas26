@@ -125,8 +125,58 @@ def verify_password(password, stored_hash):
     legacy_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
     return legacy_hash == stored_hash
 
+class SQLiteUniqueViolation(errors.UniqueViolation):
+    pass
+
+class SQLiteCursorWrapper:
+    def __init__(self, sqlite_cursor):
+        self.cursor = sqlite_cursor
+
+    def execute(self, query, params=None):
+        query_translated = query.replace('%s', '?')
+        try:
+            if params is not None:
+                self.cursor.execute(query_translated, params)
+            else:
+                self.cursor.execute(query_translated)
+        except sqlite3.IntegrityError as e:
+            raise SQLiteUniqueViolation(f"SQLite Integrity Error: {e}")
+
+    def fetchone(self):
+        row = self.cursor.fetchone()
+        return dict(row) if row else None
+
+    def fetchall(self):
+        rows = self.cursor.fetchall()
+        return [dict(r) for r in rows]
+
+    @property
+    def rowcount(self):
+        return self.cursor.rowcount
+
+    def __getattr__(self, name):
+        return getattr(self.cursor, name)
+
+class SQLiteConnectionWrapper:
+    def __init__(self, db_path):
+        self.conn = sqlite3.connect(db_path)
+        self.conn.row_factory = sqlite3.Row
+
+    def cursor(self):
+        return SQLiteCursorWrapper(self.conn.cursor())
+
+    def commit(self):
+        self.conn.commit()
+
+    def rollback(self):
+        self.conn.rollback()
+
+    def close(self):
+        self.conn.close()
+
 def get_db():
     db_url = os.environ.get("DATABASE_URL", "")
+    is_render = os.environ.get("RENDER") == "true"
     if not db_url or "oregon-postgres.render.com" not in db_url:
         db_url = "postgresql://db_salvamento_com_cordas_user:nZvQsGoE6ED6ne026zkML02fjEbtlKWo@dpg-d9mc56ijobas73ao7fk0-a.oregon-postgres.render.com/db_salvamento_com_cordas"
     try:
@@ -134,12 +184,24 @@ def get_db():
         return conn
     except Exception as e:
         print(f"[GET_DB WARNING] Falha na conexao principal ({e}), tentando URL externa...")
-        ext_url = "postgresql://db_salvamento_com_cordas_user:nZvQsGoE6ED6ne026zkML02fjEbtlKWo@dpg-d9mc56ijobas73ao7fk0-a.oregon-postgres.render.com/db_salvamento_com_cordas"
-        return psycopg2.connect(ext_url, cursor_factory=RealDictCursor)
+        try:
+            ext_url = "postgresql://db_salvamento_com_cordas_user:nZvQsGoE6ED6ne026zkML02fjEbtlKWo@dpg-d9mc56ijobas73ao7fk0.oregon-postgres.render.com/db_salvamento_com_cordas"
+            return psycopg2.connect(ext_url, cursor_factory=RealDictCursor)
+        except Exception as ex:
+            if is_render:
+                print(f"[GET_DB ERROR] Falha catastrófica de conexao no Render. Proibido usar SQLite em producao. Erro original: {ex}")
+                raise ex
+            print(f"[GET_DB WARNING] Falha na conexao externa ({ex}). Usando banco de dados local SQLite (salvamento_2gb.db)...")
+            db_path = os.path.join(os.path.dirname(__file__), 'salvamento_2gb.db')
+            return SQLiteConnectionWrapper(db_path)
 
 def init_db():
     try:
         conn = get_db()
+        if isinstance(conn, SQLiteConnectionWrapper):
+            print("[INIT_DB] SQLite detectado. Ignorando inicializacao do schema (tabelas ja existentes).")
+            conn.close()
+            return
         cur = conn.cursor()
         try:
             cur.execute('''
@@ -181,12 +243,13 @@ def init_db():
                 CREATE TABLE IF NOT EXISTS progresso_modulos (
                     id SERIAL PRIMARY KEY,
                     aluno_re TEXT NOT NULL,
-                    modulo_id INTEGER NOT NULL,
+                    modulo_id TEXT NOT NULL,
                     nota DOUBLE PRECISION DEFAULT 0.0,
                     tempo_gasto INTEGER DEFAULT 0,
                     status TEXT DEFAULT 'concluido',
                     data_conclusao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (aluno_re) REFERENCES alunos(re)
+                    FOREIGN KEY (aluno_re) REFERENCES alunos(re),
+                    UNIQUE (aluno_re, modulo_id)
                 );
             ''')
 
@@ -284,6 +347,39 @@ def init_db():
                 VALUES ('999999-9', %s, 'ALUNO DE TESTE (NÃO USAR EM PRODUÇÃO)', '999999-9', '2º GB / TESTE', 'aluno', 0, 'ativo')
                 ON CONFLICT (username) DO UPDATE SET senha_hash = EXCLUDED.senha_hash, role = 'aluno'
             ''', (teste_pass,))
+
+            # Migracao para alterar o tipo de modulo_id de INTEGER para TEXT na tabela progresso_modulos
+            try:
+                cur.execute('''
+                    ALTER TABLE progresso_modulos ALTER COLUMN modulo_id TYPE TEXT USING modulo_id::TEXT;
+                ''')
+                print("[MIGRATION] Coluna modulo_id alterada para TEXT na tabela progresso_modulos.")
+            except Exception as e_mig:
+                pass
+
+            # Garantir que a tabela progresso_modulos tenha uma constraint UNIQUE em (aluno_re, modulo_id)
+            try:
+                cur.execute('''
+                    ALTER TABLE progresso_modulos ADD CONSTRAINT unique_aluno_modulo UNIQUE (aluno_re, modulo_id);
+                ''')
+                print("[MIGRATION] Adicionada constraint UNIQUE (aluno_re, modulo_id) na tabela progresso_modulos.")
+            except Exception as e_unique:
+                pass
+
+            # Migracao para corrigir o RE e senha do Ten Palopoli
+            try:
+                cur.execute("SELECT id FROM usuarios WHERE re = '1563006-8' OR username = '1563006-8'")
+                usr = cur.fetchone()
+                if usr:
+                    novo_pass_hash = hash_password_pbkdf2('156306-8')
+                    cur.execute('''
+                        UPDATE usuarios
+                        SET re = '156306-8', username = '156306-8', senha_hash = %s, senha_provisoria = 1, primeiro_acesso_em = NULL
+                        WHERE id = %s
+                    ''', (novo_pass_hash, usr['id']))
+                    print(f"[MIGRATION] Registro do Ten Palopoli (ID {usr['id']}) corrigido com sucesso para RE 156306-8.")
+            except Exception as e_palopoli:
+                print(f"[MIGRATION ERROR] Falha ao corrigir RE do Ten Palopoli: {e_palopoli}")
 
             conn.commit()
         except Exception as e:
@@ -1224,10 +1320,11 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                 })
 
             now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            mod_val = int(modulo_id_str) if modulo_id_str.isdigit() else modulo_id_str
             cur.execute('''
                 INSERT INTO progresso_modulos (aluno_re, modulo_id, nota, tempo_gasto, status, data_conclusao)
                 VALUES (%s, %s, 100.0, 300, 'concluido', %s)
-            ''', (user['re'], int(modulo_id_str), now_str))
+            ''', (user['re'], mod_val, now_str))
 
             conn.commit()
             conn.close()

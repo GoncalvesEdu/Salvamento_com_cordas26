@@ -36,13 +36,14 @@ def init_db():
             CREATE TABLE IF NOT EXISTS progresso_modulos (
                 id SERIAL PRIMARY KEY,
                 aluno_re TEXT NOT NULL,
-                modulo_id INTEGER NOT NULL,
+                modulo_id TEXT NOT NULL,
                 nota DOUBLE PRECISION DEFAULT 0.0,
                 tempo_gasto INTEGER DEFAULT 0,
                 status TEXT DEFAULT 'concluido',
                 data_inicio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 data_conclusao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (aluno_re) REFERENCES alunos(re)
+                FOREIGN KEY (aluno_re) REFERENCES alunos(re),
+                UNIQUE (aluno_re, modulo_id)
             );
         ''')
 
@@ -68,6 +69,40 @@ def init_db():
                 data_upload TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         ''')
+
+        # Migracao para alterar o tipo de modulo_id de INTEGER para TEXT na tabela progresso_modulos
+        try:
+            cur.execute('''
+                ALTER TABLE progresso_modulos ALTER COLUMN modulo_id TYPE TEXT USING modulo_id::TEXT;
+            ''')
+        except Exception:
+            pass
+
+        # Garantir que a tabela progresso_modulos tenha uma constraint UNIQUE em (aluno_re, modulo_id)
+        try:
+            cur.execute('''
+                ALTER TABLE progresso_modulos ADD CONSTRAINT unique_aluno_modulo UNIQUE (aluno_re, modulo_id);
+            ''')
+        except Exception:
+            pass
+
+        # Migracao para corrigir o RE e senha do Ten Palopoli
+        try:
+            cur.execute("SELECT id FROM usuarios WHERE re = '1563006-8' OR username = '1563006-8'")
+            usr = cur.fetchone()
+            if usr:
+                import hashlib, secrets
+                salt_hex = secrets.token_hex(16)
+                salt_bytes = bytes.fromhex(salt_hex)
+                dk = hashlib.pbkdf2_hmac('sha256', b'156306-8', salt_bytes, 100000)
+                novo_pass_hash = f"pbkdf2_sha256${salt_hex}${dk.hex()}"
+                cur.execute('''
+                    UPDATE usuarios
+                    SET re = '156306-8', username = '156306-8', senha_hash = %s, senha_provisoria = 1, primeiro_acesso_em = NULL
+                    WHERE id = %s
+                ''', (novo_pass_hash, usr['id']))
+        except Exception:
+            pass
 
         conn.commit()
     except Exception as e:
