@@ -104,6 +104,23 @@ def init_db():
         except Exception:
             pass
 
+        # Migracao para cadastrar o CB PM Braga
+        try:
+            cur.execute("SELECT id FROM usuarios WHERE re = '116666-2' OR username = '116666-2'")
+            usr_braga = cur.fetchone()
+            if not usr_braga:
+                import hashlib, secrets
+                salt_hex = secrets.token_hex(16)
+                salt_bytes = bytes.fromhex(salt_hex)
+                dk = hashlib.pbkdf2_hmac('sha256', b'116666-2', salt_bytes, 100000)
+                braga_pass = f"pbkdf2_sha256${salt_hex}${dk.hex()}"
+                cur.execute('''
+                    INSERT INTO usuarios (username, senha_hash, nome, re, estacao, role, senha_provisoria, status)
+                    VALUES ('116666-2', %s, 'CB PM Braga', '116666-2', '2º GB', 'instrutor', 1, 'ativo')
+                ''', (braga_pass,))
+        except Exception:
+            pass
+
         conn.commit()
     except Exception as e:
         conn.rollback()

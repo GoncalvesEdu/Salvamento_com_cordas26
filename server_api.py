@@ -380,6 +380,19 @@ def init_db():
                     print(f"[MIGRATION] Registro do Ten Palopoli (ID {usr['id']}) corrigido com sucesso para RE 156306-8.")
             except Exception as e_palopoli:
                 print(f"[MIGRATION ERROR] Falha ao corrigir RE do Ten Palopoli: {e_palopoli}")
+            # Migracao para cadastrar o CB PM Braga
+            try:
+                cur.execute("SELECT id FROM usuarios WHERE re = '116666-2' OR username = '116666-2'")
+                usr_braga = cur.fetchone()
+                if not usr_braga:
+                    braga_pass = hash_password_pbkdf2('116666-2')
+                    cur.execute('''
+                        INSERT INTO usuarios (username, senha_hash, nome, re, estacao, role, senha_provisoria, status)
+                        VALUES ('116666-2', %s, 'CB PM Braga', '116666-2', '2º GB', 'instrutor', 1, 'ativo')
+                    ''', (braga_pass,))
+                    print("[MIGRATION] CB PM Braga cadastrado com sucesso.")
+            except Exception as e_braga:
+                print(f"[MIGRATION ERROR] Falha ao cadastrar CB PM Braga: {e_braga}")
 
             conn.commit()
         except Exception as e:
