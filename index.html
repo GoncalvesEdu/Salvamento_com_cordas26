@@ -1352,6 +1352,14 @@
                   <span style="font-size: 0.75rem;">Estrutura Elevada</span>
                 </div>
               </button>
+
+              <button class="menu-item" id="btn-mod-final" data-mod="final" onclick="loadModule('final')" style="border-color: var(--color-gold-patch); background: rgba(245, 194, 61, 0.08);">
+                <i class="fa-solid fa-trophy" style="color: var(--color-gold-patch);"></i>
+                <div>
+                  <strong style="display: block; font-size: 0.88rem; color: var(--color-gold-patch);">PROVA SEMANA 1</strong>
+                  <span style="font-size: 0.75rem; color: var(--color-gold-patch);">20 Questões (Avaliação)</span>
+                </div>
+              </button>
             </div>
 
             <!-- Container 2ª Semana -->
@@ -1385,14 +1393,6 @@
                 <div>
                   <strong style="display: block; font-size: 0.88rem;">Estação 7</strong>
                   <span style="font-size: 0.75rem;">Vantagem Mecânica</span>
-                </div>
-              </button>
-
-              <button class="menu-item" id="btn-mod-final" data-mod="final" onclick="loadModule('final')" style="border-color: var(--color-gold-patch); background: rgba(245, 194, 61, 0.08);">
-                <i class="fa-solid fa-trophy" style="color: var(--color-gold-patch);"></i>
-                <div>
-                  <strong style="display: block; font-size: 0.88rem; color: var(--color-gold-patch);">PROVA FINAL</strong>
-                  <span style="font-size: 0.75rem; color: var(--color-gold-patch);">20 Questões (Certificação)</span>
                 </div>
               </button>
             </div>
@@ -1668,14 +1668,15 @@
             <div class="pedagogico-filter-box" style="display: flex; align-items: center; gap: 8px;">
               <label style="color: var(--color-text-muted); font-size: 0.8rem; font-weight: 700;">Filtrar Estação:</label>
               <select id="filter-error-module-select" onchange="renderErrorQuestionsReport()" style="background: #1e293b; color: #fff; border: 1px solid var(--color-border); padding: 4px 10px; border-radius: 6px; font-size: 0.8rem;">
-                <option value="todos" selected>Todas as Estações &amp; Prova Final</option>
+                <option value="todos" selected>Todas as Estações &amp; Prova Semana 1</option>
                 <option value="1">Estação 1 - Trabalhador Suspenso</option>
                 <option value="2">Estação 2 - Poço &amp; Confinado</option>
                 <option value="3">Estação 3 - Estrutura Elevada</option>
                 <option value="4">Estação 4 - Movimentação Vítima</option>
                 <option value="5">Estação 5 - Barranco &amp; Terreno</option>
                 <option value="6">Estação 6 - Escadas &amp; Tripés</option>
-                <option value="final">Prova Final (20 Questões)</option>
+                <option value="7">Estação 7 - Vantagem Mecânica</option>
+                <option value="final">Prova Semana 1 (20 Questões)</option>
               </select>
             </div>
           </div>
@@ -2019,6 +2020,6 @@
     </div>
   </nav>
 
-  <script src="app.js?v=20260805_v107"></script>
+  <script src="app.js?v=20260805_v108"></script>
 </body>
 </html>

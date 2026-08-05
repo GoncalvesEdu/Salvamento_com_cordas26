@@ -305,19 +305,19 @@ const modulesData = {
     ]
   },
   final: {
-    title: "Exame de Certificação: Prova Final (20 Questões)",
-    subtitle: "Avaliação teórica integradora abrangendo as 7 Estações de Resgate e Protocolo PHTLS 10ª Edição",
+    title: "Prova: Semana 1 (20 Questões)",
+    subtitle: "Avaliação teórica integradora abrangendo as Estações de Resgate 1 a 3 e Protocolo PHTLS",
     slides: [
       {
-        tag: "EXAME DE CERTIFICAÇÃO - 20 QUESTÕES",
-        title: "Prova Final de Salvamento com Cordas & APH",
-        subtitle: "Avaliação abrangente para emissão do Certificado Oficial do 2º GB.",
+        tag: "AVALIAÇÃO SEMANA 1 - 20 QUESTÕES",
+        title: "Prova da 1ª Semana (Salvamento & APH)",
+        subtitle: "Avaliação abrangente abrangendo Estações 1 a 3 e Atendimento de APH",
         image: "images/logo_salvamento_2gb.png",
         bullets: [
-          "<strong>Estrutura do Exame:</strong> 20 questões de múltipla escolha abarcando o conteúdo técnico e de APH das 7 estações.",
-          "<strong>Critério de Aprovação:</strong> Aproveitamento mínimo de 70% de acertos para liberação do Certificado Oficial.",
+          "<strong>Estrutura do Exame:</strong> 20 questões de múltipla escolha abarcando o conteúdo técnico e de APH das Estações 1 a 3.",
+          "<strong>Critério de Aprovação:</strong> Aproveitamento mínimo de 70% de acertos para liberação do conteúdo da Semana 2.",
           "<strong>Navegação Interativa:</strong> Responda às 20 questões sequencialmente navegando pelos botões de Questão Anterior e Próxima.",
-          "<strong>Emissão de Certificado:</strong> Após a conclusão com sucesso, seu certificado com autenticidade em banco de dados será liberado instantaneamente."
+          "<strong>Sequência do Curso:</strong> Após aprovação, as instruções da Semana 2 estarão liberadas."
         ]
       }
     ]
@@ -1177,7 +1177,7 @@ function renderErrorQuestionsReport() {
       rateBadge = `<span style="font-weight: 800; color: #f5c23d;">${q.percentual_erro}%</span>`;
     }
 
-    const modLabel = q.modulo_id === 'final' ? 'Prova Final' : `Estação ${q.modulo_id}`;
+    const modLabel = q.modulo_id === 'final' ? 'Prova Semana 1' : `Estação ${q.modulo_id}`;
     const sampleBadge = isSmallSample ? `<span style="font-size: 0.7rem; color: var(--color-text-muted); display: block;">(Amostra reduzida &lt; 3)</span>` : '';
 
     return `
@@ -1220,6 +1220,13 @@ function switchWeek(weekNum) {
 function loadModule(modId) {
   currentModule = modId;
   currentSlideIndex = 0;
+
+  // Alternar automaticamente entre as abas da Semana 1 e Semana 2 baseado no módulo carregado
+  if (modId === 'final' || modId === 1 || modId === 2 || modId === 3) {
+    switchWeek(1);
+  } else if (modId === 4 || modId === 5 || modId === 6 || modId === 7) {
+    switchWeek(2);
+  }
 
   document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
   document.getElementById(`btn-mod-${modId}`)?.classList.add('active');
@@ -1403,7 +1410,7 @@ function renderQuizQuestionState() {
       counterEl.innerText = `Questão ${currentQuizIndex + 1} de ${totalQ}`;
     }
     if (titleBadge) {
-      titleBadge.innerHTML = `<i class="fa-solid fa-trophy"></i> Prova Final (20 Questões)`;
+      titleBadge.innerHTML = `<i class="fa-solid fa-trophy"></i> Prova Semana 1 (20 Questões)`;
     }
   } else {
     if (counterEl) counterEl.style.display = 'none';
@@ -1472,7 +1479,7 @@ async function handleQuizSubmission() {
     for (let i = 0; i < totalQ; i++) {
       const qid = currentQuizQuestions[i].question_id;
       if (!quizAnswersMap[qid]) {
-        alert(`⚠️ Por favor, responda à Questão ${i + 1} antes de finalizar a Prova Final.`);
+        alert(`⚠️ Por favor, responda à Questão ${i + 1} antes de finalizar a Prova Semana 1.`);
         currentQuizIndex = i;
         renderQuizQuestionState();
         return;
@@ -1508,10 +1515,12 @@ async function handleQuizSubmission() {
         userProgress[currentModule] = true;
         updateCourseProgressBar();
 
-        if (typeof currentModule === 'number' && currentModule < 7) {
+        if (currentModule === 3) {
+          loadModule('final');
+        } else if (typeof currentModule === 'number' && currentModule < 7) {
           loadModule(currentModule + 1);
         } else {
-          loadModule('final');
+          alert("🎉 Parabéns! Você concluiu todas as instruções da Semana 2. Em breve a Prova da Semana 2 e a Prova Final do Curso estarão liberadas!");
         }
       } else {
         alert(data.message || "❌ Resposta incorreta. Revise o material do módulo e tente novamente.");
@@ -1543,12 +1552,12 @@ async function handleQuizSubmission() {
       const scorePct = Math.round((correctCount / totalQ) * 100);
 
       if (scorePct >= 70) {
-        alert(`🏆 PARABÉNS! Você foi APROVADO na Prova Final com ${scorePct}% de acertos (${correctCount} de ${totalQ} questões)!\n\nSeu Certificado Oficial do 2º GB CBMESP foi liberado com sucesso!`);
+        alert(`🏆 PARABÉNS! Você foi APROVADO na Prova Semana 1 com ${scorePct}% de acertos (${correctCount} de ${totalQ} questões)!\n\nAgora você está liberado para iniciar a Semana 2.`);
         userProgress['final'] = true;
         updateCourseProgressBar();
-        generateCertificate();
+        loadModule(4);
       } else {
-        alert(`⚠️ Você obteve ${scorePct}% de acertos (${correctCount} de ${totalQ} questões).\n\nO aproveitamento mínimo necessário é de 70%. Revise o conteúdo das 7 estações e tente novamente.`);
+        alert(`⚠️ Você obteve ${scorePct}% de acertos (${correctCount} de ${totalQ} questões).\n\nO aproveitamento mínimo necessário é de 70%. Revise o conteúdo da Semana 1 e tente novamente.`);
       }
     }
   } catch (e) {
