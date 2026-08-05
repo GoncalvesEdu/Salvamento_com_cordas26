@@ -262,7 +262,7 @@ const modulesData = {
   7: {
     title: "Estação 7: Vantagem Mecânica & Polipastos",
     subtitle: "Cálculo de Redução de Forças, Atrito e Sistemas de Tração em Altura",
-    youtubeId: "1UFhbFW0GRs",
+    youtubeId: "d87adXQN_0I",
     slides: [
       {
         tag: "ESTAÇÃO 7 - SLIDE 1 DE 3",
