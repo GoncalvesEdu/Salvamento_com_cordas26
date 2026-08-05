@@ -185,7 +185,7 @@ const modulesData = {
       {
         tag: "ESTAÇÃO 5 - SLIDE 1 DE 3",
         title: "Imobilização em Prancha Longa com Tirante Aranha",
-        subtitle: "Estabilização firme em superfícies irregulares e declives.",
+        subtitle: "Estabilização firme em superfícies irregulares and declives.",
         image: "images/aph_mod5_prancha_barranco.png",
         bullets: [
           "<strong>Tirante Tipo Aranha:</strong> Ancoragem de 10 pontos para impedir o deslizamento da vítima durante a inclinação em barrancos.",
@@ -208,6 +208,76 @@ const modulesData = {
       },
       {
         tag: "ESTAÇÃO 5 - SLIDE 3 DE 3",
+        title: "Sistemas Compostos Vector 5:1 & Proteção de Borda",
+        subtitle: "Multiplicação avançada para elevação pesada em encostas.",
+        image: "images/sc_mod3_vector_51.png",
+        bullets: [
+          "<strong>Sistema 5:1 Composto:</strong> Combinação de um sistema 3:1 tracionando um 2:1 secundário para resgates em pirambeiras pesadas.",
+          "<strong>Polias de Placa Oscilante:</strong> Eficiência superior e menor atrito durante o tracionamento continuado.",
+          "<strong>Protetor Articulado de Calha/Quina:</strong> Proteção da corda contra quinas vivas de pedras e concreto."
+        ]
+      }
+    ]
+  },
+  6: {
+    title: "Estação 6: Escadas & Tripés Operacionais",
+    subtitle: "Tripé Operacional, Transposição de Borda e Pick-Off Tático",
+    youtubeId: "KUlGl2laKwc",
+    slides: [
+      {
+        tag: "ESTAÇÃO 6 - SLIDE 1 DE 3",
+        title: "Tripé Operacional de Resgate & Ancoragens",
+        subtitle: "Posicionamento e amarração das pernas em bocas de poço.",
+        image: "images/sc_mod4_tripe_montagem.png",
+        bullets: [
+          "<strong>Cálculo do Ponto Central:</strong> Posicionamento simétrico do cabeçote sobre a abertura vertical para evitar forças tangenciais.",
+          "<strong>Fita Limitadora de Pernas:</strong> Uso obrigatório de fita ou corrente na base do tripé para impedir abertura excessiva das pernas.",
+          "<strong>Linhas Independentes de Carga:</strong> Passagem da corda de trabalho e linha de segurança belay por polias separadas do cabeçote."
+        ]
+      },
+      {
+        tag: "ESTAÇÃO 6 - SLIDE 2 DE 3",
+        title: "Escadas Prolongáveis como Trilho de Transposição",
+        subtitle: "Descentradores e suporte mecânico para transposição de borda.",
+        image: "images/sc_mod4_escada_trilho.png",
+        bullets: [
+          "<strong>Escada de Trilho:</strong> Uso da escada prolongável como rampa inclinada para guiar o descenso/içamento da prancha na borda.",
+          "<strong>Fixação e Contraventamento:</strong> Amarração firme do topo e base da escada para impedir deslocamento lateral ou escorregamento.",
+          "<strong>Controle de Centro de Gravidade:</strong> Socorristas projetam o corpo para fora da borda mantendo base firme nas travessas."
+        ]
+      },
+      {
+        tag: "ESTAÇÃO 6 - SLIDE 3 DE 3",
+        title: "Manobra de Resgate Pick-Off Tático (Desenganche)",
+        subtitle: "Retirada de vítima suspensa por talabarte ou cinto rompido.",
+        image: "images/sc_mod4_pick_off.png",
+        bullets: [
+          "<strong>Conexão Direta à Vítima:</strong> Transferência da carga da vítima para o cinto do resgatador por fita ajustável.",
+          "<strong>Alívio da Tensão Presa:</strong> Uso de mini-sistema ou pedaleira para aliviar a tensão do talabarte da vítima antes de soltá-lo.",
+          "<strong>Descenso Duplo Controlado:</strong> Descer com a vítima acoplada usando descensor autofrenante com controle de velocidade."
+        ]
+      }
+    ]
+  },
+  7: {
+    title: "Estação 7: Vantagem Mecânica & Polipastos",
+    subtitle: "Cálculo de Redução de Forças, Atrito e Sistemas de Tração em Altura",
+    youtubeId: "1UFhbFW0GRs",
+    slides: [
+      {
+        tag: "ESTAÇÃO 7 - SLIDE 1 DE 3",
+        title: "Z-Rig 3:1 Reduzido & Captura de Progresso",
+        subtitle: "Vantagem mecânica ímpar com ancoragem móvel.",
+        image: "images/sc_mod3_z_rig_31.png",
+        bullets: [
+          "<strong>Sistema Z-Rig 3:1:</strong> Sistema ímpar reduzido que utiliza 1 polia móvel acoplada à corda principal por um bloqueador móvel (carga) e 1 polia fixa na ancoragem, reduzindo o esforço a 1/3 teórico.",
+          "<strong>Captura de Progresso:</strong> Antirretorno feito no ponto de ancoragem usando polia PMP (base chata) combinada com cordinete Prusik (mín. 3 voltas). Tandem Prusik obrigatório para peso > 1 pessoa.",
+          "<strong>Tracionamento com Descensor:</strong> Emprego de Petzl I'D dispensa captura de progresso por ter autofrenagem. Modelos pré-2019 exigem alavanca em 'belay' ao puxar e 'lock' após travar.",
+          "<strong>Operação sem Luvas:</strong> De acordo com a doutrina, o tracionamento direto da vantagem mecânica é realizado sem o uso de luvas para manter sensibilidade tátil e evitar aprisionamentos."
+        ]
+      },
+      {
+        tag: "ESTAÇÃO 7 - SLIDE 2 DE 3",
         title: "Sistemas Vector 5:1 Reduzidos & Efeito Polia",
         subtitle: "Vantagem mecânica avançada e física aplicada nas ancoragens.",
         image: "images/sc_mod3_vector_51.png",
@@ -216,6 +286,18 @@ const modulesData = {
           "<strong>Sistemas Reduzidos vs Estendidos:</strong> Sistemas reduzidos economizam cabo usando um bloqueador móvel na linha principal (Z-Rig 3:1 ou Vector 5:1). Evita desperdício (ex: 150m de corda para içar 30m no 5:1).",
           "<strong>Vector 5:1 Composto:</strong> Combinação de um sistema 3:1 que traciona o cabo de manobra de um 2:1 secundário para ganho mecânico de alto rendimento.",
           "<strong>Proteção de Quinas e Desvios:</strong> Uso de protetor articulado de calha ou quina viva para evitar danos por abrasão e corte de cordas sob tensão de 2T ou superior."
+        ]
+      },
+      {
+        tag: "ESTAÇÃO 7 - SLIDE 3 DE 3",
+        title: "Diferença entre Sistemas e Captura de Progresso",
+        subtitle: "Sistemas pares, ímpares e blocantes de segurança.",
+        image: "images/sc_mod3_ancoragem_y.png",
+        bullets: [
+          "<strong>Sistemas Ímpares vs Pares:</strong> Nos ímpares (3:1, 5:1), a corda termina na carga. Nos pares (2:1, 4:1), a corda termina no ponto de ancoragem.",
+          "<strong>Blocantes e Nós Prusik:</strong> O anel com pescador duplo fixado por Prusik (mínimo de três voltas) deve ter diâmetro adequado e base estável.",
+          "<strong>Polias PMP de Base Chata:</strong> Evitam que o nó Prusik seja engolido pela roldana, mantendo a blocagem automática ativa e segura.",
+          "<strong>Comando do Rigger:</strong> A coordenação e segurança operacional dos sistemas de tração devem ser fiscalizadas diretamente por um rigger credenciado."
         ]
       }
     ]
@@ -289,7 +371,7 @@ let authToken = localStorage.getItem('cb_auth_token') || '';
 let currentModule = 1;
 let currentSlideIndex = 0;
 let currentStudentFilter = 'ativo';
-let userProgress = { 1: false, 2: false, 3: false, 4: false, 5: false, 6: false, final: false };
+let userProgress = { 1: false, 2: false, 3: false, 4: false, 5: false, 6: false, 7: false, final: false };
 
 // Estado da Tentativa do Quiz
 let currentAttemptId = null;
@@ -1448,7 +1530,7 @@ async function handleQuizSubmission() {
         userProgress[currentModule] = true;
         updateCourseProgressBar();
 
-        if (typeof currentModule === 'number' && currentModule < 6) {
+        if (typeof currentModule === 'number' && currentModule < 7) {
           loadModule(currentModule + 1);
         } else {
           loadModule('final');
@@ -1488,7 +1570,7 @@ async function handleQuizSubmission() {
         updateCourseProgressBar();
         generateCertificate();
       } else {
-        alert(`⚠️ Você obteve ${scorePct}% de acertos (${correctCount} de ${totalQ} questões).\n\nO aproveitamento mínimo necessário é de 70%. Revise o conteúdo das 6 estações e tente novamente.`);
+        alert(`⚠️ Você obteve ${scorePct}% de acertos (${correctCount} de ${totalQ} questões).\n\nO aproveitamento mínimo necessário é de 70%. Revise o conteúdo das 7 estações e tente novamente.`);
       }
     }
   } catch (e) {
@@ -1497,7 +1579,7 @@ async function handleQuizSubmission() {
 }
 
 function applyStudentProgress(progressoArray) {
-  userProgress = { 1: false, 2: false, 3: false, 4: false, 5: false, 6: false, final: false };
+  userProgress = { 1: false, 2: false, 3: false, 4: false, 5: false, 6: false, 7: false, final: false };
   if (Array.isArray(progressoArray)) {
     progressoArray.forEach(p => {
       let mId = String(p.modulo_id);
@@ -1526,15 +1608,15 @@ async function fetchStudentProgressAndRender() {
 }
 
 function updateCourseProgressBar() {
-  const allModules = [1, 2, 3, 4, 5, 6, 'final'];
+  const allModules = [1, 2, 3, 4, 5, 6, 7, 'final'];
   const completed = allModules.filter(m => userProgress[m] === true).length;
-  const pct = Math.round((completed / 7) * 100);
+  const pct = Math.round((completed / 8) * 100);
   
   const fill = document.getElementById('course-progress-bar-fill');
   if (fill) fill.style.width = `${pct}%`;
 
   const txt = document.getElementById('course-progress-text');
-  if (txt) txt.innerText = `${completed} de 7 Módulos Concluídos (${pct}%)`;
+  if (txt) txt.innerText = `${completed} de 8 Módulos Concluídos (${pct}%)`;
 
   allModules.forEach(mId => {
     const btn = document.getElementById(`btn-mod-${mId}`);
