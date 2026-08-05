@@ -1154,6 +1154,25 @@ function renderErrorQuestionsReport() {
 // ------------------------------------------------------------------
 // SALA DE AULA E QUIZ ANTI-CHEAT COM RANDOMIZAÇÃO DETERMINÍSTICA
 // ------------------------------------------------------------------
+function switchWeek(weekNum) {
+  const w1List = document.getElementById('week-1-list');
+  const w2List = document.getElementById('week-2-list');
+  const btnW1 = document.getElementById('btn-week-1');
+  const btnW2 = document.getElementById('btn-week-2');
+
+  if (weekNum === 1) {
+    w1List?.classList.remove('hidden');
+    w2List?.classList.add('hidden');
+    btnW1?.classList.add('active');
+    btnW2?.classList.remove('active');
+  } else {
+    w1List?.classList.add('hidden');
+    w2List?.classList.remove('hidden');
+    btnW2?.classList.add('active');
+    btnW1?.classList.remove('active');
+  }
+}
+
 function loadModule(modId) {
   currentModule = modId;
   currentSlideIndex = 0;
@@ -1241,6 +1260,7 @@ function setupNavigationEvents() {
 
   document.getElementById('btn-submit-quiz')?.addEventListener('click', handleQuizSubmission);
   document.getElementById('btn-header-instrutoria')?.addEventListener('click', () => showScreen('screen-instrutoria'));
+  document.getElementById('btn-header-classroom')?.addEventListener('click', () => showScreen('screen-classroom'));
   document.getElementById('btn-header-logo')?.addEventListener('click', () => {
     if (currentUser) {
       if (currentRole === 'instrutor' || currentRole === 'admin') showScreen('screen-instrutoria');
@@ -1550,11 +1570,13 @@ function generateCertificate() {
 
 function updateHeaderUserInfo() {
   const headerBtnInstrutoria = document.getElementById('btn-header-instrutoria');
+  const headerBtnClassroom = document.getElementById('btn-header-classroom');
   const sessionInfoHeader = document.getElementById('session-info-header');
   const headerUserRe = document.getElementById('header-user-re');
   const mNavAluno = document.getElementById('mobile-nav-aluno');
   const mNavInstrutor = document.getElementById('mobile-nav-instrutor');
   const mBottomNav = document.getElementById('mobile-bottom-nav');
+  const mBackToInst = document.getElementById('mtab-back-to-instructor');
 
   if (currentUser) {
     if (sessionInfoHeader) sessionInfoHeader.style.display = 'flex';
@@ -1566,18 +1588,33 @@ function updateHeaderUserInfo() {
       mBottomNav.classList.add('active');
       mBottomNav.style.display = 'flex';
     }
+
+    const isClassroomActive = document.getElementById('screen-classroom')?.classList.contains('active');
+
     if (currentUser.role === 'instrutor' || currentUser.role === 'admin') {
       if (headerBtnInstrutoria) headerBtnInstrutoria.style.display = 'flex';
-      if (mNavAluno) mNavAluno.style.display = 'none';
-      if (mNavInstrutor) mNavInstrutor.style.display = 'flex';
+      if (headerBtnClassroom) headerBtnClassroom.style.display = 'flex';
+      if (mBackToInst) mBackToInst.style.display = 'flex';
+
+      if (isClassroomActive) {
+        if (mNavAluno) mNavAluno.style.display = 'flex';
+        if (mNavInstrutor) mNavInstrutor.style.display = 'none';
+      } else {
+        if (mNavAluno) mNavAluno.style.display = 'none';
+        if (mNavInstrutor) mNavInstrutor.style.display = 'flex';
+      }
     } else {
       if (headerBtnInstrutoria) headerBtnInstrutoria.style.display = 'none';
+      if (headerBtnClassroom) headerBtnClassroom.style.display = 'none';
+      if (mBackToInst) mBackToInst.style.display = 'none';
       if (mNavAluno) mNavAluno.style.display = 'flex';
       if (mNavInstrutor) mNavInstrutor.style.display = 'none';
     }
   } else {
     if (sessionInfoHeader) sessionInfoHeader.style.display = 'none';
     if (headerBtnInstrutoria) headerBtnInstrutoria.style.display = 'none';
+    if (headerBtnClassroom) headerBtnClassroom.style.display = 'none';
+    if (mBackToInst) mBackToInst.style.display = 'none';
     if (mBottomNav) {
       mBottomNav.classList.remove('active');
       mBottomNav.style.display = 'none';
