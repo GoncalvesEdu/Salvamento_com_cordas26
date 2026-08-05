@@ -165,14 +165,13 @@ const modulesData = {
       },
       {
         tag: "ESTAÇÃO 4 - SLIDE 3 DE 3",
-        title: "Z-Rig 3:1 Reduzido & Captura de Progresso",
-        subtitle: "Vantagem mecânica ímpar com ancoragem móvel.",
+        title: "Desmultiplicação de Força Z-Rig 3:1 & Trava de Segurança",
+        subtitle: "Vantagem mecânica com retenção automatizada de carga.",
         image: "images/sc_mod3_z_rig_31.png",
         bullets: [
-          "<strong>Sistema Z-Rig 3:1:</strong> Sistema ímpar reduzido que utiliza 1 polia móvel acoplada à corda principal por um bloqueador móvel (carga) e 1 polia fixa na ancoragem, reduzindo o esforço a 1/3 teórico.",
-          "<strong>Captura de Progresso:</strong> Antirretorno feito no ponto de ancoragem usando polia PMP (base chata) combinada com cordinete Prusik (mín. 3 voltas). Tandem Prusik obrigatório para peso > 1 pessoa.",
-          "<strong>Tracionamento com Descensor:</strong> Emprego de Petzl I'D dispensa captura de progresso por ter autofrenagem. Modelos pré-2019 exigem alavanca em 'belay' ao puxar e 'lock' após travar.",
-          "<strong>Operação sem Luvas:</strong> De acordo com a doutrina, o tracionamento direto da vantagem mecânica é realizado sem o uso de luvas para manter sensibilidade tátil e evitar aprisionamentos."
+          "<strong>Sistema Z-Rig 3:1:</strong> Utiliza 1 polia móvel na carga e 1 polia fixa na ancoragem, reduzindo o esforço a 1/3 teórico.",
+          "<strong>Trava de Captura (Capture Cam):</strong> Nó autoblocante ou blocador mecânico na polia fixa para retenção imediata.",
+          "<strong>Rendimento Real vs Teórico:</strong> Atrito das polias e cordas reduz a vantagem mecânica real para aproximadamente 2.5:1."
         ]
       }
     ]
@@ -185,7 +184,7 @@ const modulesData = {
       {
         tag: "ESTAÇÃO 5 - SLIDE 1 DE 3",
         title: "Imobilização em Prancha Longa com Tirante Aranha",
-        subtitle: "Estabilização firme em superfícies irregulares and declives.",
+        subtitle: "Estabilização firme em superfícies irregulares e declives.",
         image: "images/aph_mod5_prancha_barranco.png",
         bullets: [
           "<strong>Tirante Tipo Aranha:</strong> Ancoragem de 10 pontos para impedir o deslizamento da vítima durante a inclinação em barrancos.",
@@ -215,89 +214,6 @@ const modulesData = {
           "<strong>Sistema 5:1 Composto:</strong> Combinação de um sistema 3:1 tracionando um 2:1 secundário para resgates em pirambeiras pesadas.",
           "<strong>Polias de Placa Oscilante:</strong> Eficiência superior e menor atrito durante o tracionamento continuado.",
           "<strong>Protetor Articulado de Calha/Quina:</strong> Proteção da corda contra quinas vivas de pedras e concreto."
-        ]
-      }
-    ]
-  },
-  6: {
-    title: "Estação 6: Escadas & Tripés Operacionais",
-    subtitle: "Tripé Operacional, Transposição de Borda e Pick-Off Tático",
-    youtubeId: "KUlGl2laKwc",
-    slides: [
-      {
-        tag: "ESTAÇÃO 6 - SLIDE 1 DE 3",
-        title: "Tripé Operacional de Resgate & Ancoragens",
-        subtitle: "Posicionamento e amarração das pernas em bocas de poço.",
-        image: "images/sc_mod4_tripe_montagem.png",
-        bullets: [
-          "<strong>Cálculo do Ponto Central:</strong> Posicionamento simétrico do cabeçote sobre a abertura vertical para evitar forças tangenciais.",
-          "<strong>Fita Limitadora de Pernas:</strong> Uso obrigatório de fita ou corrente na base do tripé para impedir abertura excessiva das pernas.",
-          "<strong>Linhas Independentes de Carga:</strong> Passagem da corda de trabalho e linha de segurança belay por polias separadas do cabeçote."
-        ]
-      },
-      {
-        tag: "ESTAÇÃO 6 - SLIDE 2 DE 3",
-        title: "Escadas Prolongáveis como Trilho de Transposição",
-        subtitle: "Descentradores e suporte mecânico para transposição de borda.",
-        image: "images/sc_mod4_escada_trilho.png",
-        bullets: [
-          "<strong>Escada de Trilho:</strong> Uso da escada prolongável como rampa inclinada para guiar o descenso/içamento da prancha na borda.",
-          "<strong>Fixação e Contraventamento:</strong> Amarração firme do topo e base da escada para impedir deslocamento lateral ou escorregamento.",
-          "<strong>Controle de Centro de Gravidade:</strong> Socorristas projetam o corpo para fora da borda mantendo base firme nas travessas."
-        ]
-      },
-      {
-        tag: "ESTAÇÃO 6 - SLIDE 3 DE 3",
-        title: "Manobra de Resgate Pick-Off Tático (Desenganche)",
-        subtitle: "Retirada de vítima suspensa por talabarte ou cinto rompido.",
-        image: "images/sc_mod4_pick_off.png",
-        bullets: [
-          "<strong>Conexão Direta à Vítima:</strong> Transferência da carga da vítima para o cinto do resgatador por fita ajustável.",
-          "<strong>Alívio da Tensão Presa:</strong> Uso de mini-sistema ou pedaleira para aliviar a tensão do talabarte da vítima antes de soltá-lo.",
-          "<strong>Descenso Duplo Controlado:</strong> Descer com a vítima acoplada usando descensor autofrenante com controle de velocidade."
-        ]
-      }
-    ]
-  },
-  7: {
-    title: "Estação 7: Vantagem Mecânica & Polipastos",
-    subtitle: "Cálculo de Redução de Forças, Atrito e Sistemas de Tração em Altura",
-    youtubeId: "d87adXQN_0I",
-    slides: [
-      {
-        tag: "ESTAÇÃO 7 - SLIDE 1 DE 3",
-        title: "Z-Rig 3:1 Reduzido & Captura de Progresso",
-        subtitle: "Vantagem mecânica ímpar com ancoragem móvel.",
-        image: "images/sc_mod3_z_rig_31.png",
-        bullets: [
-          "<strong>Sistema Z-Rig 3:1:</strong> Sistema ímpar reduzido que utiliza 1 polia móvel acoplada à corda principal por um bloqueador móvel (carga) e 1 polia fixa na ancoragem, reduzindo o esforço a 1/3 teórico.",
-          "<strong>Captura de Progresso:</strong> Antirretorno feito no ponto de ancoragem usando polia PMP (base chata) combinada com cordinete Prusik (mín. 3 voltas). Tandem Prusik obrigatório para peso > 1 pessoa.",
-          "<strong>Tracionamento com Descensor:</strong> Emprego de Petzl I'D dispensa captura de progresso por ter autofrenagem. Modelos pré-2019 exigem alavanca em 'belay' ao puxar e 'lock' após travar.",
-          "<strong>Operação sem Luvas:</strong> De acordo com a doutrina, o tracionamento direto da vantagem mecânica é realizado sem o uso de luvas para manter sensibilidade tátil e evitar aprisionamentos."
-        ]
-      },
-      {
-        tag: "ESTAÇÃO 7 - SLIDE 2 DE 3",
-        title: "Sistemas Vector 5:1 Reduzidos & Efeito Polia",
-        subtitle: "Vantagem mecânica avançada e física aplicada nas ancoragens.",
-        image: "images/sc_mod3_vector_51.png",
-        bullets: [
-          "<strong>Efeito Polia na Ancoragem:</strong> A polia fixa na ancoragem sofre o efeito da ação e reação, resultando em tração de 2T (carga + força de puxada do operador = dobro do peso no ponto fixo).",
-          "<strong>Sistemas Reduzidos vs Estendidos:</strong> Sistemas reduzidos economizam cabo usando um bloqueador móvel na linha principal (Z-Rig 3:1 ou Vector 5:1). Evita desperdício (ex: 150m de corda para içar 30m no 5:1).",
-          "<strong>Vector 5:1 Composto:</strong> Combinação de um sistema 3:1 que traciona o cabo de manobra de um 2:1 secundário para ganho mecânico de alto rendimento.",
-          "<strong>Proteção de Quinas e Desvios:</strong> Uso de protetor articulado de calha ou quina viva para evitar danos por abrasão e corte de cordas sob tensão de 2T ou superior."
-        ]
-      },
-      {
-        tag: "ESTAÇÃO 7 - SLIDE 3 DE 3",
-        title: "Diferença entre Sistemas e Captura de Progresso",
-        subtitle: "Sistemas pares, ímpares e blocantes de segurança.",
-        image: "images/sc_mod3_ancoragem_y.png",
-        bullets: [
-          "<strong>Sistemas Ímpares vs Pares:</strong> Nos ímpares (3:1, 5:1), a corda termina na carga. Nos pares (2:1, 4:1), a corda termina no ponto de ancoragem.",
-          "<strong>Blocantes e Nós Prusik:</strong> O anel com pescador duplo fixado por Prusik (mínimo de três voltas) deve ter diâmetro adequado e base estável.",
-          "<strong>Polias PMP de Base Chata:</strong> Evitam que o nó Prusik seja engolido pela roldana, mantendo a blocagem automática ativa e segura.",
-          "<strong>Comando do Rigger:</strong> A coordenação e segurança operacional dos sistemas de tração devem ser fiscalizadas diretamente por um rigger credenciado."
         ]
       }
     ]
@@ -344,9 +260,52 @@ const modulesData = {
       }
     ]
   },
+  7: {
+    title: "Estação 7: Vantagem Mecânica (Estendido & Reduzido)",
+    subtitle: "Cálculo de Redução de Forças, Atrito e Sistemas de Tração em Altura",
+    youtubeIds: ["d87adXQN_0I", "omA6VkaUFBM"],
+    slides: [
+      {
+        tag: "ESTAÇÃO 7 - SLIDE 1 DE 3",
+        title: "Z-Rig 3:1 Reduzido & Captura de Progresso",
+        subtitle: "Vantagem mecânica ímpar com ancoragem móvel.",
+        image: "images/sc_mod7_zrig_31.png",
+        bullets: [
+          "<strong>Sistema Z-Rig 3:1:</strong> Sistema ímpar reduzido que utiliza 1 polia móvel acoplada à corda principal por um bloqueador móvel (carga) e 1 polia fixa na ancoragem, reduzindo o esforço a 1/3 teórico.",
+          "<strong>Captura de Progresso:</strong> Antirretorno feito no ponto de ancoragem usando polia PMP (base chata) combinada com cordinete Prusik (mín. 3 voltas). Tandem Prusik obrigatório para peso > 1 pessoa.",
+          "<strong>Tracionamento com Descensor:</strong> Emprego de Petzl I'D dispensa captura de progresso por ter autofrenagem. Modelos pré-2019 exigem alavanca em 'belay' ao puxar e 'lock' após travar.",
+          "<strong>Operação sem Luvas:</strong> De acordo com a doutrina, o tracionamento direto da vantagem mecânica é realizado sem o uso de luvas para manter sensibilidade tátil e evitar aprisionamentos."
+        ]
+      },
+      {
+        tag: "ESTAÇÃO 7 - SLIDE 2 DE 3",
+        title: "Sistemas Estendidos vs Reduzidos",
+        subtitle: "Análise doutrinária de rendimento prático e volume de corda.",
+        image: "images/sc_mod7_extended.png",
+        bullets: [
+          "<strong>Sistemas Reduzidos:</strong> Acoplados à corda de tração principal por bloqueador mecânico ou cordinete Prusik. Otimizam cabo, pois o sistema mecânico não acompanha toda a extensão do percurso.",
+          "<strong>Sistemas Estendidos:</strong> Montados diretamente de ponta a ponta na corda principal. Exigem alta metragem de corda (ex: 150m de cabo seriam necessários para subir 30m de desnível em um 5:1 estendido).",
+          "<strong>Polia Fixa na Carga:</strong> Nos sistemas estendidos, a fixação se estende por todo o curso da corda, limitando a mobilidade tátil operacional se comparado aos sistemas reduzidos.",
+          "<strong>Fator de Atrito Real:</strong> O acréscimo de polias e conectores gera atrito que reduz a vantagem nominal teórica. Polias de alta eficiência são vitais em sistemas estendidos."
+        ]
+      },
+      {
+        tag: "ESTAÇÃO 7 - SLIDE 3 DE 3",
+        title: "Vector 5:1 Reduzido & Efeito Polia",
+        subtitle: "Vantagem mecânica avançada e física aplicada nas ancoragens.",
+        image: "images/sc_mod3_vector_51.png",
+        bullets: [
+          "<strong>Efeito Polia na Ancoragem:</strong> A polia fixa na ancoragem sofre o efeito da ação e reação, resultando em tração de 2T (carga + força de puxada do operador = dobro do peso no ponto fixo).",
+          "<strong>Z-Rig e Vector 5:1:</strong> Sistemas com bloqueadores móveis na linha principal reduzem expressivamente a carga teórica no puxador.",
+          "<strong>Vector 5:1 Composto:</strong> Combinação de um sistema 3:1 que traciona o cabo de manobra de um 2:1 secundário para ganho mecânico de alto rendimento.",
+          "<strong>Proteção de Quinas e Desvios:</strong> Uso de protetor articulado de calha ou quina viva para evitar danos por abrasão e corte de cordas sob tensão de 2T ou superior."
+        ]
+      }
+    ]
+  },
   final: {
     title: "Exame de Certificação: Prova Final (20 Questões)",
-    subtitle: "Avaliação teórica integradora abrangendo as 6 Estações de Resgate e Protocolo PHTLS 10ª Edição",
+    subtitle: "Avaliação teórica integradora abrangendo as 7 Estações de Resgate e Protocolo PHTLS 10ª Edição",
     slides: [
       {
         tag: "EXAME DE CERTIFICAÇÃO - 20 QUESTÕES",
@@ -354,7 +313,7 @@ const modulesData = {
         subtitle: "Avaliação abrangente para emissão do Certificado Oficial do 2º GB.",
         image: "images/logo_salvamento_2gb.png",
         bullets: [
-          "<strong>Estrutura do Exame:</strong> 20 questões de múltipla escolha abarcando o conteúdo técnico e de APH das 6 estações.",
+          "<strong>Estrutura do Exame:</strong> 20 questões de múltipla escolha abarcando o conteúdo técnico e de APH das 7 estações.",
           "<strong>Critério de Aprovação:</strong> Aproveitamento mínimo de 70% de acertos para liberação do Certificado Oficial.",
           "<strong>Navegação Interativa:</strong> Responda às 20 questões sequencialmente navegando pelos botões de Questão Anterior e Próxima.",
           "<strong>Emissão de Certificado:</strong> Após a conclusão com sucesso, seu certificado com autenticidade em banco de dados será liberado instantaneamente."
@@ -1283,7 +1242,35 @@ function renderSlide() {
 
   const mediaContainer = document.querySelector('.slide-media-container');
   if (mediaContainer) {
-    if (mData && mData.youtubeId && currentSlideIndex === 0) {
+    if (mData && mData.youtubeIds && currentSlideIndex === 0) {
+      let embedsHtml = '';
+      mData.youtubeIds.forEach((vidId, idx) => {
+        const title = idx === 0 ? "Sistema Reduzido" : "Sistema Estendido";
+        embedsHtml += `
+          <div style="flex: 1; min-width: 120px;">
+            <div style="position: relative; padding-bottom: 177.78%; height: 0; overflow: hidden; border-radius: 12px; border: 1px solid rgba(245, 194, 61, 0.4); box-shadow: 0 12px 35px rgba(0,0,0,0.6); background: #000;">
+              <iframe src="https://www.youtube-nocookie.com/embed/${vidId}?autoplay=0&rel=0" 
+                      title="${title}" 
+                      frameborder="0" 
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                      allowfullscreen 
+                      style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 12px;">
+              </iframe>
+            </div>
+            <div style="font-size: 0.8rem; color: var(--color-gold-patch); font-weight: 800; text-align: center; margin-top: 8px;">
+              🎬 ${title}
+            </div>
+          </div>
+        `;
+      });
+      mediaContainer.innerHTML = `
+        <div style="width: 100%; margin-bottom: 1.25rem;">
+          <div style="display: flex; gap: 1.5rem; justify-content: center; max-width: 500px; margin: 0 auto;">
+            ${embedsHtml}
+          </div>
+        </div>
+      `;
+    } else if (mData && mData.youtubeId && currentSlideIndex === 0) {
       mediaContainer.innerHTML = `
         <div style="width: 100%; margin-bottom: 1.25rem;">
           <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; border: 1px solid rgba(245, 194, 61, 0.4); box-shadow: 0 12px 35px rgba(0,0,0,0.6); background: #000;">
