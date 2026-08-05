@@ -263,13 +263,13 @@ const modulesData = {
   7: {
     title: "Estação 7: Vantagem Mecânica (Estendido & Reduzido)",
     subtitle: "Cálculo de Redução de Forças, Atrito e Sistemas de Tração em Altura",
-    youtubeIds: ["d87adXQN_0I", "omA6VkaUFBM"],
     slides: [
       {
         tag: "ESTAÇÃO 7 - SLIDE 1 DE 3",
         title: "Z-Rig 3:1 Reduzido & Captura de Progresso",
         subtitle: "Vantagem mecânica ímpar com ancoragem móvel.",
         image: "images/sc_mod7_zrig_31.png",
+        youtubeId: "d87adXQN_0I",
         bullets: [
           "<strong>Sistema Z-Rig 3:1:</strong> Sistema ímpar reduzido que utiliza 1 polia móvel acoplada à corda principal por um bloqueador móvel (carga) e 1 polia fixa na ancoragem, reduzindo o esforço a 1/3 teórico.",
           "<strong>Captura de Progresso:</strong> Antirretorno feito no ponto de ancoragem usando polia PMP (base chata) combinada com cordinete Prusik (mín. 3 voltas). Tandem Prusik obrigatório para peso > 1 pessoa.",
@@ -282,6 +282,7 @@ const modulesData = {
         title: "Sistemas Estendidos vs Reduzidos",
         subtitle: "Análise doutrinária de rendimento prático e volume de corda.",
         image: "images/sc_mod7_extended.png",
+        youtubeId: "omA6VkaUFBM",
         bullets: [
           "<strong>Sistemas Reduzidos:</strong> Acoplados à corda de tração principal por bloqueador mecânico ou cordinete Prusik. Otimizam cabo, pois o sistema mecânico não acompanha toda a extensão do percurso.",
           "<strong>Sistemas Estendidos:</strong> Montados diretamente de ponta a ponta na corda principal. Exigem alta metragem de corda (ex: 150m de cabo seriam necessários para subir 30m de desnível em um 5:1 estendido).",
@@ -292,7 +293,7 @@ const modulesData = {
       {
         tag: "ESTAÇÃO 7 - SLIDE 3 DE 3",
         title: "Vector 5:1 Reduzido & Efeito Polia",
-        subtitle: "Vantagem mecânica avançada e física aplicada nas ancoragens.",
+        subtitle: "Vantagem mecânica advanced e física aplicada nas ancoragens.",
         image: "images/sc_mod3_vector_51.png",
         bullets: [
           "<strong>Efeito Polia na Ancoragem:</strong> A polia fixa na ancoragem sofre o efeito da ação e reação, resultando em tração de 2T (carga + força de puxada do operador = dobro do peso no ponto fixo).",
