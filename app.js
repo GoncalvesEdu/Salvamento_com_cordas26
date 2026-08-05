@@ -1243,34 +1243,24 @@ function renderSlide() {
 
   const mediaContainer = document.querySelector('.slide-media-container');
   if (mediaContainer) {
-    if (mData && mData.youtubeIds && currentSlideIndex === 0) {
-      let embedsHtml = '';
-      mData.youtubeIds.forEach((vidId, idx) => {
-        const title = idx === 0 ? "Sistema Reduzido" : "Sistema Estendido";
-        embedsHtml += `
-          <div style="flex: 1; min-width: 120px;">
-            <div style="position: relative; padding-bottom: 177.78%; height: 0; overflow: hidden; border-radius: 12px; border: 1px solid rgba(245, 194, 61, 0.4); box-shadow: 0 12px 35px rgba(0,0,0,0.6); background: #000;">
-              <iframe src="https://www.youtube-nocookie.com/embed/${vidId}?autoplay=0&rel=0" 
-                      title="${title}" 
-                      frameborder="0" 
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                      allowfullscreen 
-                      style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 12px;">
-              </iframe>
-            </div>
-            <div style="font-size: 0.8rem; color: var(--color-gold-patch); font-weight: 800; text-align: center; margin-top: 8px;">
-              🎬 ${title}
-            </div>
-          </div>
-        `;
-      });
+    if (slide && slide.youtubeId) {
       mediaContainer.innerHTML = `
         <div style="width: 100%; margin-bottom: 1.25rem;">
-          <div style="display: flex; gap: 1.5rem; justify-content: center; max-width: 500px; margin: 0 auto;">
-            ${embedsHtml}
+          <div style="position: relative; padding-bottom: 177.78%; height: 0; max-width: 280px; margin: 0 auto; overflow: hidden; border-radius: 12px; border: 1px solid rgba(245, 194, 61, 0.4); box-shadow: 0 12px 35px rgba(0,0,0,0.6); background: #000;">
+            <iframe src="https://www.youtube-nocookie.com/embed/${slide.youtubeId}?autoplay=0&rel=0" 
+                    title="${slide.title}" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen 
+                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 12px;">
+            </iframe>
+          </div>
+          <div style="font-size: 0.85rem; color: var(--color-gold-patch); font-weight: 800; text-align: center; margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <i class="fa-solid fa-circle-play" style="font-size: 1rem;"></i> 🎬 Vídeo Demonstrativo
           </div>
         </div>
       `;
+
     } else if (mData && mData.youtubeId && currentSlideIndex === 0) {
       mediaContainer.innerHTML = `
         <div style="width: 100%; margin-bottom: 1.25rem;">
