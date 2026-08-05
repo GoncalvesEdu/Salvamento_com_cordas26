@@ -165,13 +165,14 @@ const modulesData = {
       },
       {
         tag: "ESTAÇÃO 4 - SLIDE 3 DE 3",
-        title: "Desmultiplicação de Força Z-Rig 3:1 & Trava de Segurança",
-        subtitle: "Vantagem mecânica com retenção automatizada de carga.",
+        title: "Z-Rig 3:1 Reduzido & Captura de Progresso",
+        subtitle: "Vantagem mecânica ímpar com ancoragem móvel.",
         image: "images/sc_mod3_z_rig_31.png",
         bullets: [
-          "<strong>Sistema Z-Rig 3:1:</strong> Utiliza 1 polia móvel na carga e 1 polia fixa na ancoragem, reduzindo o esforço a 1/3 teórico.",
-          "<strong>Trava de Captura (Capture Cam):</strong> Nó autoblocante ou blocador mecânico na polia fixa para retenção imediata.",
-          "<strong>Rendimento Real vs Teórico:</strong> Atrito das polias e cordas reduz a vantagem mecânica real para aproximadamente 2.5:1."
+          "<strong>Sistema Z-Rig 3:1:</strong> Sistema ímpar reduzido que utiliza 1 polia móvel acoplada à corda principal por um bloqueador móvel (carga) e 1 polia fixa na ancoragem, reduzindo o esforço a 1/3 teórico.",
+          "<strong>Captura de Progresso:</strong> Antirretorno feito no ponto de ancoragem usando polia PMP (base chata) combinada com cordinete Prusik (mín. 3 voltas). Tandem Prusik obrigatório para peso > 1 pessoa.",
+          "<strong>Tracionamento com Descensor:</strong> Emprego de Petzl I'D dispensa captura de progresso por ter autofrenagem. Modelos pré-2019 exigem alavanca em 'belay' ao puxar e 'lock' após travar.",
+          "<strong>Operação sem Luvas:</strong> De acordo com a doutrina, o tracionamento direto da vantagem mecânica é realizado sem o uso de luvas para manter sensibilidade tátil e evitar aprisionamentos."
         ]
       }
     ]
@@ -207,13 +208,14 @@ const modulesData = {
       },
       {
         tag: "ESTAÇÃO 5 - SLIDE 3 DE 3",
-        title: "Sistemas Compostos Vector 5:1 & Proteção de Borda",
-        subtitle: "Multiplicação avançada para elevação pesada em encostas.",
+        title: "Sistemas Vector 5:1 Reduzidos & Efeito Polia",
+        subtitle: "Vantagem mecânica avançada e física aplicada nas ancoragens.",
         image: "images/sc_mod3_vector_51.png",
         bullets: [
-          "<strong>Sistema 5:1 Composto:</strong> Combinação de um sistema 3:1 tracionando um 2:1 secundário para resgates em pirambeiras pesadas.",
-          "<strong>Polias de Placa Oscilante:</strong> Eficiência superior e menor atrito durante o tracionamento continuado.",
-          "<strong>Protetor Articulado de Calha/Quina:</strong> Proteção da corda contra quinas vivas de pedras e concreto."
+          "<strong>Efeito Polia na Ancoragem:</strong> A polia fixa na ancoragem sofre o efeito da ação e reação, resultando em tração de 2T (carga + força de puxada do operador = dobro do peso no ponto fixo).",
+          "<strong>Sistemas Reduzidos vs Estendidos:</strong> Sistemas reduzidos economizam cabo usando um bloqueador móvel na linha principal (Z-Rig 3:1 ou Vector 5:1). Evita desperdício (ex: 150m de corda para içar 30m no 5:1).",
+          "<strong>Vector 5:1 Composto:</strong> Combinação de um sistema 3:1 que traciona o cabo de manobra de um 2:1 secundário para ganho mecânico de alto rendimento.",
+          "<strong>Proteção de Quinas e Desvios:</strong> Uso de protetor articulado de calha ou quina viva para evitar danos por abrasão e corte de cordas sob tensão de 2T ou superior."
         ]
       }
     ]

@@ -121,6 +121,43 @@ def init_db():
         except Exception:
             pass
 
+        # Migracao para atualizar questoes dos modulos 4, 5 e 6 para versao altamente tecnica
+        try:
+            # Modulo 4
+            cur.execute('''
+                UPDATE quiz_questions 
+                SET question_text = %s 
+                WHERE id = 'sc_mod4_q1'
+            ''', ('Em uma operação de resgate vertical utilizando a Maca Sked envelopada integrada a um sistema de desmultiplicação Z-Rig (3:1), qual é a recomendação técnica correta do manual de Salvamento em Altura e das diretrizes de APH?',))
+            cur.execute("UPDATE quiz_options SET option_text = %s, is_correct = 1 WHERE id = 'sc_aph_mod4_q1_opA'", ('O sistema Z-Rig (3:1) por ser um sistema ímpar exige que o terminal da corda de trabalho esteja fixado na carga (bloqueador móvel), a captura de progresso deve ser posicionada no ponto de ancoragem e o envelopamento da maca Sked deve incluir colar cervical para RMC e proteção térmica activa contra hipotermia antes do fechamento.',))
+            cur.execute("UPDATE quiz_options SET option_text = %s, is_correct = 0 WHERE id = 'sc_aph_mod4_q1_opB'", ('O sistema Z-Rig (3:1) por ser um sistema par exige que o cabo seja ancorado diretamente na estrutura fixa, dispensando captura de progresso na ancoragem e permitindo que a maca Sked seja fechada sem colar cervical para facilitar a flexão da cabeça.',))
+            cur.execute("UPDATE quiz_options SET option_text = %s, is_correct = 0 WHERE id = 'sc_aph_mod4_q1_opC'", ('O nó de captura de progresso (antirretorno) deve ser confeccionado com cordinete Prusik posicionado diretamente sobre o bloqueador móvel (carga) e o envelopamento da Sked deve comprimir o tórax da vítima para máxima rigidez vertical.',))
+            cur.execute("UPDATE quiz_options SET option_text = %s, is_correct = 0 WHERE id = 'sc_aph_mod4_q1_opD'", ('Para o tracionamento do Z-Rig, os operadores devem obrigatoriamente calçar luvas de raspas grossas de vaqueta e o terminal da corda de trabalho deve ser fixado diretamente na ancoragem primária.',))
+
+            # Modulo 5
+            cur.execute('''
+                UPDATE quiz_questions 
+                SET question_text = %s 
+                WHERE id = 'sc_mod5_q1'
+            ''', ('Ao montar um sistema de desmultiplicação de forças Vector (5:1) reduzido para o resgate de uma prancha longa em rampa (barranco/terreno inclinado), quais princípios físicos de ancoragem e procedimentos de APH devem ser observados?',))
+            cur.execute("UPDATE quiz_options SET option_text = %s, is_correct = 1 WHERE id = 'sc_aph_mod5_q1_opA'", ('A polia fixa na ancoragem sofre o "efeito polia" suportando o dobro da tração aplicada (2T), a distância da puxada é otimizada usando um bloqueador móvel na linha principal (sistema reduzido ímpar) e a prancha deve ser fixada com tirante tipo aranha e guiada por um socorrista acompanhante focado na via aérea.',))
+            cur.execute("UPDATE quiz_options SET option_text = %s, is_correct = 0 WHERE id = 'sc_aph_mod5_q1_opB'", ('O ponto de ancoragem fixo sofre o efeito polia de forma atenuada recebendo apenas 0.5T da tração aplicada, o tracionamento dispensa bloqueadores móveis usando apenas polias estendidas e a prancha deve ser rolada rampa abaixo sem tirante aranha para agilizar a extração.',))
+            cur.execute("UPDATE quiz_options SET option_text = %s, is_correct = 0 WHERE id = 'sc_aph_mod5_q1_opC'", ('O sistema Vector (5:1) reduzido, por ser um sistema par, exige que a terminação do cabo esteja ancorada na estrutura e a captura de progresso com Prusik tandem deve ser alocada no bloqueador móvel sobre a maca.',))
+            cur.execute("UPDATE quiz_options SET option_text = %s, is_correct = 0 WHERE id = 'sc_aph_mod5_q1_opD'", ('A prancha longa deve ser suspensa verticalmente sem proteção contra rolamento secundário e o socorrista acompanhante deve realizar a tração da corda a partir do solo para economizar força da equipe de cima.',))
+
+            # Modulo 6
+            cur.execute('''
+                UPDATE quiz_questions 
+                SET question_text = %s 
+                WHERE id = 'sc_mod6_q1'
+            ''', ('Durante a extração vertical de uma vítima utilizando o Tripé Operacional de Resgate e escadas como trilho na transposição de borda, qual é a conduta de segurança e APH adequada?',))
+            cur.execute("UPDATE quiz_options SET option_text = %s, is_correct = 1 WHERE id = 'sc_aph_mod6_q1_opA'", ('A transposição de borda exige a manutenção do controle cervical manual e linha de vida de segurança (belay) tensionada de forma redundante, garantindo que o tripé atue como ancoragem alta para evitar choque na quina e que a escada funcione como guia estável.',))
+            cur.execute("UPDATE quiz_options SET option_text = %s, is_correct = 0 WHERE id = 'sc_aph_mod6_q1_opB'", ('A linha de vida de segurança deve ser afrouxada para dar maior mobilidade na transposição de borda e o tripé deve ser posicionado com as pernas sobre solo instável sem amarração limitadora.',))
+            cur.execute("UPDATE quiz_options SET option_text = %s, is_correct = 0 WHERE id = 'sc_aph_mod6_q1_opC'", ('O tripé operacional deve ser dispensado na transposição de borda para evitar atrito nas pernas de alumínio, sendo a escada prolongável mantida sem fixação ou tirantes nas quinas vivas.',))
+            cur.execute("UPDATE quiz_options SET option_text = %s, is_correct = 0 WHERE id = 'sc_aph_mod6_q1_opD'", ('O socorrista deve acelerar a descida abruptamente sem comunicação prévia com a equipe do topo, permitindo que a maca gire livremente e bata na calha ou borda de concreto.',))
+        except Exception:
+            pass
+
         conn.commit()
     except Exception as e:
         conn.rollback()
