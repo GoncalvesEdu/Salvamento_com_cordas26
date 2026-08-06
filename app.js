@@ -1973,6 +1973,10 @@ function renderVideoCard(v, isInstructorView) {
   let actionHtml = '';
   let previewHtml = '';
 
+  const deleteBtn = isInstructorView 
+    ? `<button onclick="handleDeletarVideo(${v.id})" class="nav-btn" style="background: rgba(239, 68, 68, 0.15); border-color: #ef4444; color: #f87171; padding: 6px 12px; font-size: 0.85rem; cursor: pointer; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px;"><i class="fa-solid fa-trash"></i> Excluir</button>` 
+    : '';
+
   if (ytEmbed) {
     const videoId = ytEmbed.split('/').pop().split('?')[0];
     const thumbUrl = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
@@ -2020,8 +2024,9 @@ function renderVideoCard(v, isInstructorView) {
             </span>
           </div>
         </div>
-        <div>
+        <div style="display: flex; gap: 8px; align-items: center;">
           ${actionHtml}
+          ${deleteBtn}
         </div>
       </div>
       ${previewHtml}
@@ -2059,3 +2064,28 @@ async function handleCadastrarVideo(event) {
     alert("❌ Erro de conexão ao cadastrar vídeo.");
   }
 }
+
+window.handleDeletarVideo = async function(id) {
+  if (!confirm("⚠️ Deseja realmente excluir este vídeo demonstrativo?")) return;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/instrutoria/videos/excluir`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: JSON.stringify({ id })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      alert("✅ Vídeo removido com sucesso!");
+      loadVideos();
+    } else {
+      alert(`❌ Erro ao excluir: ${data.message || data.error}`);
+    }
+  } catch (err) {
+    alert("❌ Erro de conexão ao excluir vídeo.");
+  }
+};

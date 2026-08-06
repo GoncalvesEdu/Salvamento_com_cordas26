@@ -1929,6 +1929,22 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             conn.close()
             return self.send_json({'success': True, 'message': 'Vídeo cadastrado com sucesso!'})
 
+        elif path == '/api/instrutoria/videos/excluir':
+            user = self.authenticate_request(required_role='instrutor')
+            if not user:
+                return
+
+            video_id = payload.get('id')
+            if not video_id:
+                return self.send_json({'success': False, 'message': 'ID do vídeo é obrigatório.'}, 400)
+
+            conn = get_db()
+            cur = conn.cursor()
+            cur.execute('DELETE FROM videos_ead WHERE id = %s', (video_id,))
+            conn.commit()
+            conn.close()
+            return self.send_json({'success': True, 'message': 'Vídeo removido com sucesso!'})
+
         else:
             return self.send_json({'error': 'Endpoint não encontrado (404)'}, 404)
 
