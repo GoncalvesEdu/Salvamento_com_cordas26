@@ -332,6 +332,29 @@ def init_db():
                 );
             ''')
 
+            # Tabela de Vídeos EAD (links externos YouTube/Google Drive)
+            try:
+                cur.execute("SAVEPOINT sp_videos_ead")
+                cur.execute('''
+                    CREATE TABLE IF NOT EXISTS videos_ead (
+                        id SERIAL PRIMARY KEY,
+                        titulo TEXT NOT NULL,
+                        descricao TEXT,
+                        url TEXT NOT NULL,
+                        visivel_para TEXT DEFAULT 'todos',
+                        ordem INTEGER DEFAULT 0,
+                        criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    );
+                ''')
+                cur.execute("RELEASE SAVEPOINT sp_videos_ead")
+                print("[INIT_DB] Tabela videos_ead OK.")
+            except Exception as e_vid:
+                try:
+                    cur.execute("ROLLBACK TO SAVEPOINT sp_videos_ead")
+                except Exception:
+                    pass
+                print(f"[INIT_DB WARNING] videos_ead: {e_vid}")
+
             # Inserir Usuário Instrutor Padronizado
             instrutor_pass = hash_password_pbkdf2('2gb2026')
             cur.execute('''
@@ -916,16 +939,9 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                 'total_modulos': total_modulos_curso,
                 'alunos': alunos,
                 'conclusao_por_turma': conclusao_por_modulo,
-                'alertas': alertas,
-                'alertas_atencao': alertas_atencao,
-                'resumo_atencao': {
-                    'total_precisam_atencao': len(alertas_atencao),
-                    'cnt_nao_iniciados': cnt_nao_iniciados,
-                    'cnt_atrasados': cnt_atrasados,
-                    'cnt_em_dia': cnt_em_dia,
-                    'prazo_certificacao': '13/08/2026',
-                    'ritmo_esperado_hoje': pacing_sample['expected_modules']
-                }
+                'alertas': [],
+                'alertas_atencao': [],
+                'resumo_atencao': {'total_precisam_atencao': 0}
             })
 
         elif path == '/api/instrutoria/certificados':
@@ -1030,6 +1046,22 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             conn.close()
 
             return self.send_json({'success': True, 'progresso': progresso})
+
+        elif path == '/api/videos':
+            user = self.authenticate_request(required_role=['aluno', 'instrutor', 'admin'])
+            if not user:
+                return
+
+            conn = get_db()
+            cur = conn.cursor()
+            user_role = user.get('role', 'aluno')
+            if user_role in ('instrutor', 'admin'):
+                cur.execute("SELECT id, titulo, descricao, url, visivel_para, ordem, criado_em FROM videos_ead ORDER BY ordem ASC, criado_em DESC")
+            else:
+                cur.execute("SELECT id, titulo, descricao, url, visivel_para, ordem, criado_em FROM videos_ead WHERE (visivel_para = 'todos' OR visivel_para IS NULL) ORDER BY ordem ASC, criado_em DESC")
+            videos = [dict(r) for r in cur.fetchall()]
+            conn.close()
+            return self.send_json({'success': True, 'videos': videos})
 
         else:
             super().do_GET()
@@ -1787,6 +1819,41 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             except errors.UniqueViolation:
                 conn.close()
                 return self.send_json({'success': True, 'message': 'Certificado já existente'})
+
+        elif path == '/api/instrutoria/videos':
+            user = self.authenticate_request(required_role='instrutor')
+            if not user:
+                return
+
+            titulo = payload.get('titulo', '').strip()
+            descricao = payload.get('descricao', '').strip()
+            url_video = payload.get('url', '').strip()
+            visivel_para = payload.get('visivel_para', 'todos').strip()
+            try:
+                ordem = int(payload.get('ordem', 0))
+            except (TypeError, ValueError):
+                ordem = 0
+
+            if not titulo or not url_video:
+                return self.send_json({'success': False, 'message': 'Título e URL são obrigatórios.'}, 400)
+
+            parsed_url = urllib.parse.urlparse(url_video)
+            if parsed_url.scheme not in ('http', 'https'):
+                return self.send_json({'success': False, 'message': 'Protocolo inválido. Use HTTP ou HTTPS.'}, 400)
+            domain = parsed_url.netloc.lower()
+            allowed_domains = ('youtube.com', 'youtu.be', 'drive.google.com')
+            if not any(domain == d or domain.endswith('.' + d) for d in allowed_domains):
+                return self.send_json({'success': False, 'message': 'Domínio não permitido. Apenas YouTube ou Google Drive.'}, 400)
+
+            conn = get_db()
+            cur = conn.cursor()
+            cur.execute(
+                'INSERT INTO videos_ead (titulo, descricao, url, visivel_para, ordem) VALUES (%s, %s, %s, %s, %s)',
+                (titulo, descricao, url_video, visivel_para, ordem)
+            )
+            conn.commit()
+            conn.close()
+            return self.send_json({'success': True, 'message': 'Vídeo cadastrado com sucesso!'})
 
         else:
             return self.send_json({'error': 'Endpoint não encontrado (404)'}, 404)
