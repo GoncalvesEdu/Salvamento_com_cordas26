@@ -332,26 +332,6 @@ def init_db():
                 );
             ''')
 
-            try:
-                cur.execute("SAVEPOINT sp_videos_ead")
-                cur.execute('''
-                    CREATE TABLE IF NOT EXISTS videos_ead (
-                        id SERIAL PRIMARY KEY,
-                        titulo TEXT NOT NULL,
-                        descricao TEXT,
-                        url TEXT NOT NULL,
-                        visivel_para TEXT DEFAULT 'todos',
-                        ordem INTEGER DEFAULT 0,
-                        criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    );
-                ''')
-                cur.execute("RELEASE SAVEPOINT sp_videos_ead")
-                print("[INIT_DB] Tabela videos_ead criada/verificada com sucesso.")
-            except Exception as e_vid:
-                cur.execute("ROLLBACK TO SAVEPOINT sp_videos_ead")
-                print(f"[INIT_DB WARNING] Erro ao criar tabela videos_ead (ignorado): {e_vid}")
-
-
             # Inserir Usuário Instrutor Padronizado
             instrutor_pass = hash_password_pbkdf2('2gb2026')
             cur.execute('''
@@ -884,26 +864,50 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                     'porcentagem': pct
                 }
 
-            # --- SEÇÃO DE ALERTAS REMOVIDA ---
-            # O cálculo de alertas_atencao e alertas foi removido pois
-            # causava falsos positivos (alunos ativos marcados como "sem acesso").
-            # Mantido comentado para referência futura.
-            #
-            # today_str = datetime.now().strftime('%Y-%m-%d')
-            # alertas = []
-            # alertas_atencao = []
-            # cnt_nao_iniciados = 0
-            # cnt_atrasados = 0
-            # cnt_em_dia = 0
-            # for a in alunos:
-            #     pacing = calculate_student_pacing_status(a['modulos_concluidos'], total_modulos_curso)
-            #     ...  (bloco omitido)
+            today_str = datetime.now().strftime('%Y-%m-%d')
+            alertas = []
+            alertas_atencao = []
+            cnt_nao_iniciados = 0
+            cnt_atrasados = 0
+            cnt_em_dia = 0
 
+            for a in alunos:
+                pacing = calculate_student_pacing_status(a['modulos_concluidos'], total_modulos_curso)
+                a['status_ritmo'] = pacing['status_key']
+                a['status_ritmo_label'] = pacing['status_label']
+                a['status_ritmo_color'] = pacing['status_color']
+                a['modulos_esperados'] = pacing['expected_modules']
 
+                if a['status'] == 'ativo':
+                    if pacing['status_key'] == 'nao_iniciado':
+                        cnt_nao_iniciados += 1
+                        alertas_atencao.append(a)
+                    elif pacing['status_key'] == 'atrasado':
+                        cnt_atrasados += 1
+                        alertas_atencao.append(a)
+                    else:
+                        cnt_em_dia += 1
+
+                    ult_acesso = str(a['data_cadastro'])[:10] if a['data_cadastro'] else ''
+                    pendente = a['modulos_concluidos'] < total_modulos_curso
+                    nao_acessou_hoje = (ult_acesso != today_str)
+
+                    if nao_acessou_hoje or pendente or a['senha_provisoria'] == 1:
+                        motivo = 'Senha Provisória Pendente' if a['senha_provisoria'] == 1 else ('Sem acesso no dia/noite' if nao_acessou_hoje else 'Módulos pendentes')
+                        alertas.append({
+                            're': a['re'],
+                            'nome': a['nome'],
+                            'estacao': a['estacao'],
+                            'modulos_concluidos': a['modulos_concluidos'],
+                            'total_modulos': total_modulos_curso,
+                            'pendencias': total_modulos_curso - a['modulos_concluidos'],
+                            'nao_acessou_hoje': nao_acessou_hoje,
+                            'motivo': motivo
+                        })
 
             conn.close()
 
-
+            pacing_sample = calculate_student_pacing_status(0, total_modulos_curso)
 
             return self.send_json({
                 'success': True,
@@ -911,8 +915,17 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                 'total_desligados': total_desligados,
                 'total_modulos': total_modulos_curso,
                 'alunos': alunos,
-                'conclusao_por_turma': conclusao_por_modulo
-
+                'conclusao_por_turma': conclusao_por_modulo,
+                'alertas': alertas,
+                'alertas_atencao': alertas_atencao,
+                'resumo_atencao': {
+                    'total_precisam_atencao': len(alertas_atencao),
+                    'cnt_nao_iniciados': cnt_nao_iniciados,
+                    'cnt_atrasados': cnt_atrasados,
+                    'cnt_em_dia': cnt_em_dia,
+                    'prazo_certificacao': '13/08/2026',
+                    'ritmo_esperado_hoje': pacing_sample['expected_modules']
+                }
             })
 
         elif path == '/api/instrutoria/certificados':
@@ -1003,23 +1016,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                     f_dict['visivel_para'] = 'todos' if any(k in fn_low for k in ['qts', 'manual', 'dip', 'salvamento']) else 'instrutor'
                 arquivos.append(f_dict)
 
-        elif path == '/api/videos':
-            user = self.authenticate_request(required_role=['aluno', 'instrutor', 'admin'])
-            if not user:
-                return
-
-            conn = get_db()
-            cur = conn.cursor()
-            user_role = user.get('role', 'aluno')
-
-            if user_role in ('instrutor', 'admin'):
-                cur.execute("SELECT * FROM videos_ead ORDER BY ordem ASC, criado_em DESC")
-            else:
-                cur.execute("SELECT * FROM videos_ead WHERE (visivel_para = 'todos' OR visivel_para IS NULL) ORDER BY ordem ASC, criado_em DESC")
-
-            videos = [dict(r) for r in cur.fetchall()]
-            conn.close()
-            return self.send_json({'success': True, 'videos': videos})
+            return self.send_json({'success': True, 'arquivos': arquivos})
 
         elif path == '/api/aluno/meu-progresso':
             user = self.authenticate_request(required_role=['aluno', 'instrutor', 'admin'])
@@ -1404,57 +1401,6 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                     'error': 'Erro Interno',
                     'message': 'Ocorreu um erro no servidor ao salvar seu progresso. Procure a instrutoria.'
                 }, 500)
-
-        elif path == '/api/instrutoria/videos':
-            user = self.authenticate_request(required_role='instrutor')
-            if not user:
-                return
-
-            titulo = payload.get('titulo', '').strip()
-            descricao = payload.get('descricao', '').strip()
-            url = payload.get('url', '').strip()
-            visivel_para = payload.get('visivel_para', 'todos').strip()
-            ordem_val = payload.get('ordem', 0)
-
-            if not titulo or not url:
-                return self.send_json({'success': False, 'message': 'Título e URL são obrigatórios.'}, 400)
-
-            # Validação estrita da URL
-            import urllib.parse
-            try:
-                parsed_url = urllib.parse.urlparse(url)
-                if parsed_url.scheme not in ('http', 'https'):
-                    return self.send_json({'success': False, 'message': 'Protocolo de URL inválido. Apenas HTTP/HTTPS são aceitos.'}, 400)
-                
-                domain = parsed_url.netloc.lower()
-                allowed = False
-                for d in ('youtube.com', 'youtu.be', 'drive.google.com'):
-                    if domain == d or domain.endswith('.' + d):
-                        allowed = True
-                        break
-                
-                if not allowed:
-                    return self.send_json({'success': False, 'message': 'Domínio não permitido. Apenas links do YouTube ou Google Drive são aceitos.'}, 400)
-            except Exception:
-                return self.send_json({'success': False, 'message': 'URL em formato inválido.'}, 400)
-
-            # Garantir ordem numérica
-            try:
-                ordem = int(ordem_val)
-            except (TypeError, ValueError):
-                ordem = 0
-
-            # Salvar no banco
-            conn = get_db()
-            cur = conn.cursor()
-            cur.execute('''
-                INSERT INTO videos_ead (titulo, descricao, url, visivel_para, ordem)
-                VALUES (%s, %s, %s, %s, %s)
-            ''', (titulo, descricao, url, visivel_para, ordem))
-            conn.commit()
-            conn.close()
-
-            return self.send_json({'success': True, 'message': 'Vídeo cadastrado com sucesso!'})
 
         elif path == '/api/instrutoria/upload':
             user = self.authenticate_request(required_role='instrutor')
