@@ -332,17 +332,25 @@ def init_db():
                 );
             ''')
 
-            cur.execute('''
-                CREATE TABLE IF NOT EXISTS videos_ead (
-                    id SERIAL PRIMARY KEY,
-                    titulo TEXT NOT NULL,
-                    descricao TEXT,
-                    url TEXT NOT NULL,
-                    visivel_para TEXT DEFAULT 'todos',
-                    ordem INTEGER DEFAULT 0,
-                    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                );
-            ''')
+            try:
+                cur.execute("SAVEPOINT sp_videos_ead")
+                cur.execute('''
+                    CREATE TABLE IF NOT EXISTS videos_ead (
+                        id SERIAL PRIMARY KEY,
+                        titulo TEXT NOT NULL,
+                        descricao TEXT,
+                        url TEXT NOT NULL,
+                        visivel_para TEXT DEFAULT 'todos',
+                        ordem INTEGER DEFAULT 0,
+                        criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    );
+                ''')
+                cur.execute("RELEASE SAVEPOINT sp_videos_ead")
+                print("[INIT_DB] Tabela videos_ead criada/verificada com sucesso.")
+            except Exception as e_vid:
+                cur.execute("ROLLBACK TO SAVEPOINT sp_videos_ead")
+                print(f"[INIT_DB WARNING] Erro ao criar tabela videos_ead (ignorado): {e_vid}")
+
 
             # Inserir Usuário Instrutor Padronizado
             instrutor_pass = hash_password_pbkdf2('2gb2026')
