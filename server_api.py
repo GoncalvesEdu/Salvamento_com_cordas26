@@ -1377,6 +1377,11 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                 cur.execute('''
                     INSERT INTO progresso_modulos (aluno_re, modulo_id, nota, tempo_gasto, status, data_conclusao)
                     VALUES (%s, %s, 100.0, 300, 'concluido', %s)
+                    ON CONFLICT (aluno_re, modulo_id) DO UPDATE SET
+                        nota = EXCLUDED.nota,
+                        tempo_gasto = EXCLUDED.tempo_gasto,
+                        status = EXCLUDED.status,
+                        data_conclusao = EXCLUDED.data_conclusao
                 ''', (user['re'], mod_val, now_str))
 
                 conn.commit()
