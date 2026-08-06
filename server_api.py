@@ -1331,63 +1331,73 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
             })
 
         elif path == '/api/aluno/progresso':
-            user = self.authenticate_request(required_role='aluno')
-            if not user:
-                return
+            try:
+                user = self.authenticate_request(required_role='aluno')
+                if not user:
+                    return
 
-            if user.get('status') == 'desligado':
-                return self.send_json({'error': 'Acesso Desativado (403)', 'message': 'Acesso desativado. Procure a instrutoria.'}, 403)
+                if user.get('status') == 'desligado':
+                    return self.send_json({'error': 'Acesso Desativado (403)', 'message': 'Acesso desativado. Procure a instrutoria.'}, 403)
 
-            modulo_id_str = str(payload.get('modulo_id', '1'))
-            chosen_option_id = payload.get('chosen_option_id')
-            opcao_selecionada = payload.get('opcao_selecionada')
+                modulo_id_str = str(payload.get('modulo_id', '1'))
+                chosen_option_id = payload.get('chosen_option_id')
+                opcao_selecionada = payload.get('opcao_selecionada')
 
-            qid = f"sc_mod{modulo_id_str}_q1"
+                qid = f"sc_mod{modulo_id_str}_q1"
 
-            if chosen_option_id is None and opcao_selecionada is not None:
-                letters = ['opA', 'opB', 'opC', 'opD']
-                idx = int(opcao_selecionada)
-                chosen_option_id = f"{qid}_{letters[idx]}" if idx < len(letters) else f"{qid}_opA"
+                if chosen_option_id is None and opcao_selecionada is not None:
+                    letters = ['opA', 'opB', 'opC', 'opD']
+                    idx = int(opcao_selecionada)
+                    chosen_option_id = f"{qid}_{letters[idx]}" if idx < len(letters) else f"{qid}_opA"
 
-            conn = get_db()
-            cur = conn.cursor()
+                conn = get_db()
+                cur = conn.cursor()
 
-            cur.execute('SELECT is_correct FROM quiz_options WHERE id = %s AND question_id = %s', (chosen_option_id, qid))
-            op_row = cur.fetchone()
+                cur.execute('SELECT is_correct FROM quiz_options WHERE id = %s AND question_id = %s', (chosen_option_id, qid))
+                op_row = cur.fetchone()
 
-            if not op_row:
+                if not op_row:
+                    conn.close()
+                    return self.send_json({'error': 'Opção de quiz não encontrada no banco de dados'}, 400)
+
+                is_corr = (op_row['is_correct'] == 1)
+
+                if not is_corr:
+                    conn.close()
+                    return self.send_json({
+                        'success': True,
+                        'acertou': False,
+                        'correct': False,
+                        'nota': 0,
+                        'message': 'Resposta incorreta. Revise o material do módulo e tente novamente.'
+                    })
+
+                now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                mod_val = modulo_id_str
+                cur.execute('''
+                    INSERT INTO progresso_modulos (aluno_re, modulo_id, nota, tempo_gasto, status, data_conclusao)
+                    VALUES (%s, %s, 100.0, 300, 'concluido', %s)
+                ''', (user['re'], mod_val, now_str))
+
+                conn.commit()
                 conn.close()
-                return self.send_json({'error': 'Opção de quiz não encontrada no banco de dados'}, 400)
 
-            is_corr = (op_row['is_correct'] == 1)
-
-            if not is_corr:
-                conn.close()
                 return self.send_json({
                     'success': True,
-                    'acertou': False,
-                    'correct': False,
-                    'nota': 0,
-                    'message': 'Resposta incorreta. Revise o material do módulo e tente novamente.'
+                    'acertou': True,
+                    'correct': True,
+                    'nota': 100,
+                    'message': f'🎉 Excelente! Resposta correta. Módulo {modulo_id_str} Concluído com Nota 100!'
                 })
-
-            now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            mod_val = modulo_id_str
-            cur.execute('''
-                INSERT INTO progresso_modulos (aluno_re, modulo_id, nota, tempo_gasto, status, data_conclusao)
-                VALUES (%s, %s, 100.0, 300, 'concluido', %s)
-            ''', (user['re'], mod_val, now_str))
-
-            conn.commit()
-            conn.close()
-
-            return self.send_json({
-                'success': True,
-                'acertou': True,
-                'correct': True,
-                'nota': 100,
-                'message': f'🎉 Excelente! Resposta correta. Módulo {modulo_id_str} Concluído com Nota 100!'
-            })
+            except Exception as e:
+                import traceback
+                tb = traceback.format_exc()
+                return self.send_json({
+                    'success': False,
+                    'error': 'Internal Server Error',
+                    'message': str(e),
+                    'traceback': tb
+                }, 500)
 
         elif path == '/api/instrutoria/upload':
             user = self.authenticate_request(required_role='instrutor')
