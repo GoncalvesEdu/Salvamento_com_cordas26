@@ -724,27 +724,6 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
         path = parsed.path
         query_params = urllib.parse.parse_qs(parsed.query)
 
-        if path == '/api/public/debug-db':
-            conn = get_db()
-            cur = conn.cursor()
-            try:
-                cur.execute("SELECT re, nome, role, status FROM usuarios ORDER BY id DESC")
-                users = [dict(r) for r in cur.fetchall()]
-                cur.execute("SELECT aluno_re, modulo_id, nota, status FROM progresso_modulos")
-                progress = [dict(r) for r in cur.fetchall()]
-                conn.close()
-                return self.send_json({
-                    'success': True,
-                    'users': users,
-                    'progress': progress
-                })
-            except Exception as e:
-                conn.close()
-                return self.send_json({
-                    'success': False,
-                    'error': str(e)
-                }, 500)
-
         if path == '/api/instrutoria/download':
             user = self.authenticate_request(required_role=['aluno', 'instrutor', 'admin'])
             if not user:
