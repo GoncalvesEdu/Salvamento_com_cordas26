@@ -1395,13 +1395,11 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                     'message': f'🎉 Excelente! Resposta correta. Módulo {modulo_id_str} Concluído com Nota 100!'
                 })
             except Exception as e:
-                import traceback
-                tb = traceback.format_exc()
+                print(f"[ERROR PROGRESSO] Erro ao salvar progresso: {e}")
                 return self.send_json({
                     'success': False,
-                    'error': 'Internal Server Error',
-                    'message': str(e),
-                    'traceback': tb
+                    'error': 'Erro Interno',
+                    'message': 'Ocorreu um erro no servidor ao salvar seu progresso. Procure a instrutoria.'
                 }, 500)
 
         elif path == '/api/instrutoria/upload':
