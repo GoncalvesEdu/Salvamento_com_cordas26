@@ -373,24 +373,35 @@ def init_db():
 
             # Migracao para alterar o tipo de modulo_id de INTEGER para TEXT na tabela progresso_modulos
             try:
+                cur.execute("SAVEPOINT sp_mig_mod_id")
                 cur.execute('''
                     ALTER TABLE progresso_modulos ALTER COLUMN modulo_id TYPE TEXT USING modulo_id::TEXT;
                 ''')
+                cur.execute("RELEASE SAVEPOINT sp_mig_mod_id")
                 print("[MIGRATION] Coluna modulo_id alterada para TEXT na tabela progresso_modulos.")
             except Exception as e_mig:
-                pass
+                try:
+                    cur.execute("ROLLBACK TO SAVEPOINT sp_mig_mod_id")
+                except Exception:
+                    pass
 
             # Garantir que a tabela progresso_modulos tenha uma constraint UNIQUE em (aluno_re, modulo_id)
             try:
+                cur.execute("SAVEPOINT sp_mig_unique")
                 cur.execute('''
                     ALTER TABLE progresso_modulos ADD CONSTRAINT unique_aluno_modulo UNIQUE (aluno_re, modulo_id);
                 ''')
+                cur.execute("RELEASE SAVEPOINT sp_mig_unique")
                 print("[MIGRATION] Adicionada constraint UNIQUE (aluno_re, modulo_id) na tabela progresso_modulos.")
             except Exception as e_unique:
-                pass
+                try:
+                    cur.execute("ROLLBACK TO SAVEPOINT sp_mig_unique")
+                except Exception:
+                    pass
 
             # Migracao para corrigir o RE e senha do Ten Palopoli
             try:
+                cur.execute("SAVEPOINT sp_mig_palopoli")
                 cur.execute("SELECT id FROM usuarios WHERE re = '1563006-8' OR username = '1563006-8'")
                 usr = cur.fetchone()
                 if usr:
@@ -401,10 +412,16 @@ def init_db():
                         WHERE id = %s
                     ''', (novo_pass_hash, usr['id']))
                     print(f"[MIGRATION] Registro do Ten Palopoli (ID {usr['id']}) corrigido com sucesso para RE 156306-8.")
+                cur.execute("RELEASE SAVEPOINT sp_mig_palopoli")
             except Exception as e_palopoli:
+                try:
+                    cur.execute("ROLLBACK TO SAVEPOINT sp_mig_palopoli")
+                except Exception:
+                    pass
                 print(f"[MIGRATION ERROR] Falha ao corrigir RE do Ten Palopoli: {e_palopoli}")
             # Migracao para cadastrar o CB PM Braga
             try:
+                cur.execute("SAVEPOINT sp_mig_braga")
                 cur.execute("SELECT id FROM usuarios WHERE re = '116666-2' OR username = '116666-2'")
                 usr_braga = cur.fetchone()
                 if not usr_braga:
@@ -414,11 +431,17 @@ def init_db():
                         VALUES ('116666-2', %s, 'CB PM Braga', '116666-2', '2º GB', 'instrutor', 1, 'ativo')
                     ''', (braga_pass,))
                     print("[MIGRATION] CB PM Braga cadastrado com sucesso.")
+                cur.execute("RELEASE SAVEPOINT sp_mig_braga")
             except Exception as e_braga:
+                try:
+                    cur.execute("ROLLBACK TO SAVEPOINT sp_mig_braga")
+                except Exception:
+                    pass
                 print(f"[MIGRATION ERROR] Falha ao cadastrar CB PM Braga: {e_braga}")
 
             # Migracao para restaurar questoes 4, 5 e 6 e cadastrar a Estacao 7 (Vantagem Mecanica)
             try:
+                cur.execute("SAVEPOINT sp_mig_questoes")
                 # Restaurar Modulo 4
                 cur.execute("UPDATE quiz_questions SET question_text = 'Segundo as diretrizes de Restrição de Movimentos da Coluna (RMC) do PHTLS 10ª Edição para movimentação em Maca Sked envelopada, qual procedimento é correto?' WHERE id = 'sc_mod4_q1'")
                 cur.execute("UPDATE quiz_options SET option_text = 'Manter alinhamento neutro com colar cervical, tirantes cruzados de envelopamento e prevenção ativa da hipotermia com manta térmica.', is_correct = 1 WHERE id = 'sc_aph_mod4_q1_opA'")
@@ -451,9 +474,14 @@ def init_db():
                 cur.execute("ALTER TABLE quiz_questions ADD COLUMN IF NOT EXISTS semana INTEGER DEFAULT 1")
                 cur.execute("UPDATE quiz_questions SET semana = 1 WHERE modulo_id IN ('1', '2', '3', '4', '5', '6', 'final')")
                 cur.execute("UPDATE quiz_questions SET semana = 2 WHERE modulo_id = '7'")
+                cur.execute("RELEASE SAVEPOINT sp_mig_questoes")
                 print("[MIGRATION] Coluna semana adicionada/populada no Postgres.")
                 print("[MIGRATION] Questoes restauradas e Estacao 7 cadastrada no Postgres.")
             except Exception as e_qmig:
+                try:
+                    cur.execute("ROLLBACK TO SAVEPOINT sp_mig_questoes")
+                except Exception:
+                    pass
                 print(f"[MIGRATION ERROR] Falha ao ajustar questoes e Estacao 7 no Postgres: {e_qmig}")
 
             conn.commit()
