@@ -1345,7 +1345,7 @@ function renderSlide() {
             <iframe src="https://www.youtube-nocookie.com/embed/${slide.youtubeId}?autoplay=0&rel=0" 
                     title="${slide.title}" 
                     frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
                     allowfullscreen 
                     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 12px;">
             </iframe>
@@ -1363,7 +1363,7 @@ function renderSlide() {
             <iframe src="https://www.youtube-nocookie.com/embed/${mData.youtubeId}?autoplay=0&rel=0" 
                     title="${mData.title}" 
                     frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
                     allowfullscreen 
                     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 12px;">
             </iframe>
@@ -1920,7 +1920,11 @@ window.playEmbeddedVideo = function(videoId, embedUrl) {
   const container = document.getElementById(`yt-preview-${videoId}`);
   if (container) {
     container.innerHTML = `
-      <iframe src="${embedUrl}?autoplay=1" style="width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      <iframe src="${embedUrl}?autoplay=1" 
+              style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
+              allowfullscreen>
+      </iframe>
     `;
   }
 };

@@ -355,6 +355,27 @@ def init_db():
                     pass
                 print(f"[INIT_DB WARNING] videos_ead: {e_vid}")
 
+            # Limpeza automática de vídeos que não correspondem aos 6 IDs legítimos
+            try:
+                cur.execute("SAVEPOINT sp_clean_fake_videos")
+                cur.execute('''
+                    DELETE FROM videos_ead WHERE
+                        url NOT LIKE '%e6OFgIm0AFc%' AND
+                        url NOT LIKE '%HC2nB_RN3H8%' AND
+                        url NOT LIKE '%M2ZZZ7-ZN-8%' AND
+                        url NOT LIKE '%Ywx7VGLJBIA%' AND
+                        url NOT LIKE '%Lj8gVfcCYus%' AND
+                        url NOT LIKE '%aLZrzPOTOns%';
+                ''')
+                cur.execute("RELEASE SAVEPOINT sp_clean_fake_videos")
+                print("[INIT_DB] Limpeza automática de vídeos concluída.")
+            except Exception as e_clean:
+                try:
+                    cur.execute("ROLLBACK TO SAVEPOINT sp_clean_fake_videos")
+                except Exception:
+                    pass
+                print(f"[INIT_DB WARNING] Falha ao limpar vídeos não autorizados: {e_clean}")
+
             # Inserir Usuário Instrutor Padronizado
             instrutor_pass = hash_password_pbkdf2('2gb2026')
             cur.execute('''
