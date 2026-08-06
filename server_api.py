@@ -876,50 +876,26 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                     'porcentagem': pct
                 }
 
-            today_str = datetime.now().strftime('%Y-%m-%d')
-            alertas = []
-            alertas_atencao = []
-            cnt_nao_iniciados = 0
-            cnt_atrasados = 0
-            cnt_em_dia = 0
+            # --- SEÇÃO DE ALERTAS REMOVIDA ---
+            # O cálculo de alertas_atencao e alertas foi removido pois
+            # causava falsos positivos (alunos ativos marcados como "sem acesso").
+            # Mantido comentado para referência futura.
+            #
+            # today_str = datetime.now().strftime('%Y-%m-%d')
+            # alertas = []
+            # alertas_atencao = []
+            # cnt_nao_iniciados = 0
+            # cnt_atrasados = 0
+            # cnt_em_dia = 0
+            # for a in alunos:
+            #     pacing = calculate_student_pacing_status(a['modulos_concluidos'], total_modulos_curso)
+            #     ...  (bloco omitido)
 
-            for a in alunos:
-                pacing = calculate_student_pacing_status(a['modulos_concluidos'], total_modulos_curso)
-                a['status_ritmo'] = pacing['status_key']
-                a['status_ritmo_label'] = pacing['status_label']
-                a['status_ritmo_color'] = pacing['status_color']
-                a['modulos_esperados'] = pacing['expected_modules']
 
-                if a['status'] == 'ativo':
-                    if pacing['status_key'] == 'nao_iniciado':
-                        cnt_nao_iniciados += 1
-                        alertas_atencao.append(a)
-                    elif pacing['status_key'] == 'atrasado':
-                        cnt_atrasados += 1
-                        alertas_atencao.append(a)
-                    else:
-                        cnt_em_dia += 1
-
-                    ult_acesso = str(a['data_cadastro'])[:10] if a['data_cadastro'] else ''
-                    pendente = a['modulos_concluidos'] < total_modulos_curso
-                    nao_acessou_hoje = (ult_acesso != today_str)
-
-                    if nao_acessou_hoje or pendente or a['senha_provisoria'] == 1:
-                        motivo = 'Senha Provisória Pendente' if a['senha_provisoria'] == 1 else ('Sem acesso no dia/noite' if nao_acessou_hoje else 'Módulos pendentes')
-                        alertas.append({
-                            're': a['re'],
-                            'nome': a['nome'],
-                            'estacao': a['estacao'],
-                            'modulos_concluidos': a['modulos_concluidos'],
-                            'total_modulos': total_modulos_curso,
-                            'pendencias': total_modulos_curso - a['modulos_concluidos'],
-                            'nao_acessou_hoje': nao_acessou_hoje,
-                            'motivo': motivo
-                        })
 
             conn.close()
 
-            pacing_sample = calculate_student_pacing_status(0, total_modulos_curso)
+
 
             return self.send_json({
                 'success': True,
@@ -927,17 +903,8 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                 'total_desligados': total_desligados,
                 'total_modulos': total_modulos_curso,
                 'alunos': alunos,
-                'conclusao_por_turma': conclusao_por_modulo,
-                'alertas': alertas,
-                'alertas_atencao': alertas_atencao,
-                'resumo_atencao': {
-                    'total_precisam_atencao': len(alertas_atencao),
-                    'cnt_nao_iniciados': cnt_nao_iniciados,
-                    'cnt_atrasados': cnt_atrasados,
-                    'cnt_em_dia': cnt_em_dia,
-                    'prazo_certificacao': '13/08/2026',
-                    'ritmo_esperado_hoje': pacing_sample['expected_modules']
-                }
+                'conclusao_por_turma': conclusao_por_modulo
+
             })
 
         elif path == '/api/instrutoria/certificados':

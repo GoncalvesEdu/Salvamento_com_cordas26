@@ -864,8 +864,7 @@ function setStudentFilter(filterType) {
 
 async function loadDatabaseStudentReport() {
   const tbody = document.getElementById('db-students-table-body');
-  const alertBox = document.getElementById('alerts-list-box');
-  const alertCountBadge = document.getElementById('alert-count-badge');
+
 
   loadErrorQuestionsReport();
 
@@ -899,67 +898,6 @@ async function loadDatabaseStudentReport() {
       }
     }
 
-    if (data.alertas && data.alertas.length > 0) {
-      alertCountBadge.innerText = `${data.alertas.length} Alerta(s)`;
-      alertBox.innerHTML = data.alertas.map(a => `
-        <div style="padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between;">
-          <span><strong>${a.nome}</strong> (RE: ${a.re}) - ${a.estacao}</span>
-          <span style="color: #f5c23d; font-weight: 800;">⚠️ ${a.motivo}</span>
-        </div>
-      `).join('');
-    } else {
-      alertCountBadge.innerText = `0 Alertas`;
-      alertBox.innerHTML = `<span style="color: #2a9d68; font-weight: 700;">✅ Nenhuma pendência ou senha provisória pendente na turma de alunos ativos.</span>`;
-    }
-
-    // Renderizar Seção de Alunos que Precisam de Atenção / Ritmo
-    const attentionBox = document.getElementById('attention-students-list');
-    const attentionSummaryBadge = document.getElementById('attention-summary-badge');
-    const pacingExpectedBadge = document.getElementById('pacing-expected-badge');
-    const alertasAtencao = data.alertas_atencao || [];
-    const resumoAtencao = data.resumo_atencao || {};
-
-    if (pacingExpectedBadge) {
-      pacingExpectedBadge.innerText = `${resumoAtencao.ritmo_esperado_hoje || 0} de ${totalModulos} Módulos Concluídos`;
-    }
-
-    if (attentionSummaryBadge) {
-      const tot = resumoAtencao.total_precisam_atencao || 0;
-      attentionSummaryBadge.innerText = `${tot} Aluno${tot !== 1 ? 's' : ''} Requerem Atenção`;
-    }
-
-    if (attentionBox) {
-      if (alertasAtencao.length === 0) {
-        attentionBox.innerHTML = `<span style="color: #4ade80; font-weight: 700; font-size: 0.85rem;"><i class="fa-solid fa-circle-check"></i> Excelente! 100% dos alunos da turma estão em dia com o ritmo esperado de estudos.</span>`;
-      } else {
-        attentionBox.innerHTML = alertasAtencao.map(a => {
-          const modConc = Number(a.modulos_concluidos || 0);
-          const modEsp = Number(a.modulos_esperados || 0);
-          const isNaoIniciado = a.status_ritmo === 'nao_iniciado';
-          
-          const tagBg = isNaoIniciado ? 'background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #f87171;' : 'background: rgba(245, 194, 61, 0.15); border: 1px solid #f5c23d; color: #f5c23d;';
-          const iconStr = isNaoIniciado ? '<i class="fa-solid fa-user-xmark"></i> Não iniciado' : '<i class="fa-solid fa-clock"></i> Atrasado';
-          const descMsg = isNaoIniciado 
-            ? 'Nenhum módulo concluído no portal.' 
-            : `Concluiu <strong>${modConc}</strong> módulo(s), mas o esperado para hoje eram <strong>${modEsp}</strong>.`;
-
-          return `
-            <div class="attention-item-row" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 6px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="${tagBg} padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 800;">${iconStr}</span>
-                <div>
-                  <strong style="color: #fff; font-size: 0.9rem;">${a.nome}</strong>
-                  <span style="font-size: 0.78rem; color: var(--color-text-muted); margin-left: 8px;">RE: <code>${a.re}</code> &bull; ${a.estacao}</span>
-                </div>
-              </div>
-              <div style="font-size: 0.8rem; color: var(--color-text-main);">
-                ${descMsg}
-              </div>
-            </div>
-          `;
-        }).join('');
-      }
-    }
 
     if (data.alunos.length === 0) {
       tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-text-muted); padding: 2rem;">Nenhum aluno encontrado no filtro selecionado (${currentStudentFilter.toUpperCase()}).</td></tr>`;
