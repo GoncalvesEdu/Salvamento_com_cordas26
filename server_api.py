@@ -1938,3 +1938,5 @@ if __name__ == '__main__':
     with socketserver.ThreadingTCPServer(("0.0.0.0", PORT), RBACPortalHandler) as httpd:
         print(f"Servidor API rodando em 0.0.0.0:{PORT}")
         httpd.serve_forever()
+
+# Trigger redeploy to test video persistence (one-time migration check)
