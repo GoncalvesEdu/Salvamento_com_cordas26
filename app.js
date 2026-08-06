@@ -406,6 +406,7 @@ function showScreen(screenId) {
   if (screenId === 'screen-instrutoria') {
     loadDatabaseStudentReport();
     loadInstructorFiles();
+    loadVideos();
   } else if (screenId === 'screen-classroom') {
     fetchStudentProgressAndRender();
   }
@@ -1079,6 +1080,7 @@ async function loadInstructorFiles() {
 }
 
 function openLibraryModal() {
+  switchLibraryTab('files');
   loadInstructorFiles();
   document.getElementById('modal-library')?.classList.remove('hidden');
 }
@@ -1874,5 +1876,182 @@ function calcY() {
   } else {
     st.innerText = "PERIGO! Sobrecarga Crítica (> 90°)";
     st.style.color = "#f87171";
+  }
+}
+
+// ==========================================================================
+// VÍDEOS DEMONSTRATIVOS EAD
+// ==========================================================================
+
+function getYouTubeEmbedUrl(url) {
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  if (match && match[2].length === 11) {
+    return `https://www.youtube.com/embed/${match[2]}`;
+  }
+  return null;
+}
+
+window.switchLibraryTab = function(tab) {
+  const tabFiles = document.getElementById('lib-tab-files');
+  const tabVideos = document.getElementById('lib-tab-videos');
+  const secFiles = document.getElementById('lib-section-files');
+  const secVideos = document.getElementById('lib-section-videos');
+
+  if (tab === 'files') {
+    tabFiles?.classList.add('active-aluno');
+    tabVideos?.classList.remove('active-aluno');
+    tabVideos?.style.setProperty('border-bottom', '3px solid transparent');
+    tabFiles?.style.setProperty('border-bottom', '3px solid var(--color-tactical-blue-light)');
+    secFiles?.classList.remove('hidden');
+    secVideos?.classList.add('hidden');
+  } else {
+    tabVideos?.classList.add('active-aluno');
+    tabFiles?.classList.remove('active-aluno');
+    tabFiles?.style.setProperty('border-bottom', '3px solid transparent');
+    tabVideos?.style.setProperty('border-bottom', '3px solid var(--color-tactical-blue-light)');
+    secFiles?.classList.add('hidden');
+    secVideos?.classList.remove('hidden');
+    loadVideos();
+  }
+};
+
+window.playEmbeddedVideo = function(videoId, embedUrl) {
+  const container = document.getElementById(`yt-preview-${videoId}`);
+  if (container) {
+    container.innerHTML = `
+      <iframe src="${embedUrl}?autoplay=1" style="width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    `;
+  }
+};
+
+async function loadVideos() {
+  const containerClassVideos = document.getElementById('classroom-videos-list');
+  const containerInstVideos = document.getElementById('instrutoria-videos-list');
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/videos`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    const data = await res.json();
+
+    if (!data.success || !data.videos) return;
+
+    if (containerClassVideos) {
+      if (data.videos.length === 0) {
+        containerClassVideos.innerHTML = `<p style="color: var(--color-text-muted); font-size: 0.9rem; text-align: center; padding: 20px;">Nenhum vídeo cadastrado.</p>`;
+      } else {
+        containerClassVideos.innerHTML = data.videos.map(v => renderVideoCard(v, false)).join('');
+      }
+    }
+
+    if (containerInstVideos) {
+      if (data.videos.length === 0) {
+        containerInstVideos.innerHTML = `<p style="color: var(--color-text-muted); font-size: 0.9rem; text-align: center; padding: 20px;">Nenhum vídeo cadastrado.</p>`;
+      } else {
+        containerInstVideos.innerHTML = data.videos.map(v => renderVideoCard(v, true)).join('');
+      }
+    }
+
+  } catch (err) {
+    console.error("Erro ao carregar lista de vídeos:", err);
+  }
+}
+
+function renderVideoCard(v, isInstructorView) {
+  const ytEmbed = getYouTubeEmbedUrl(v.url);
+  const badge = v.visivel_para === 'todos'
+    ? `<span style="background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #4ade80; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 800; margin-left: 8px;">🌐 Liberado para Alunos</span>`
+    : `<span style="background: rgba(245, 194, 61, 0.15); border: 1px solid #f5c23d; color: #f5c23d; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 800; margin-left: 8px;">🔒 Restrito Instrutoria</span>`;
+
+  const orderBadge = `<span style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; font-weight: 600; margin-left: 8px;">Ordem: ${v.ordem || 0}</span>`;
+
+  let actionHtml = '';
+  let previewHtml = '';
+
+  if (ytEmbed) {
+    const videoId = ytEmbed.split('/').pop().split('?')[0];
+    const thumbUrl = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+    
+    previewHtml = `
+      <div class="video-preview-wrapper" id="yt-preview-${v.id}" style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; margin-top: 10px; border: 1px solid rgba(255,255,255,0.1);">
+        <img src="${thumbUrl}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8;" alt="Thumbnail">
+        <button type="button" onclick="playEmbeddedVideo('${v.id}', '${ytEmbed}')" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; border-radius: 50%; background: var(--color-tactical-blue); border: none; color: #fff; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: all 0.2s;">
+          <i class="fa-solid fa-play" style="margin-left: 4px;"></i>
+        </button>
+      </div>
+    `;
+    
+    actionHtml = `
+      <a href="${v.url}" target="_blank" class="nav-btn" style="background: rgba(220, 38, 38, 0.15); border-color: #ef4444; color: #f87171; text-decoration: none; padding: 6px 14px; display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem;">
+        <i class="fa-brands fa-youtube"></i> Abrir no YouTube
+      </a>
+    `;
+  } else {
+    previewHtml = `
+      <div style="background: rgba(0,0,0,0.2); border: 1px dashed rgba(255,255,255,0.1); border-radius: 8px; padding: 20px; text-align: center; margin-top: 10px;">
+        <i class="fa-brands fa-google-drive" style="font-size: 2.5rem; color: #22c55e; margin-bottom: 8px;"></i>
+        <p style="color: var(--color-text-muted); font-size: 0.85rem; margin: 0;">Vídeo hospedado no Google Drive. Use o botão para abrir em uma nova aba.</p>
+      </div>
+    `;
+    
+    actionHtml = `
+      <a href="${v.url}" target="_blank" class="nav-btn" style="background: rgba(34, 197, 94, 0.15); border-color: #22c55e; color: #4ade80; text-decoration: none; padding: 6px 14px; display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem;">
+        <i class="fa-brands fa-google-drive"></i> Abrir Google Drive
+      </a>
+    `;
+  }
+
+  return `
+    <div class="file-item-card" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 16px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <i class="fa-solid fa-circle-play" style="font-size: 2rem; color: var(--color-gold-patch);"></i>
+          <div>
+            <strong style="color: #fff; font-size: 1rem; display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
+              ${v.titulo} ${isInstructorView ? badge + orderBadge : ''}
+            </strong>
+            <span style="font-size: 0.8rem; color: var(--color-text-muted); display: block; margin-top: 2px;">
+              ${v.descricao || 'Sem descrição.'}
+            </span>
+          </div>
+        </div>
+        <div>
+          ${actionHtml}
+        </div>
+      </div>
+      ${previewHtml}
+    </div>
+  `;
+}
+
+async function handleCadastrarVideo(event) {
+  event.preventDefault();
+  const titulo = document.getElementById('video-titulo').value.trim();
+  const url = document.getElementById('video-url').value.trim();
+  const descricao = document.getElementById('video-descricao').value.trim();
+  const visivel_para = document.getElementById('video-visibilidade').value;
+  const ordem = parseInt(document.getElementById('video-ordem').value || 0);
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/instrutoria/videos`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: JSON.stringify({ titulo, url, descricao, visivel_para, ordem })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      alert("✅ Vídeo cadastrado com sucesso!");
+      document.getElementById('form-cadastro-video').reset();
+      loadVideos();
+    } else {
+      alert(`❌ Erro ao cadastrar: ${data.message || data.error}`);
+    }
+  } catch (err) {
+    alert("❌ Erro de conexão ao cadastrar vídeo.");
   }
 }
