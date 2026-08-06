@@ -175,8 +175,12 @@ class SQLiteConnectionWrapper:
         self.conn.close()
 
 def get_db():
-    db_url = os.environ.get("DATABASE_URL", "")
     is_render = os.environ.get("RENDER") == "true"
+    if not is_render:
+        db_path = os.path.join(os.path.dirname(__file__), 'salvamento_2gb.db')
+        return SQLiteConnectionWrapper(db_path)
+
+    db_url = os.environ.get("DATABASE_URL", "")
     if not db_url or "oregon-postgres.render.com" not in db_url:
         db_url = "postgresql://db_salvamento_com_cordas_user:nZvQsGoE6ED6ne026zkML02fjEbtlKWo@dpg-d9mc56ijobas73ao7fk0-a.oregon-postgres.render.com/db_salvamento_com_cordas"
     try:
@@ -188,12 +192,8 @@ def get_db():
             ext_url = "postgresql://db_salvamento_com_cordas_user:nZvQsGoE6ED6ne026zkML02fjEbtlKWo@dpg-d9mc56ijobas73ao7fk0.oregon-postgres.render.com/db_salvamento_com_cordas"
             return psycopg2.connect(ext_url, cursor_factory=RealDictCursor)
         except Exception as ex:
-            if is_render:
-                print(f"[GET_DB ERROR] Falha catastrófica de conexao no Render. Proibido usar SQLite em producao. Erro original: {ex}")
-                raise ex
-            print(f"[GET_DB WARNING] Falha na conexao externa ({ex}). Usando banco de dados local SQLite (salvamento_2gb.db)...")
-            db_path = os.path.join(os.path.dirname(__file__), 'salvamento_2gb.db')
-            return SQLiteConnectionWrapper(db_path)
+            print(f"[GET_DB ERROR] Falha catastrófica de conexao no Render. Proibido usar SQLite em producao. Erro original: {ex}")
+            raise ex
 
 def init_db():
     try:
@@ -1291,7 +1291,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
 
             if att_row:
                 raw_mod_id = str(att_row['modulo_id'])
-                mod_id_val = int(raw_mod_id) if raw_mod_id.isdigit() else raw_mod_id
+                mod_id_val = raw_mod_id
                 q_order = json.loads(att_row['question_order'])
                 total_q = len(q_order)
 
@@ -1372,7 +1372,7 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                 })
 
             now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            mod_val = int(modulo_id_str) if modulo_id_str.isdigit() else modulo_id_str
+            mod_val = modulo_id_str
             cur.execute('''
                 INSERT INTO progresso_modulos (aluno_re, modulo_id, nota, tempo_gasto, status, data_conclusao)
                 VALUES (%s, %s, 100.0, 300, 'concluido', %s)
