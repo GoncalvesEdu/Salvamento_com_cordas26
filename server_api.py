@@ -355,26 +355,51 @@ def init_db():
                     pass
                 print(f"[INIT_DB WARNING] videos_ead: {e_vid}")
 
-            # Limpeza automática de vídeos que não correspondem aos 6 IDs legítimos
+            # Tabela de controle de migrações
+            try:
+                cur.execute("SAVEPOINT sp_migrations_run")
+                cur.execute('''
+                    CREATE TABLE IF NOT EXISTS migrations_run (
+                        name TEXT PRIMARY KEY,
+                        run_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    );
+                ''')
+                cur.execute("RELEASE SAVEPOINT sp_migrations_run")
+            except Exception as e_mrun:
+                try:
+                    cur.execute("ROLLBACK TO SAVEPOINT sp_migrations_run")
+                except Exception:
+                    pass
+                print(f"[INIT_DB WARNING] migrations_run: {e_mrun}")
+
+            # Limpeza única de vídeos que não correspondem aos 6 IDs legítimos (migration clean_fake_videos_v1)
             try:
                 cur.execute("SAVEPOINT sp_clean_fake_videos")
-                cur.execute('''
-                    DELETE FROM videos_ead WHERE
-                        url NOT LIKE '%e6OFgIm0AFc%' AND
-                        url NOT LIKE '%HC2nB_RN3H8%' AND
-                        url NOT LIKE '%M2ZZZ7-ZN-8%' AND
-                        url NOT LIKE '%Ywx7VGLJBIA%' AND
-                        url NOT LIKE '%Lj8gVfcCYus%' AND
-                        url NOT LIKE '%aLZrzPOTOns%';
-                ''')
+                
+                # Verificar se a migração já rodou
+                cur.execute("SELECT 1 FROM migrations_run WHERE name = 'clean_fake_videos_v1'")
+                mig_exec = cur.fetchone()
+                
+                if not mig_exec:
+                    cur.execute('''
+                        DELETE FROM videos_ead WHERE
+                            url NOT LIKE '%e6OFgIm0AFc%' AND
+                            url NOT LIKE '%HC2nB_RN3H8%' AND
+                            url NOT LIKE '%M2ZZZ7-ZN-8%' AND
+                            url NOT LIKE '%Ywx7VGLJBIA%' AND
+                            url NOT LIKE '%Lj8gVfcCYus%' AND
+                            url NOT LIKE '%aLZrzPOTOns%';
+                    ''')
+                    cur.execute("INSERT INTO migrations_run (name) VALUES ('clean_fake_videos_v1')")
+                    print("[INIT_DB] Migração clean_fake_videos_v1 (limpeza de vídeos falsos) executada com sucesso.")
+                
                 cur.execute("RELEASE SAVEPOINT sp_clean_fake_videos")
-                print("[INIT_DB] Limpeza automática de vídeos concluída.")
             except Exception as e_clean:
                 try:
                     cur.execute("ROLLBACK TO SAVEPOINT sp_clean_fake_videos")
                 except Exception:
                     pass
-                print(f"[INIT_DB WARNING] Falha ao limpar vídeos não autorizados: {e_clean}")
+                print(f"[INIT_DB WARNING] Falha ao executar migração clean_fake_videos_v1: {e_clean}")
 
             # Inserir Usuário Instrutor Padronizado
             instrutor_pass = hash_password_pbkdf2('2gb2026')
