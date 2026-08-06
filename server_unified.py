@@ -148,8 +148,17 @@ def init_db():
             cur.execute("INSERT INTO quiz_options (id, question_id, option_text, is_correct) VALUES ('sc_aph_mod7_q1_opB', 'sc_mod7_q1', 'Sistemas pares possuem o terminal do cabo fixado na carga, e a polia fixa na ancoragem sofre tração reduzida equivalente a 0.5T.', 0) ON CONFLICT (id) DO UPDATE SET option_text = EXCLUDED.option_text, is_correct = EXCLUDED.is_correct")
             cur.execute("INSERT INTO quiz_options (id, question_id, option_text, is_correct) VALUES ('sc_aph_mod7_q1_opC', 'sc_mod7_q1', 'O nó Prusik de captura de progresso deve ser alocado diretamente sobre a polia móvel de tração e operadores devem usar obrigatoriamente luvas de raspas.', 0) ON CONFLICT (id) DO UPDATE SET option_text = EXCLUDED.option_text, is_correct = EXCLUDED.is_correct")
             cur.execute("INSERT INTO quiz_options (id, question_id, option_text, is_correct) VALUES ('sc_aph_mod7_q1_opD', 'sc_mod7_q1', 'Sistemas estendidos economizam corda perante os sistemas reduzidos e a captura de progresso de cordinete é dispensada em sistemas ímpares.', 0) ON CONFLICT (id) DO UPDATE SET option_text = EXCLUDED.option_text, is_correct = EXCLUDED.is_correct")
-        except Exception:
-            pass
+        except Exception as e_q:
+            print(f"[MIGRATION ERROR] Unified questions/Station 7 fail: {e_q}")
+
+        try:
+            # Migracao para adicionar coluna semana na tabela quiz_questions no SQLite/Postgres
+            cur.execute("ALTER TABLE quiz_questions ADD COLUMN IF NOT EXISTS semana INTEGER DEFAULT 1")
+            cur.execute("UPDATE quiz_questions SET semana = 1 WHERE modulo_id IN ('1', '2', '3', '4', '5', '6', 'final')")
+            cur.execute("UPDATE quiz_questions SET semana = 2 WHERE modulo_id = '7'")
+            print("[MIGRATION] Coluna semana adicionada/populada no Banco Unificado.")
+        except Exception as e_sem:
+            print(f"[MIGRATION ERROR] Falha ao adicionar/popular coluna semana no Banco Unificado: {e_sem}")
 
         conn.commit()
     except Exception as e:

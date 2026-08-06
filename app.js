@@ -12,6 +12,11 @@ const modulesData = {
     title: "Estação 1: Trabalhador Suspenso & Trauma de Suspensão",
     subtitle: "Atendimento Pré-Hospitalar (PHTLS) e Doutrina Técnica no Resgate de Suspenso Inerte",
     youtubeId: "qzvVESMHxXs",
+    semana: 1,
+    ordem: 1,
+    icon: "fa-person-falling",
+    menuLabel: "Estação 1",
+    menuSubtext: "Trabalhador Suspenso",
     slides: [
       {
         tag: "ESTAÇÃO 1 - SLIDE 1 DE 3",
@@ -54,6 +59,11 @@ const modulesData = {
     title: "Estação 2: Poço & Espaço Confinado",
     subtitle: "Atendimento Pré-Hospitalar em Ambientes de Risco Atmosférico e Acesso Vertical",
     youtubeId: "aQD-0JYT1Ok",
+    semana: 1,
+    ordem: 2,
+    icon: "fa-circle-notch",
+    menuLabel: "Estação 2",
+    menuSubtext: "Poço & Confinado",
     slides: [
       {
         tag: "ESTAÇÃO 2 - SLIDE 1 DE 3",
@@ -96,6 +106,11 @@ const modulesData = {
     title: "Estação 3: Estrutura Elevada",
     subtitle: "Atendimento de Trauma por Queda de Altura e Operações em Plataformas",
     youtubeId: "kACDQnv6Cfo",
+    semana: 1,
+    ordem: 3,
+    icon: "fa-building-user",
+    menuLabel: "Estação 3",
+    menuSubtext: "Estrutura Elevada",
     slides: [
       {
         tag: "ESTAÇÃO 3 - SLIDE 1 DE 3",
@@ -138,6 +153,11 @@ const modulesData = {
     title: "Estação 4: Movimentação Operacional de Vítima",
     subtitle: "Manejo em Maca Sked Envelopada, RMC PHTLS 10ª Ed e Desmultiplicação Z-Rig",
     youtubeId: "1UFhbFW0GRs",
+    semana: 1,
+    ordem: 4,
+    icon: "fa-truck-medical",
+    menuLabel: "Estação 4",
+    menuSubtext: "Movimentação Vítima",
     slides: [
       {
         tag: "ESTAÇÃO 4 - SLIDE 1 DE 3",
@@ -180,6 +200,11 @@ const modulesData = {
     title: "Estação 5: Barranco & Terreno Inclinado",
     subtitle: "Atendimento Pré-Hospitalar e Transposição em Encostas e Despenhadeiros",
     youtubeId: "6eC2oqs43pQ",
+    semana: 1,
+    ordem: 5,
+    icon: "fa-mountain",
+    menuLabel: "Estação 5",
+    menuSubtext: "Barranco & Terreno",
     slides: [
       {
         tag: "ESTAÇÃO 5 - SLIDE 1 DE 3",
@@ -222,6 +247,11 @@ const modulesData = {
     title: "Estação 6: Escadas & Tripés Operacionais",
     subtitle: "Extração Vertical com Tripé de Resgate, Escada Prolongável e Pick-Off Tático",
     youtubeId: "KUlGl2laKwc",
+    semana: 1,
+    ordem: 6,
+    icon: "fa-xmark",
+    menuLabel: "Estação 6",
+    menuSubtext: "Escadas & Tripés",
     slides: [
       {
         tag: "ESTAÇÃO 6 - SLIDE 1 DE 3",
@@ -263,6 +293,11 @@ const modulesData = {
   7: {
     title: "Estação 7: Vantagem Mecânica (Estendido & Reduzido)",
     subtitle: "Cálculo de Redução de Forças, Atrito e Sistemas de Tração em Altura",
+    semana: 2,
+    ordem: 1,
+    icon: "fa-gears",
+    menuLabel: "Estação 7",
+    menuSubtext: "Vantagem Mecânica",
     slides: [
       {
         tag: "ESTAÇÃO 7 - SLIDE 1 DE 3",
@@ -306,15 +341,21 @@ const modulesData = {
   },
   final: {
     title: "Prova: Semana 1 (20 Questões)",
-    subtitle: "Avaliação teórica integradora abrangendo as Estações de Resgate 1 a 3 e Protocolo PHTLS",
+    subtitle: "Avaliação teórica integradora abrangendo as Estações de Resgate 1 a 6 e Protocolo PHTLS",
+    semana: 1,
+    ordem: 7,
+    icon: "fa-trophy",
+    menuLabel: "PROVA SEMANA 1",
+    menuSubtext: "20 Questões (Avaliação)",
+    isExam: true,
     slides: [
       {
         tag: "AVALIAÇÃO SEMANA 1 - 20 QUESTÕES",
         title: "Prova da 1ª Semana (Salvamento & APH)",
-        subtitle: "Avaliação abrangente abrangendo Estações 1 a 3 e Atendimento de APH",
+        subtitle: "Avaliação abrangente abrangendo Estações 1 a 6 e Atendimento de APH",
         image: "images/logo_salvamento_2gb.png",
         bullets: [
-          "<strong>Estrutura do Exame:</strong> 20 questões de múltipla escolha abarcando o conteúdo técnico e de APH das Estações 1 a 3.",
+          "<strong>Estrutura do Exame:</strong> 20 questões de múltipla escolha abarcando o conteúdo técnico e de APH das Estações 1 a 6.",
           "<strong>Critério de Aprovação:</strong> Aproveitamento mínimo de 70% de acertos para liberação do conteúdo da Semana 2.",
           "<strong>Navegação Interativa:</strong> Responda às 20 questões sequencialmente navegando pelos botões de Questão Anterior e Próxima.",
           "<strong>Sequência do Curso:</strong> Após aprovação, as instruções da Semana 2 estarão liberadas."
@@ -331,7 +372,7 @@ let authToken = localStorage.getItem('cb_auth_token') || '';
 let currentModule = 1;
 let currentSlideIndex = 0;
 let currentStudentFilter = 'ativo';
-let userProgress = { 1: false, 2: false, 3: false, 4: false, 5: false, 6: false, 7: false, final: false };
+let userProgress = {};
 
 // Estado da Tentativa do Quiz
 let currentAttemptId = null;
@@ -1217,22 +1258,133 @@ function switchWeek(weekNum) {
   }
 }
 
+function getOrderedModules() {
+  const list = Object.keys(modulesData).map(key => ({
+    id: key,
+    ...modulesData[key]
+  }));
+  list.sort((a, b) => {
+    if (a.semana !== b.semana) return a.semana - b.semana;
+    return a.ordem - b.ordem;
+  });
+  return list;
+}
+
+function getPreviousModuleId(modId) {
+  const ordered = getOrderedModules();
+  const idx = ordered.findIndex(m => String(m.id) === String(modId));
+  if (idx > 0) {
+    return ordered[idx - 1].id;
+  }
+  return null;
+}
+
+function isModuleUnlocked(modId) {
+  const ordered = getOrderedModules();
+  if (ordered.length === 0) return true;
+  if (String(ordered[0].id) === String(modId)) return true;
+
+  // Se já concluiu o módulo, sempre pode acessar
+  if (userProgress[modId]) return true;
+
+  // Exceção Histórica para a Semana 2: se o aluno já concluiu/acessou QUALQUER módulo da Semana 2,
+  // liberamos os módulos da Semana 2.
+  const modInfo = modulesData[modId];
+  if (modInfo && modInfo.semana === 2) {
+    const hasCompletedAnySemana2 = ordered.some(m => m.semana === 2 && userProgress[m.id]);
+    if (hasCompletedAnySemana2) return true;
+  }
+
+  // Regra de Progressão Sequencial: o módulo anterior na sequência ordenada deve estar concluído
+  const prevId = getPreviousModuleId(modId);
+  if (prevId && userProgress[prevId]) return true;
+
+  return false;
+}
+
+function renderSidebar() {
+  const w1List = document.getElementById('week-1-list');
+  const w2List = document.getElementById('week-2-list');
+  if (!w1List || !w2List) return;
+
+  w1List.innerHTML = '';
+  w2List.innerHTML = '';
+
+  const ordered = getOrderedModules();
+
+  ordered.forEach(mod => {
+    const isAct = (String(currentModule) === String(mod.id)) ? 'active' : '';
+    const isUnlocked = isModuleUnlocked(mod.id);
+    const lockClass = isUnlocked ? '' : 'locked';
+    
+    let badgeHtml = '';
+    if (userProgress[mod.id]) {
+      badgeHtml = `
+        <span class="mod-completion-badge" style="background: rgba(42, 157, 104, 0.25); border: 1px solid #4ade80; color: #4ade80; font-size: 0.7rem; font-weight: 800; padding: 2px 6px; border-radius: 10px; margin-left: auto; display: inline-flex; align-items: center; gap: 4px;">
+          <i class="fa-solid fa-circle-check"></i> Concluído
+        </span>
+      `;
+    } else if (!isUnlocked) {
+      badgeHtml = `
+        <span style="font-size: 0.7rem; color: #94a3b8; margin-left: auto; display: inline-flex; align-items: center; gap: 4px;">
+          <i class="fa-solid fa-lock"></i> Bloqueado
+        </span>
+      `;
+    }
+
+    let btnHtml = '';
+    if (mod.isExam) {
+      btnHtml = `
+        <button class="menu-item ${isAct} ${lockClass}" id="btn-mod-${mod.id}" data-mod="${mod.id}" onclick="loadModule('${mod.id}')" style="border-color: var(--color-gold-patch); background: rgba(245, 194, 61, 0.08); display: flex; align-items: center; width: 100%; text-align: left;">
+          <i class="fa-solid ${mod.icon}" style="color: var(--color-gold-patch); margin-right: 12px; font-size: 1.1rem;"></i>
+          <div style="flex: 1;">
+            <strong style="display: block; font-size: 0.88rem; color: var(--color-gold-patch);">${mod.menuLabel}</strong>
+            <span style="font-size: 0.75rem; color: var(--color-gold-patch);">${mod.menuSubtext}</span>
+          </div>
+          ${badgeHtml}
+        </button>
+      `;
+    } else {
+      btnHtml = `
+        <button class="menu-item ${isAct} ${lockClass}" id="btn-mod-${mod.id}" data-mod="${mod.id}" onclick="loadModule('${mod.id}')" style="display: flex; align-items: center; width: 100%; text-align: left;">
+          <i class="fa-solid ${mod.icon}" style="margin-right: 12px; font-size: 1.1rem;"></i>
+          <div style="flex: 1;">
+            <strong style="display: block; font-size: 0.88rem;">${mod.menuLabel}</strong>
+            <span style="font-size: 0.75rem;">${mod.menuSubtext}</span>
+          </div>
+          ${badgeHtml}
+        </button>
+      `;
+    }
+
+    if (mod.semana === 1) {
+      w1List.innerHTML += btnHtml;
+    } else {
+      w2List.innerHTML += btnHtml;
+    }
+  });
+}
+
 function loadModule(modId) {
+  if (!isModuleUnlocked(modId)) {
+    alert("⚠️ Este módulo está bloqueado. Conclua os módulos anteriores e a Prova correspondente para liberá-lo.");
+    return;
+  }
+
   currentModule = modId;
   currentSlideIndex = 0;
 
+  const mData = modulesData[modId];
+  if (!mData) return;
+
   // Alternar automaticamente entre as abas da Semana 1 e Semana 2 baseado no módulo carregado
-  if (modId === 'final' || modId === 1 || modId === 2 || modId === 3) {
+  if (mData.semana === 1) {
     switchWeek(1);
-  } else if (modId === 4 || modId === 5 || modId === 6 || modId === 7) {
+  } else if (mData.semana === 2) {
     switchWeek(2);
   }
 
-  document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
-  document.getElementById(`btn-mod-${modId}`)?.classList.add('active');
-
-  const mData = modulesData[modId];
-  if (!mData) return;
+  renderSidebar();
 
   renderSlide();
   document.getElementById('quiz-card-element')?.classList.add('hidden');
@@ -1319,13 +1471,6 @@ function setupNavigationEvents() {
     }
   });
 
-  document.querySelectorAll('.menu-item').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const rawMod = btn.getAttribute('data-mod');
-      const modId = (rawMod === 'final') ? 'final' : (parseInt(rawMod) || 1);
-      loadModule(modId);
-    });
-  });
 
   document.getElementById('btn-submit-quiz')?.addEventListener('click', handleQuizSubmission);
   document.getElementById('btn-header-instrutoria')?.addEventListener('click', () => showScreen('screen-instrutoria'));
@@ -1514,11 +1659,13 @@ async function handleQuizSubmission() {
         alert(data.message || `🎉 Excelente! Resposta correta no Módulo ${currentModule}. Módulo Concluído com Nota 100!`);
         userProgress[currentModule] = true;
         updateCourseProgressBar();
+        renderSidebar();
 
-        if (currentModule === 3) {
-          loadModule('final');
-        } else if (typeof currentModule === 'number' && currentModule < 7) {
-          loadModule(currentModule + 1);
+        const ordered = getOrderedModules();
+        const currentIdx = ordered.findIndex(m => String(m.id) === String(currentModule));
+        if (currentIdx >= 0 && currentIdx < ordered.length - 1) {
+          const nextModId = ordered[currentIdx + 1].id;
+          loadModule(nextModId);
         } else {
           alert("🎉 Parabéns! Você concluiu todas as instruções da Semana 2. Em breve a Prova da Semana 2 e a Prova Final do Curso estarão liberadas!");
         }
@@ -1555,7 +1702,16 @@ async function handleQuizSubmission() {
         alert(`🏆 PARABÉNS! Você foi APROVADO na Prova Semana 1 com ${scorePct}% de acertos (${correctCount} de ${totalQ} questões)!\n\nAgora você está liberado para iniciar a Semana 2.`);
         userProgress['final'] = true;
         updateCourseProgressBar();
-        loadModule(4);
+        renderSidebar();
+
+        const ordered = getOrderedModules();
+        const currentIdx = ordered.findIndex(m => String(m.id) === String(currentModule));
+        if (currentIdx >= 0 && currentIdx < ordered.length - 1) {
+          const nextModId = ordered[currentIdx + 1].id;
+          loadModule(nextModId);
+        } else {
+          alert("🎉 Parabéns! Você concluiu todas as instruções da Semana 2. Em breve a Prova da Semana 2 e a Prova Final do Curso estarão liberadas!");
+        }
       } else {
         alert(`⚠️ Você obteve ${scorePct}% de acertos (${correctCount} de ${totalQ} questões).\n\nO aproveitamento mínimo necessário é de 70%. Revise o conteúdo da Semana 1 e tente novamente.`);
       }
@@ -1566,17 +1722,17 @@ async function handleQuizSubmission() {
 }
 
 function applyStudentProgress(progressoArray) {
-  userProgress = { 1: false, 2: false, 3: false, 4: false, 5: false, 6: false, 7: false, final: false };
+  userProgress = {};
+  Object.keys(modulesData).forEach(key => {
+    userProgress[key] = false;
+  });
   if (Array.isArray(progressoArray)) {
     progressoArray.forEach(p => {
-      let mId = String(p.modulo_id);
-      if (mId !== 'final' && !isNaN(parseInt(mId))) {
-        mId = parseInt(mId);
-      }
-      userProgress[mId] = true;
+      userProgress[String(p.modulo_id)] = true;
     });
   }
   updateCourseProgressBar();
+  renderSidebar();
 }
 
 async function fetchStudentProgressAndRender() {
@@ -1588,37 +1744,34 @@ async function fetchStudentProgressAndRender() {
     const data = await res.json();
     if (data.success && Array.isArray(data.progresso)) {
       applyStudentProgress(data.progresso);
+    } else {
+      renderSidebar();
     }
   } catch (err) {
     console.error("Erro ao sincronizar progresso do aluno:", err);
+    renderSidebar();
   }
 }
 
 function updateCourseProgressBar() {
-  const allModules = [1, 2, 3, 4, 5, 6, 7, 'final'];
+  const allModules = Object.keys(modulesData);
+  const totalCount = allModules.length;
   const completed = allModules.filter(m => userProgress[m] === true).length;
-  const pct = Math.round((completed / 8) * 100);
+  const pct = totalCount > 0 ? Math.round((completed / totalCount) * 100) : 0;
   
   const fill = document.getElementById('course-progress-bar-fill');
   if (fill) fill.style.width = `${pct}%`;
 
   const txt = document.getElementById('course-progress-text');
-  if (txt) txt.innerText = `${completed} de 8 Módulos Concluídos (${pct}%)`;
+  if (txt) txt.innerText = `${completed} de ${totalCount} Módulos Concluídos (${pct}%)`;
 
   allModules.forEach(mId => {
     const btn = document.getElementById(`btn-mod-${mId}`);
     if (btn) {
-      let badge = btn.querySelector('.mod-completion-badge');
-      if (userProgress[mId]) {
-        if (!badge) {
-          badge = document.createElement('span');
-          badge.className = 'mod-completion-badge';
-          badge.style.cssText = 'background: rgba(42, 157, 104, 0.25); border: 1px solid #4ade80; color: #4ade80; font-size: 0.7rem; font-weight: 800; padding: 2px 6px; border-radius: 10px; margin-left: auto; display: inline-flex; align-items: center; gap: 4px;';
-          badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Concluído';
-          btn.appendChild(badge);
-        }
+      if (currentModule === mId) {
+        btn.classList.add('active');
       } else {
-        if (badge) badge.remove();
+        btn.classList.remove('active');
       }
     }
   });
