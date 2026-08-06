@@ -1916,8 +1916,8 @@ window.switchLibraryTab = function(tab) {
   }
 };
 
-window.playEmbeddedVideo = function(videoId, embedUrl) {
-  const container = document.getElementById(`yt-preview-${videoId}`);
+window.playEmbeddedVideo = function(containerId, embedUrl) {
+  const container = document.getElementById(containerId);
   if (container) {
     container.innerHTML = `
       <iframe src="${embedUrl}?autoplay=1" 
@@ -1977,14 +1977,17 @@ function renderVideoCard(v, isInstructorView) {
     ? `<button onclick="handleDeletarVideo(${v.id})" class="nav-btn" style="background: rgba(239, 68, 68, 0.15); border-color: #ef4444; color: #f87171; padding: 6px 12px; font-size: 0.85rem; cursor: pointer; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px;"><i class="fa-solid fa-trash"></i> Excluir</button>` 
     : '';
 
+  const prefix = isInstructorView ? 'inst' : 'class';
+  const containerId = `yt-preview-${prefix}-${v.id}`;
+
   if (ytEmbed) {
     const videoId = ytEmbed.split('/').pop().split('?')[0];
     const thumbUrl = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
     
     previewHtml = `
-      <div class="video-preview-wrapper" id="yt-preview-${v.id}" style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; margin-top: 10px; border: 1px solid rgba(255,255,255,0.1);">
+      <div class="video-preview-wrapper" id="${containerId}" style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 8px; overflow: hidden; margin-top: 10px; border: 1px solid rgba(255,255,255,0.1);">
         <img src="${thumbUrl}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8;" alt="Thumbnail">
-        <button type="button" onclick="playEmbeddedVideo('${v.id}', '${ytEmbed}')" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; border-radius: 50%; background: var(--color-tactical-blue); border: none; color: #fff; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: all 0.2s;">
+        <button type="button" onclick="playEmbeddedVideo('${containerId}', '${ytEmbed}')" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; border-radius: 50%; background: var(--color-tactical-blue); border: none; color: #fff; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: all 0.2s;">
           <i class="fa-solid fa-play" style="margin-left: 4px;"></i>
         </button>
       </div>
