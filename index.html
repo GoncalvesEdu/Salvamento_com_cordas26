@@ -1716,6 +1716,51 @@
           <div id="instrutoria-files-list">
             <!-- Lista Dinâmica de Arquivos Físicos -->
           </div>
+
+          <!-- Cadastro de Vídeos Demonstrativos EAD -->
+          <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 1.5rem; margin-top: 2rem;">
+            <h3 style="color: #fff; font-size: 1.3rem; font-weight: 800; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 10px;">
+              <i class="fa-solid fa-video" style="color: var(--color-gold-patch);"></i> Cadastro de Vídeos Demonstrativos EAD
+            </h3>
+            <p style="color: var(--color-text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
+              Insira links externos do YouTube ou Google Drive para exibição na biblioteca dos alunos.
+            </p>
+
+            <form id="form-cadastrar-video" onsubmit="handleCadastrarVideo(event)" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="color: #fff; font-size: 0.85rem; font-weight: 700;">Título do Vídeo *</label>
+                <input type="text" id="video-titulo" placeholder="Ex: Nó de Escota Dupla — Demonstração" required style="background: #1e293b; color: #fff; border: 1px solid var(--color-border); padding: 8px 12px; border-radius: 6px; font-size: 0.9rem;">
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="color: #fff; font-size: 0.85rem; font-weight: 700;">URL do Vídeo (YouTube ou Google Drive) *</label>
+                <input type="url" id="video-url" placeholder="https://www.youtube.com/watch?v=..." required style="background: #1e293b; color: #fff; border: 1px solid var(--color-border); padding: 8px 12px; border-radius: 6px; font-size: 0.9rem;">
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px; grid-column: span 2;">
+                <label style="color: #fff; font-size: 0.85rem; font-weight: 700;">Descrição (Opcional)</label>
+                <textarea id="video-descricao" placeholder="Breve explicação técnica sobre a aplicação prática do nó." rows="2" style="background: #1e293b; color: #fff; border: 1px solid var(--color-border); padding: 8px 12px; border-radius: 6px; font-size: 0.9rem; resize: vertical;"></textarea>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="color: #fff; font-size: 0.85rem; font-weight: 700;">Visibilidade do Vídeo</label>
+                <select id="video-visibilidade" style="background: #1e293b; color: #fff; border: 1px solid var(--color-border); padding: 8px 12px; border-radius: 6px; font-size: 0.9rem;">
+                  <option value="todos" selected>🌐 Todos (Alunos &amp; Instrutores)</option>
+                  <option value="instrutor">🔒 Apenas Instrutoria (Privado)</option>
+                </select>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="color: #fff; font-size: 0.85rem; font-weight: 700;">Ordem de Exibição (Opcional)</label>
+                <input type="number" id="video-ordem" value="0" min="0" style="background: #1e293b; color: #fff; border: 1px solid var(--color-border); padding: 8px 12px; border-radius: 6px; font-size: 0.9rem;">
+              </div>
+              <div style="grid-column: span 2; display: flex; justify-content: flex-end; margin-top: 0.5rem;">
+                <button type="submit" class="nav-btn" style="background: #1e3a8a; border-color: #3b82f6; color: #fff; font-weight: 800; padding: 10px 24px;">
+                  <i class="fa-solid fa-plus"></i> Cadastrar Vídeo
+                </button>
+              </div>
+            </form>
+
+            <div id="instrutoria-videos-list" style="display: flex; flex-direction: column; gap: 12px;">
+              <!-- Lista Dinâmica de Vídeos no Painel do Instrutor -->
+            </div>
+          </div>
         </div>
 
       </div>
@@ -1903,6 +1948,15 @@
 
       <div id="classroom-files-list" style="display: flex; flex-direction: column; gap: 12px;">
         <!-- Carregado Dinamicamente -->
+      </div>
+
+      <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 1.5rem; margin-top: 1.5rem;">
+        <h3 style="color: #fff; font-size: 1.2rem; font-weight: 800; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-circle-play" style="color: var(--color-gold-patch);"></i> Vídeos Demonstrativos de Nós
+        </h3>
+        <div id="classroom-videos-list" style="display: flex; flex-direction: column; gap: 16px;">
+          <!-- Carregado Dinamicamente -->
+        </div>
       </div>
     </div>
   <!-- NAVEGAÇÃO INFERIOR FIXA PARA MOBILE (BOTTOM TAB BAR NATIVA DE APP) -->

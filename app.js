@@ -406,6 +406,7 @@ function showScreen(screenId) {
   if (screenId === 'screen-instrutoria') {
     loadDatabaseStudentReport();
     loadInstructorFiles();
+    loadVideos();
   } else if (screenId === 'screen-classroom') {
     fetchStudentProgressAndRender();
   }
@@ -1146,11 +1147,159 @@ async function loadInstructorFiles() {
 
 function openLibraryModal() {
   loadInstructorFiles();
+  loadVideos();
   document.getElementById('modal-library')?.classList.remove('hidden');
 }
 
 function closeLibraryModal() {
   document.getElementById('modal-library')?.classList.add('hidden');
+}
+
+// Extrair e validar ID do YouTube de forma segura
+function getYouTubeIdAndValidate(url) {
+  if (!url) return null;
+  const ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
+  const match = url.match(ytRegex);
+  if (match && match[1]) {
+    const videoId = match[1];
+    // Validação estrita: apenas alfanuméricos, hífen e sublinhado (11 chars)
+    if (/^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
+      return videoId;
+    }
+  }
+  return null;
+}
+
+// Carregar e renderizar vídeos (Aluno e Instrutor)
+async function loadVideos() {
+  const containerClass = document.getElementById('classroom-videos-list');
+  const containerInst = document.getElementById('instrutoria-videos-list');
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/videos`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+    const data = await res.json();
+
+    if (!data.success || !data.videos) return;
+
+    // 1. Renderizar para o Aluno (Modal da Biblioteca)
+    if (containerClass) {
+      if (data.videos.length === 0) {
+        containerClass.innerHTML = `<p style="color: var(--color-text-muted); font-size: 0.9rem; text-align: center; padding: 10px;">Nenhum vídeo demonstrativo disponível no momento.</p>`;
+      } else {
+        containerClass.innerHTML = data.videos.map(v => {
+          const videoId = getYouTubeIdAndValidate(v.url);
+
+          let mediaEmbed = '';
+          if (videoId) {
+            // Player responsivo do YouTube
+            mediaEmbed = `
+              <div style="position: relative; width: 100%; height: 0; padding-bottom: 56.25%; border-radius: 8px; overflow: hidden; background: #000; border: 1px solid rgba(255,255,255,0.1);">
+                <iframe src="https://www.youtube.com/embed/${videoId}" 
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                </iframe>
+              </div>
+            `;
+          } else {
+            // Outro link permitido (ex. Google Drive)
+            mediaEmbed = `
+              <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <i class="fa-solid fa-square-share-nodes" style="font-size: 2rem; color: var(--color-tactical-blue-light);"></i>
+                  <span style="font-size: 0.85rem; color: var(--color-text-muted);">Visualização externa do vídeo configurada.</span>
+                </div>
+                <a href="${v.url}" target="_blank" rel="noopener noreferrer" class="nav-btn" style="background: rgba(35, 123, 189, 0.2); border-color: var(--color-tactical-blue); color: var(--color-tactical-blue-light); text-decoration: none; padding: 8px 16px; border-radius: 6px; font-weight: 800;">
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i> Assistir Vídeo
+                </a>
+              </div>
+            `;
+          }
+
+          return `
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+              <div>
+                <strong style="color: #fff; font-size: 1.05rem; display: block; margin-bottom: 4px;">${v.titulo}</strong>
+                ${v.descricao ? `<span style="font-size: 0.85rem; color: var(--color-text-muted); display: block; line-height: 1.4;">${v.descricao}</span>` : ''}
+              </div>
+              ${mediaEmbed}
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // 2. Renderizar para o Instrutor (Painel do Instrutor)
+    if (containerInst) {
+      if (data.videos.length === 0) {
+        containerInst.innerHTML = `<p style="color: var(--color-text-muted); font-size: 0.85rem; text-align: center; padding: 10px;">Nenhum vídeo cadastrado.</p>`;
+      } else {
+        containerInst.innerHTML = data.videos.map(v => {
+          const isPublic = v.visivel_para === 'todos';
+          const badge = isPublic 
+            ? `<span style="background: rgba(34, 197, 94, 0.15); border: 1px solid #22c55e; color: #4ade80; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 800; margin-left: 8px;">🌐 Liberado para Alunos</span>`
+            : `<span style="background: rgba(245, 194, 61, 0.15); border: 1px solid #f5c23d; color: #f5c23d; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 800; margin-left: 8px;">🔒 Restrito Instrutoria</span>`;
+
+          return `
+            <div class="file-item-card" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <i class="fa-solid fa-video" style="font-size: 1.8rem; color: var(--color-gold-patch);"></i>
+                <div>
+                  <strong style="color: #fff; font-size: 0.95rem; display: flex; align-items: center;">${v.titulo} ${badge}</strong>
+                  <span style="font-size: 0.8rem; color: var(--color-text-muted); display: block; margin-top: 2px;">
+                    Ordem: ${v.ordem} &bull; ${v.url.substring(0, 50)}${v.url.length > 50 ? '...' : ''}
+                  </span>
+                </div>
+              </div>
+              <a href="${v.url}" target="_blank" rel="noopener noreferrer" class="nav-btn" style="background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.2); color: #fff; text-decoration: none; padding: 6px 12px; font-size: 0.8rem;">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Testar Link
+              </a>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+  } catch (err) {
+    console.error("Erro ao buscar vídeos demonstrativos:", err);
+  }
+}
+
+// Tratar envio de novo vídeo no Painel do Instrutor
+async function handleCadastrarVideo(e) {
+  e.preventDefault();
+
+  const titulo = document.getElementById('video-titulo').value.trim();
+  const url = document.getElementById('video-url').value.trim();
+  const descricao = document.getElementById('video-descricao').value.trim();
+  const visivel_para = document.getElementById('video-visibilidade').value;
+  const ordem = parseInt(document.getElementById('video-ordem').value) || 0;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/instrutoria/videos`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: JSON.stringify({ titulo, url, descricao, visivel_para, ordem })
+    });
+
+    const data = await res.json();
+    if (!data.success) {
+      alert(`❌ Erro ao cadastrar vídeo: ${data.message || data.error}`);
+      return;
+    }
+
+    alert("🎉 Vídeo demonstrativo cadastrado com sucesso!");
+    document.getElementById('form-cadastrar-video').reset();
+    loadVideos();
+
+  } catch (err) {
+    alert(`❌ Erro ao conectar com o servidor: ${err.message || err}`);
+  }
 }
 
 let cachedErrorQuestions = [];

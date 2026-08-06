@@ -332,6 +332,18 @@ def init_db():
                 );
             ''')
 
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS videos_ead (
+                    id SERIAL PRIMARY KEY,
+                    titulo TEXT NOT NULL,
+                    descricao TEXT,
+                    url TEXT NOT NULL,
+                    visivel_para TEXT DEFAULT 'todos',
+                    ordem INTEGER DEFAULT 0,
+                    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+            ''')
+
             # Inserir Usuário Instrutor Padronizado
             instrutor_pass = hash_password_pbkdf2('2gb2026')
             cur.execute('''
@@ -1016,7 +1028,23 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                     f_dict['visivel_para'] = 'todos' if any(k in fn_low for k in ['qts', 'manual', 'dip', 'salvamento']) else 'instrutor'
                 arquivos.append(f_dict)
 
-            return self.send_json({'success': True, 'arquivos': arquivos})
+        elif path == '/api/videos':
+            user = self.authenticate_request(required_role=['aluno', 'instrutor', 'admin'])
+            if not user:
+                return
+
+            conn = get_db()
+            cur = conn.cursor()
+            user_role = user.get('role', 'aluno')
+
+            if user_role in ('instrutor', 'admin'):
+                cur.execute("SELECT * FROM videos_ead ORDER BY ordem ASC, criado_em DESC")
+            else:
+                cur.execute("SELECT * FROM videos_ead WHERE (visivel_para = 'todos' OR visivel_para IS NULL) ORDER BY ordem ASC, criado_em DESC")
+
+            videos = [dict(r) for r in cur.fetchall()]
+            conn.close()
+            return self.send_json({'success': True, 'videos': videos})
 
         elif path == '/api/aluno/meu-progresso':
             user = self.authenticate_request(required_role=['aluno', 'instrutor', 'admin'])
@@ -1401,6 +1429,57 @@ class RBACPortalHandler(http.server.SimpleHTTPRequestHandler):
                     'error': 'Erro Interno',
                     'message': 'Ocorreu um erro no servidor ao salvar seu progresso. Procure a instrutoria.'
                 }, 500)
+
+        elif path == '/api/instrutoria/videos':
+            user = self.authenticate_request(required_role='instrutor')
+            if not user:
+                return
+
+            titulo = payload.get('titulo', '').strip()
+            descricao = payload.get('descricao', '').strip()
+            url = payload.get('url', '').strip()
+            visivel_para = payload.get('visivel_para', 'todos').strip()
+            ordem_val = payload.get('ordem', 0)
+
+            if not titulo or not url:
+                return self.send_json({'success': False, 'message': 'Título e URL são obrigatórios.'}, 400)
+
+            # Validação estrita da URL
+            import urllib.parse
+            try:
+                parsed_url = urllib.parse.urlparse(url)
+                if parsed_url.scheme not in ('http', 'https'):
+                    return self.send_json({'success': False, 'message': 'Protocolo de URL inválido. Apenas HTTP/HTTPS são aceitos.'}, 400)
+                
+                domain = parsed_url.netloc.lower()
+                allowed = False
+                for d in ('youtube.com', 'youtu.be', 'drive.google.com'):
+                    if domain == d or domain.endswith('.' + d):
+                        allowed = True
+                        break
+                
+                if not allowed:
+                    return self.send_json({'success': False, 'message': 'Domínio não permitido. Apenas links do YouTube ou Google Drive são aceitos.'}, 400)
+            except Exception:
+                return self.send_json({'success': False, 'message': 'URL em formato inválido.'}, 400)
+
+            # Garantir ordem numérica
+            try:
+                ordem = int(ordem_val)
+            except (TypeError, ValueError):
+                ordem = 0
+
+            # Salvar no banco
+            conn = get_db()
+            cur = conn.cursor()
+            cur.execute('''
+                INSERT INTO videos_ead (titulo, descricao, url, visivel_para, ordem)
+                VALUES (%s, %s, %s, %s, %s)
+            ''', (titulo, descricao, url, visivel_para, ordem))
+            conn.commit()
+            conn.close()
+
+            return self.send_json({'success': True, 'message': 'Vídeo cadastrado com sucesso!'})
 
         elif path == '/api/instrutoria/upload':
             user = self.authenticate_request(required_role='instrutor')
